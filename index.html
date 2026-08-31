@@ -4,7 +4,125 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Visão Gestor — Arroba Banda Larga (Jan-Jul 2026)</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+// === VISÃO ESTRATÉGICA ===
+var tercData=[
+{nome:"Weyderson",id:157,cor:"#f59e0b",monthly:[25,117,108,125,145,132,133],total:785,custo:39250,media:112.1},
+{nome:"Jose Edson",id:181,cor:"#3b82f6",monthly:[70,67,78,72,84,91,61],total:523,custo:26150,media:74.7},
+{nome:"Givaldo",id:213,cor:"#10b981",monthly:[64,56,64,61,52,74,70],total:441,custo:22050,media:63.0},
+{nome:"Salvador",id:149,cor:"#8b5cf6",monthly:[59,52,62,65,62,62,59],total:421,custo:21050,media:60.1}
+];
+var intData=[
+{nome:"Charles",id:214,cor:"#3b82f6",monthly:[0,4,27,30,28,8,2],total:99},
+{nome:"Tec.388",id:388,cor:"#10b981",monthly:[0,0,2,10,28,9,4],total:53},
+{nome:"Pedro H.",id:410,cor:"#ec4899",monthly:[0,0,3,6,3,2,0],total:14},
+{nome:"Tec.396",id:396,cor:"#f59e0b",monthly:[0,0,7,2,2,0,0],total:11},
+{nome:"Tec.382",id:382,cor:"#94a3b8",monthly:[0,1,0,1,0,0,0],total:2}
+];
+var tercTotalOS=0,intTotalOS=0;
+tercData.forEach(function(t){tercTotalOS+=t.total;});
+intData.forEach(function(t){intTotalOS+=t.total;});
+var grandTotal=tercTotalOS+intTotalOS;
+var tercCusto=tercTotalOS*50;
+var custoCLT=4475;
+var breakEven=Math.round(custoCLT/50);
+
+// Stat cards
+document.getElementById('statsEstrategica').innerHTML=
+'<div class="stat"><div class="stat-label">Total Instalações (7 meses)</div><div class="stat-value">'+grandTotal.toLocaleString('pt-BR')+'</div><div class="stat-sub">Setor 1 · Jan-Jul 2026</div></div>'
++'<div class="stat"><div class="stat-label">Custo Terceirizados</div><div class="stat-value">R$ '+tercCusto.toLocaleString('pt-BR')+'</div><div class="stat-sub">'+tercTotalOS+' OS × R$ 50</div></div>'
++'<div class="stat"><div class="stat-label">Participação Terceirizados</div><div class="stat-value">'+(tercTotalOS/grandTotal*100).toFixed(1)+'%</div><div class="stat-sub">Internos: '+(intTotalOS/grandTotal*100).toFixed(1)+'% ('+intTotalOS+' OS)</div></div>'
++'<div class="stat"><div class="stat-label">Break-Even (CLT vs Terc.)</div><div class="stat-value">'+breakEven+' OS/mês</div><div class="stat-sub">Custo CLT: R$ '+custoCLT+'/mês</div></div>';
+
+// Alert box
+var alertHtml='<div class="alert-title" style="color:var(--amber)">⚠️ Insights Estratégicos</div>';
+alertHtml+='<div class="alert-item">📊 Terceirizados fazem <strong>'+(tercTotalOS/grandTotal*100).toFixed(1)+'%</strong> das instalações ('+tercTotalOS+' de '+grandTotal+' OS) — custo de <strong>R$ '+tercCusto.toLocaleString('pt-BR')+'</strong> em 7 meses</div>';
+alertHtml+='<div class="alert-item">🟢 <strong>Weyderson</strong> (média '+112.1+' OS/mês) está acima do break-even ('+breakEven+' OS/mês) — CLT seria <strong>R$ 1.132/mês mais barato</strong></div>';
+alertHtml+='<div class="alert-item">🔴 <strong>Jose Edson, Givaldo e Salvador</strong> estão abaixo do break-even — terceirizado é mais barato no volume atual</div>';
+alertHtml+='<div class="alert-item">💰 Custo médio mensal com terceirizados: <strong>R$ '+(tercCusto/7).toLocaleString('pt-BR', {maximumFractionDigits:0})+'</strong> · Custo médio/OS instalado: <strong>R$ '+(tercCusto/tercTotalOS).toFixed(2)+'</strong></div>';
+alertHtml+='<div class="alert-item">🔄 Modelo híbrido (R$ 2.000 fixo + R$ 25/OS) reduz risco e garante qualidade — ver simulação abaixo</div>';
+document.getElementById('alertEstrategico').innerHTML=alertHtml;
+
+// Chart: OS by month - Third-party vs Internal
+var tercMonthly=[0,0,0,0,0,0,0];
+var intMonthly=[0,0,0,0,0,0,0];
+tercData.forEach(function(t){for(var i=0;i<7;i++){tercMonthly[i]+=t.monthly[i];}});
+intData.forEach(function(t){for(var i=0;i<7;i++){intMonthly[i]+=t.monthly[i];}});
+
+new Chart(document.getElementById('chartEstratOS'),{type:'bar',data:{labels:meses,datasets:[
+{label:'Terceirizados',data:tercMonthly,backgroundColor:'#f59e0b',borderRadius:4,stack:'a'},
+{label:'Internos',data:intMonthly,backgroundColor:'#3b82f6',borderRadius:4,stack:'a'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},title:{display:true,text:'OS Finalizadas'}}}}});
+
+// Chart: Monthly cost of third-party
+var custoMonthly=tercMonthly.map(function(v){return v*50;});
+new Chart(document.getElementById('chartEstratCusto'),{type:'line',data:{labels:meses,datasets:[
+{label:'Custo Terceirizados (R$)',data:custoMonthly,borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.1)',fill:true,tension:.3,pointRadius:4,pointBackgroundColor:'#f59e0b'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:colors.border},title:{display:true,text:'R$'}},x:{grid:{display:false}}}}});
+
+// Chart: OS by third-party tech
+new Chart(document.getElementById('chartEstratTechT'),{type:'bar',data:{labels:tercData.map(function(t){return t.nome;}),datasets:[{label:'OS Total',data:tercData.map(function(t){return t.total;}),backgroundColor:tercData.map(function(t){return t.cor;}),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:colors.border},beginAtZero:true},x:{grid:{display:false}}}}});
+
+// Chart: OS by internal tech
+new Chart(document.getElementById('chartEstratTechI'),{type:'bar',data:{labels:intData.map(function(t){return t.nome;}),datasets:[{label:'OS Total',data:intData.map(function(t){return t.total;}),backgroundColor:intData.map(function(t){return t.cor;}),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:colors.border},beginAtZero:true},x:{grid:{display:false}}}}});
+
+// Table: Third-party monthly breakdown
+var htmlT='<thead><tr><th>Técnico</th>';meses.forEach(function(m){htmlT+='<th>'+m+'</th>';});htmlT+='<th>Total</th><th>Custo (R$50/OS)</th><th>Média/mês</th></tr></thead><tbody>';
+tercData.forEach(function(t){htmlT+='<tr><td>'+t.nome+'</td>';t.monthly.forEach(function(v){htmlT+='<td>'+(v>0?v:'—')+'</td>';});htmlT+='<td><strong>'+t.total+'</strong></td><td>R$ '+t.custo.toLocaleString('pt-BR')+'</td><td>'+t.media.toFixed(1)+'</td></tr>';});
+var totT=tercData.reduce(function(s,t){return s+t.total;},0);
+htmlT+='<tr style="border-top:2px solid var(--border);font-weight:700"><td>TOTAL</td>';for(var i=0;i<7;i++){htmlT+='<td>'+tercMonthly[i]+'</td>';}htmlT+='<td>'+totT+'</td><td>R$ '+(totT*50).toLocaleString('pt-BR')+'</td><td>'+(totT/7).toFixed(1)+'</td></tr>';
+htmlT+='</tbody>';
+document.getElementById('tableEstratTerc').innerHTML=htmlT;
+
+// Table: Internal monthly breakdown
+var htmlI='<thead><tr><th>Técnico</th>';meses.forEach(function(m){htmlI+='<th>'+m+'</th>';});htmlI+='<th>Total</th><th>Média/mês</th></tr></thead><tbody>';
+intData.forEach(function(t){htmlI+='<tr><td>'+t.nome+'</td>';t.monthly.forEach(function(v){htmlI+='<td>'+(v>0?v:'—')+'</td>';});htmlI+='<td><strong>'+t.total+'</strong></td><td>'+(t.total/7).toFixed(1)+'</td></tr>';});
+htmlI+='<tr style="border-top:2px solid var(--border);font-weight:700"><td>TOTAL</td>';for(var i=0;i<7;i++){htmlI+='<td>'+intMonthly[i]+'</td>';}htmlI+='<td>'+intTotalOS+'</td><td>'+(intTotalOS/7).toFixed(1)+'</td></tr>';
+htmlI+='</tbody>';
+document.getElementById('tableEstratInt').innerHTML=htmlI;
+
+// Table: Break-even analysis
+var htmlBE='<thead><tr><th>Técnico</th><th>Média OS/mês</th><th>Custo Terc./mês</th><th>Custo CLT/mês</th><th>Diferença/mês</th><th>Diferença/7 meses</th><th>Recomendação</th></tr></thead><tbody>';
+tercData.forEach(function(t){
+var custoTerc=t.media*50;
+var diff=custoTerc-custoCLT;
+var diff7=diff*7;
+var rec=diff>0?'<span style="color:var(--green)">CLT mais barato</span>':'<span style="color:var(--amber)">Terc. mais barato</span>';
+htmlBE+='<tr><td>'+t.nome+'</td><td>'+t.media.toFixed(1)+'</td><td>R$ '+custoTerc.toLocaleString('pt-BR',{maximumFractionDigits:0})+'</td><td>R$ '+custoCLT.toLocaleString('pt-BR')+'</td><td style="color:'+(diff>0?'var(--green)':'var(--amber)')+'">'+(diff>0?'+':'')+'R$ '+Math.abs(diff).toLocaleString('pt-BR',{maximumFractionDigits:0})+'</td><td style="color:'+(diff>0?'var(--green)':'var(--amber)')+'">'+(diff7>0?'+':'')+'R$ '+Math.abs(diff7).toLocaleString('pt-BR',{maximumFractionDigits:0})+'</td><td>'+rec+'</td></tr>';
+});
+htmlBE+='</tbody>';
+document.getElementById('tableBreakEven').innerHTML=htmlBE;
+
+// Simulation: 3 scenarios
+var cenarios=[
+{nome:"Atual (100% Terc.)",desc:"R$ 50/OS · Sem fixo",custoTerc:tercCusto,custoCLT:0,total:tercCusto},
+{nome:"Híbrido (R$2K+R$25/OS)",desc:"Fixo R$ 2.000 + R$ 25/OS",custoTerc:0,custoCLT:4*2000*7,total:4*2000*7+tercTotalOS*25},
+{nome:"100% CLT",desc:"4 técnicos × R$ 4.475/mês",custoTerc:0,custoCLT:4*custoCLT*7,total:4*custoCLT*7},
+{nome:"Misto (2 CLT + 2 Terc.)",desc:"Weyderson+Jose CLT · Givaldo+Salvador Terc.",custoTerc:(441+421)*50,custoCLT:2*custoCLT*7,total:2*custoCLT*7+(441+421)*50}
+];
+
+// Chart: Simulation comparison
+new Chart(document.getElementById('chartSimulacao'),{type:'bar',data:{labels:cenarios.map(function(c){return c.nome;}),datasets:[
+{label:'Custo Terceirizado',data:cenarios.map(function(c){return c.custoTerc;}),backgroundColor:'#f59e0b',borderRadius:4},
+{label:'Custo CLT (Fixo)',data:cenarios.map(function(c){return c.custoCLT;}),backgroundColor:'#3b82f6',borderRadius:4}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},title:{display:true,text:'R$ (7 meses)'}}}}});
+
+// Table: Simulation details
+var htmlSim='<thead><tr><th>Cenário</th><th>Descrição</th><th>Custo Terc.</th><th>Custo CLT</th><th>Total (7 meses)</th><th>vs Atual</th></tr></thead><tbody>';
+var atualTotal=cenarios[0].total;
+cenarios.forEach(function(c){
+var diff=c.total-atualTotal;
+var pct=(diff/atualTotal*100).toFixed(1);
+var color=diff<0?'var(--green)':'var(--red)';
+var sign=diff<0?'-':'+';
+htmlSim+='<tr><td><strong>'+c.nome+'</strong></td><td>'+c.desc+'</td><td>R$ '+c.custoTerc.toLocaleString('pt-BR')+'</td><td>R$ '+c.custoCLT.toLocaleString('pt-BR')+'</td><td><strong>R$ '+c.total.toLocaleString('pt-BR')+'</strong></td><td style="color:'+color+'">'+sign+'R$ '+Math.abs(diff).toLocaleString('pt-BR')+' ('+pct+'%)</td></tr>';
+});
+htmlSim+='</tbody>';
+document.getElementById('tableSimulacao').innerHTML=htmlSim;
+
+// === FIM VISÃO ESTRATÉGICA ===
+
+</script>
 <style>
 :root{--bg:#0f172a;--card:#1e293b;--border:#334155;--text:#f1f5f9;--muted:#94a3b8;--primary:#3b82f6;--green:#10b981;--red:#ef4444;--amber:#f59e0b;--purple:#8b5cf6;--pink:#ec4899}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -57,6 +175,7 @@ tr:hover{background:rgba(59,130,246,.05)}
 <button class="tab" onclick="showTab('setores',this)">Setores</button>
 <button class="tab" onclick="showTab('combustivel',this)">Combustível</button>
 <button class="tab" onclick="showTab('analitico',this)">Custo Analítico</button>
+<button class="tab" onclick="showTab('estrategica',this)">Visão Estratégica</button>
 </div>
 <div id="tab-custo" class="tab-content active">
 <div class="stats" id="statsCusto"></div>
@@ -101,6 +220,23 @@ tr:hover{background:rgba(59,130,246,.05)}
 <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Combustível Detalhado — <span id="analiticoFuelTitle">Charles</span> (Dados Reais da Planilha)</div><table id="tableAnaliticoFuel"></table></div>
 </div>
 </div>
+
+<div id="tab-estrategica" class="tab-content">
+<div class="stats" id="statsEstrategica"></div>
+<div class="alert-box" id="alertEstrategico" style="background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.2)"></div>
+<div class="chart-container"><div class="chart-title">Instalações (Setor 1) por Mês — Terceirizados vs Internos</div><div class="chart-wrapper"><canvas id="chartEstratOS"></canvas></div></div>
+<div class="chart-container"><div class="chart-title">Custo Mensal com Terceirizados (R$ 50/OS)</div><div class="chart-wrapper-sm"><canvas id="chartEstratCusto"></canvas></div></div>
+<div class="grid-2">
+<div class="chart-container"><div class="chart-title">OS por Técnico — Terceirizados</div><div class="chart-wrapper-sm"><canvas id="chartEstratTechT"></canvas></div></div>
+<div class="chart-container"><div class="chart-title">OS por Técnico — Internos</div><div class="chart-wrapper-sm"><canvas id="chartEstratTechI"></canvas></div></div>
+</div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Instalações por Terceirizado — Mês a Mês</div><table id="tableEstratTerc"></table></div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Instalações por Interno — Mês a Mês</div><table id="tableEstratInt"></table></div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Análise Break-Even — CLT vs Terceirizado (R$ 50/OS)</div><table id="tableBreakEven"></table></div>
+<div class="chart-container"><div class="chart-title">Simulação de Cenários — Internalização dos Terceirizados</div><div class="chart-wrapper"><canvas id="chartSimulacao"></canvas></div></div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Simulação de Cenários — Custo Mensal por Modelo</div><table id="tableSimulacao"></table></div>
+</div>
+
 <div class="footer">Dados: IXC Web (API) + Planilha de Combustível (Bd_TickeckLOG) · Custo fixo: R$ 4.475,44/mês · Combustível: dados reais por abastecimento · Afastamento Jose Fernando (04/06): INSS · Setores 76 e 84 excluídos · Atualizado em 31/08/2026</div>
 <script>
 const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul"];
@@ -183,6 +319,124 @@ function renderAnalitico(){var t=techs.find(function(x){return x.nome===currentA
 var analiticoButtonsHtml='';techs.forEach(function(t,i){analiticoButtonsHtml+='<button class="tech-btn '+(i===0?'active':'')+'" onclick="selectAnaliticoTech(\''+t.nome+'\',this)">'+t.nome+'</button>';});document.getElementById('techSelectAnalitico').innerHTML=analiticoButtonsHtml;
 function selectAnaliticoTech(name,btn){currentAnaliticoTech=name;document.querySelectorAll('#techSelectAnalitico .tech-btn').forEach(function(b){b.classList.remove('active');});if(btn)btn.classList.add('active');renderAnalitico();}
 renderAnalitico();
+
+// === VISÃO ESTRATÉGICA ===
+var tercData=[
+{nome:"Weyderson",id:157,cor:"#f59e0b",monthly:[25,117,108,125,145,132,133],total:785,custo:39250,media:112.1},
+{nome:"Jose Edson",id:181,cor:"#3b82f6",monthly:[70,67,78,72,84,91,61],total:523,custo:26150,media:74.7},
+{nome:"Givaldo",id:213,cor:"#10b981",monthly:[64,56,64,61,52,74,70],total:441,custo:22050,media:63.0},
+{nome:"Salvador",id:149,cor:"#8b5cf6",monthly:[59,52,62,65,62,62,59],total:421,custo:21050,media:60.1}
+];
+var intData=[
+{nome:"Charles",id:214,cor:"#3b82f6",monthly:[0,4,27,30,28,8,2],total:99},
+{nome:"Tec.388",id:388,cor:"#10b981",monthly:[0,0,2,10,28,9,4],total:53},
+{nome:"Pedro H.",id:410,cor:"#ec4899",monthly:[0,0,3,6,3,2,0],total:14},
+{nome:"Tec.396",id:396,cor:"#f59e0b",monthly:[0,0,7,2,2,0,0],total:11},
+{nome:"Tec.382",id:382,cor:"#94a3b8",monthly:[0,1,0,1,0,0,0],total:2}
+];
+var tercTotalOS=0,intTotalOS=0;
+tercData.forEach(function(t){tercTotalOS+=t.total;});
+intData.forEach(function(t){intTotalOS+=t.total;});
+var grandTotal=tercTotalOS+intTotalOS;
+var tercCusto=tercTotalOS*50;
+var custoCLT=4475;
+var breakEven=Math.round(custoCLT/50);
+
+// Stat cards
+document.getElementById('statsEstrategica').innerHTML=
+'<div class="stat"><div class="stat-label">Total Instalações (7 meses)</div><div class="stat-value">'+grandTotal.toLocaleString('pt-BR')+'</div><div class="stat-sub">Setor 1 · Jan-Jul 2026</div></div>'
++'<div class="stat"><div class="stat-label">Custo Terceirizados</div><div class="stat-value">R$ '+tercCusto.toLocaleString('pt-BR')+'</div><div class="stat-sub">'+tercTotalOS+' OS × R$ 50</div></div>'
++'<div class="stat"><div class="stat-label">Participação Terceirizados</div><div class="stat-value">'+(tercTotalOS/grandTotal*100).toFixed(1)+'%</div><div class="stat-sub">Internos: '+(intTotalOS/grandTotal*100).toFixed(1)+'% ('+intTotalOS+' OS)</div></div>'
++'<div class="stat"><div class="stat-label">Break-Even (CLT vs Terc.)</div><div class="stat-value">'+breakEven+' OS/mês</div><div class="stat-sub">Custo CLT: R$ '+custoCLT+'/mês</div></div>';
+
+// Alert box
+var alertHtml='<div class="alert-title" style="color:var(--amber)">⚠️ Insights Estratégicos</div>';
+alertHtml+='<div class="alert-item">📊 Terceirizados fazem <strong>'+(tercTotalOS/grandTotal*100).toFixed(1)+'%</strong> das instalações ('+tercTotalOS+' de '+grandTotal+' OS) — custo de <strong>R$ '+tercCusto.toLocaleString('pt-BR')+'</strong> em 7 meses</div>';
+alertHtml+='<div class="alert-item">🟢 <strong>Weyderson</strong> (média '+112.1+' OS/mês) está acima do break-even ('+breakEven+' OS/mês) — CLT seria <strong>R$ 1.132/mês mais barato</strong></div>';
+alertHtml+='<div class="alert-item">🔴 <strong>Jose Edson, Givaldo e Salvador</strong> estão abaixo do break-even — terceirizado é mais barato no volume atual</div>';
+alertHtml+='<div class="alert-item">💰 Custo médio mensal com terceirizados: <strong>R$ '+(tercCusto/7).toLocaleString('pt-BR', {maximumFractionDigits:0})+'</strong> · Custo médio/OS instalado: <strong>R$ '+(tercCusto/tercTotalOS).toFixed(2)+'</strong></div>';
+alertHtml+='<div class="alert-item">🔄 Modelo híbrido (R$ 2.000 fixo + R$ 25/OS) reduz risco e garante qualidade — ver simulação abaixo</div>';
+document.getElementById('alertEstrategico').innerHTML=alertHtml;
+
+// Chart: OS by month - Third-party vs Internal
+var tercMonthly=[0,0,0,0,0,0,0];
+var intMonthly=[0,0,0,0,0,0,0];
+tercData.forEach(function(t){for(var i=0;i<7;i++){tercMonthly[i]+=t.monthly[i];}});
+intData.forEach(function(t){for(var i=0;i<7;i++){intMonthly[i]+=t.monthly[i];}});
+
+new Chart(document.getElementById('chartEstratOS'),{type:'bar',data:{labels:meses,datasets:[
+{label:'Terceirizados',data:tercMonthly,backgroundColor:'#f59e0b',borderRadius:4,stack:'a'},
+{label:'Internos',data:intMonthly,backgroundColor:'#3b82f6',borderRadius:4,stack:'a'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},title:{display:true,text:'OS Finalizadas'}}}}});
+
+// Chart: Monthly cost of third-party
+var custoMonthly=tercMonthly.map(function(v){return v*50;});
+new Chart(document.getElementById('chartEstratCusto'),{type:'line',data:{labels:meses,datasets:[
+{label:'Custo Terceirizados (R$)',data:custoMonthly,borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.1)',fill:true,tension:.3,pointRadius:4,pointBackgroundColor:'#f59e0b'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:colors.border},title:{display:true,text:'R$'}},x:{grid:{display:false}}}}});
+
+// Chart: OS by third-party tech
+new Chart(document.getElementById('chartEstratTechT'),{type:'bar',data:{labels:tercData.map(function(t){return t.nome;}),datasets:[{label:'OS Total',data:tercData.map(function(t){return t.total;}),backgroundColor:tercData.map(function(t){return t.cor;}),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:colors.border},beginAtZero:true},x:{grid:{display:false}}}}});
+
+// Chart: OS by internal tech
+new Chart(document.getElementById('chartEstratTechI'),{type:'bar',data:{labels:intData.map(function(t){return t.nome;}),datasets:[{label:'OS Total',data:intData.map(function(t){return t.total;}),backgroundColor:intData.map(function(t){return t.cor;}),borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:colors.border},beginAtZero:true},x:{grid:{display:false}}}}});
+
+// Table: Third-party monthly breakdown
+var htmlT='<thead><tr><th>Técnico</th>';meses.forEach(function(m){htmlT+='<th>'+m+'</th>';});htmlT+='<th>Total</th><th>Custo (R$50/OS)</th><th>Média/mês</th></tr></thead><tbody>';
+tercData.forEach(function(t){htmlT+='<tr><td>'+t.nome+'</td>';t.monthly.forEach(function(v){htmlT+='<td>'+(v>0?v:'—')+'</td>';});htmlT+='<td><strong>'+t.total+'</strong></td><td>R$ '+t.custo.toLocaleString('pt-BR')+'</td><td>'+t.media.toFixed(1)+'</td></tr>';});
+var totT=tercData.reduce(function(s,t){return s+t.total;},0);
+htmlT+='<tr style="border-top:2px solid var(--border);font-weight:700"><td>TOTAL</td>';for(var i=0;i<7;i++){htmlT+='<td>'+tercMonthly[i]+'</td>';}htmlT+='<td>'+totT+'</td><td>R$ '+(totT*50).toLocaleString('pt-BR')+'</td><td>'+(totT/7).toFixed(1)+'</td></tr>';
+htmlT+='</tbody>';
+document.getElementById('tableEstratTerc').innerHTML=htmlT;
+
+// Table: Internal monthly breakdown
+var htmlI='<thead><tr><th>Técnico</th>';meses.forEach(function(m){htmlI+='<th>'+m+'</th>';});htmlI+='<th>Total</th><th>Média/mês</th></tr></thead><tbody>';
+intData.forEach(function(t){htmlI+='<tr><td>'+t.nome+'</td>';t.monthly.forEach(function(v){htmlI+='<td>'+(v>0?v:'—')+'</td>';});htmlI+='<td><strong>'+t.total+'</strong></td><td>'+(t.total/7).toFixed(1)+'</td></tr>';});
+htmlI+='<tr style="border-top:2px solid var(--border);font-weight:700"><td>TOTAL</td>';for(var i=0;i<7;i++){htmlI+='<td>'+intMonthly[i]+'</td>';}htmlI+='<td>'+intTotalOS+'</td><td>'+(intTotalOS/7).toFixed(1)+'</td></tr>';
+htmlI+='</tbody>';
+document.getElementById('tableEstratInt').innerHTML=htmlI;
+
+// Table: Break-even analysis
+var htmlBE='<thead><tr><th>Técnico</th><th>Média OS/mês</th><th>Custo Terc./mês</th><th>Custo CLT/mês</th><th>Diferença/mês</th><th>Diferença/7 meses</th><th>Recomendação</th></tr></thead><tbody>';
+tercData.forEach(function(t){
+var custoTerc=t.media*50;
+var diff=custoTerc-custoCLT;
+var diff7=diff*7;
+var rec=diff>0?'<span style="color:var(--green)">CLT mais barato</span>':'<span style="color:var(--amber)">Terc. mais barato</span>';
+htmlBE+='<tr><td>'+t.nome+'</td><td>'+t.media.toFixed(1)+'</td><td>R$ '+custoTerc.toLocaleString('pt-BR',{maximumFractionDigits:0})+'</td><td>R$ '+custoCLT.toLocaleString('pt-BR')+'</td><td style="color:'+(diff>0?'var(--green)':'var(--amber)')+'">'+(diff>0?'+':'')+'R$ '+Math.abs(diff).toLocaleString('pt-BR',{maximumFractionDigits:0})+'</td><td style="color:'+(diff>0?'var(--green)':'var(--amber)')+'">'+(diff7>0?'+':'')+'R$ '+Math.abs(diff7).toLocaleString('pt-BR',{maximumFractionDigits:0})+'</td><td>'+rec+'</td></tr>';
+});
+htmlBE+='</tbody>';
+document.getElementById('tableBreakEven').innerHTML=htmlBE;
+
+// Simulation: 3 scenarios
+var cenarios=[
+{nome:"Atual (100% Terc.)",desc:"R$ 50/OS · Sem fixo",custoTerc:tercCusto,custoCLT:0,total:tercCusto},
+{nome:"Híbrido (R$2K+R$25/OS)",desc:"Fixo R$ 2.000 + R$ 25/OS",custoTerc:0,custoCLT:4*2000*7,total:4*2000*7+tercTotalOS*25},
+{nome:"100% CLT",desc:"4 técnicos × R$ 4.475/mês",custoTerc:0,custoCLT:4*custoCLT*7,total:4*custoCLT*7},
+{nome:"Misto (2 CLT + 2 Terc.)",desc:"Weyderson+Jose CLT · Givaldo+Salvador Terc.",custoTerc:(441+421)*50,custoCLT:2*custoCLT*7,total:2*custoCLT*7+(441+421)*50}
+];
+
+// Chart: Simulation comparison
+new Chart(document.getElementById('chartSimulacao'),{type:'bar',data:{labels:cenarios.map(function(c){return c.nome;}),datasets:[
+{label:'Custo Terceirizado',data:cenarios.map(function(c){return c.custoTerc;}),backgroundColor:'#f59e0b',borderRadius:4},
+{label:'Custo CLT (Fixo)',data:cenarios.map(function(c){return c.custoCLT;}),backgroundColor:'#3b82f6',borderRadius:4}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},title:{display:true,text:'R$ (7 meses)'}}}}});
+
+// Table: Simulation details
+var htmlSim='<thead><tr><th>Cenário</th><th>Descrição</th><th>Custo Terc.</th><th>Custo CLT</th><th>Total (7 meses)</th><th>vs Atual</th></tr></thead><tbody>';
+var atualTotal=cenarios[0].total;
+cenarios.forEach(function(c){
+var diff=c.total-atualTotal;
+var pct=(diff/atualTotal*100).toFixed(1);
+var color=diff<0?'var(--green)':'var(--red)';
+var sign=diff<0?'-':'+';
+htmlSim+='<tr><td><strong>'+c.nome+'</strong></td><td>'+c.desc+'</td><td>R$ '+c.custoTerc.toLocaleString('pt-BR')+'</td><td>R$ '+c.custoCLT.toLocaleString('pt-BR')+'</td><td><strong>R$ '+c.total.toLocaleString('pt-BR')+'</strong></td><td style="color:'+color+'">'+sign+'R$ '+Math.abs(diff).toLocaleString('pt-BR')+' ('+pct+'%)</td></tr>';
+});
+htmlSim+='</tbody>';
+document.getElementById('tableSimulacao').innerHTML=htmlSim;
+
+// === FIM VISÃO ESTRATÉGICA ===
+
 </script>
 </body>
 </html>
