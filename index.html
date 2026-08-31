@@ -28,8 +28,7 @@ h1{font-size:1.4rem;margin-bottom:4px}
 .chart-wrapper-sm{position:relative;height:220px}
 .chart-wrapper-lg{position:relative;height:400px}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
-@media(max-width:768px){.grid-2,.grid-3{grid-template-columns:1fr}}
+@media(max-width:768px){.grid-2{grid-template-columns:1fr}}
 table{width:100%;border-collapse:collapse;font-size:.75rem}
 th{text-align:right;padding:8px 6px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);text-transform:uppercase;font-size:.625rem;letter-spacing:.03em;white-space:nowrap}
 th:first-child,td:first-child{text-align:left}
@@ -50,55 +49,53 @@ tr:hover{background:rgba(59,130,246,.05)}
 <body>
 <h1>Visão Gestor — Manutenção Cliente</h1>
 <p class="subtitle">Arroba Banda Larga · Janeiro a Julho 2026 · 5 Técnicos · Custo proporcional por dias trabalhados · Setores 76 e 84 excluídos</p>
-
 <div class="tabs">
-  <button class="tab active" onclick="showTab('custo')">Custo</button>
-  <button class="tab" onclick="showTab('setores')">Setores</button>
-  <button class="tab" onclick="showTab('combustivel')">Combustível</button>
+<button class="tab active" onclick="showTab('custo',this)">Custo</button>
+<button class="tab" onclick="showTab('setores',this)">Setores</button>
+<button class="tab" onclick="showTab('combustivel',this)">Combustível</button>
 </div>
 
 <!-- TAB 1: CUSTO -->
 <div id="tab-custo" class="tab-content active">
-  <div class="stats" id="statsCusto"></div>
-  <div class="chart-container"><div class="chart-title">Custo Mensal — Fixo vs Combustível</div><div class="chart-wrapper"><canvas id="chartCost"></canvas></div></div>
-  <div class="grid-2">
-    <div class="chart-container"><div class="chart-title">OS por Mês</div><div class="chart-wrapper-sm"><canvas id="chartOS"></canvas></div></div>
-    <div class="chart-container"><div class="chart-title">Custo/OS — Evolução Mensal</div><div class="chart-wrapper-sm"><canvas id="chartCPOS"></canvas></div></div>
-  </div>
-  <div class="chart-container"><div class="chart-title">Custo Total por Técnico</div><div class="chart-wrapper-sm"><canvas id="chartTechCost"></canvas></div></div>
-  <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Detalhamento por Técnico — Mês a Mês</div><table id="tableTech"></table></div>
-  <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Resumo por Técnico (7 meses)</div><table id="tableSummary"></table></div>
-  <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Resumo Mensal da Equipe</div><table id="tableMonthly"></table></div>
+<div class="stats" id="statsCusto"></div>
+<div class="chart-container"><div class="chart-title">Custo Mensal — Fixo vs Combustível</div><div class="chart-wrapper"><canvas id="chartCost"></canvas></div></div>
+<div class="grid-2">
+<div class="chart-container"><div class="chart-title">OS por Mês</div><div class="chart-wrapper-sm"><canvas id="chartOS"></canvas></div></div>
+<div class="chart-container"><div class="chart-title">Custo/OS — Evolução Mensal</div><div class="chart-wrapper-sm"><canvas id="chartCPOS"></canvas></div></div>
+</div>
+<div class="chart-container"><div class="chart-title">Custo Total por Técnico</div><div class="chart-wrapper-sm"><canvas id="chartTechCost"></canvas></div></div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Detalhamento por Técnico — Mês a Mês</div><table id="tableTech"></table></div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Resumo por Técnico (7 meses)</div><table id="tableSummary"></table></div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Resumo Mensal da Equipe</div><table id="tableMonthly"></table></div>
 </div>
 
 <!-- TAB 2: SETORES -->
 <div id="tab-setores" class="tab-content">
-  <div class="stats" id="statsSetores"></div>
-  <div class="chart-container"><div class="chart-title">Distribuição de OS por Setor — Por Técnico</div><div class="chart-wrapper-lg"><canvas id="chartSector"></canvas></div></div>
-  <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Resumo de Setores por Técnico</div><table id="tableSectorSummary"></table></div>
-  <div class="chart-container"><div class="chart-title">Setores por Técnico — Mês a Mês</div>
-    <div class="tech-select" id="techSelectSetores"></div>
-    <div style="overflow-x:auto"><table id="tableSectorMonthly"></table></div>
-  </div>
-  <div class="chart-container"><div class="chart-title">Evolução de Setores por Mês — <span id="sectorTechName">Charles</span></div><div class="chart-wrapper"><canvas id="chartSectorMonthly"></canvas></div></div>
+<div class="stats" id="statsSetores"></div>
+<div class="chart-container"><div class="chart-title">Distribuição de OS por Setor — Por Técnico</div><div class="chart-wrapper-lg"><canvas id="chartSector"></canvas></div></div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Resumo de Setores por Técnico</div><table id="tableSectorSummary"></table></div>
+<div class="chart-container"><div class="chart-title">Setores por Técnico — Mês a Mês</div>
+<div class="tech-select" id="techSelectSetores"></div>
+<div style="overflow-x:auto"><table id="tableSectorMonthly"></table></div>
+</div>
+<div class="chart-container"><div class="chart-title">Evolução de Setores — <span id="sectorTechName">Charles</span></div><div class="chart-wrapper"><canvas id="chartSectorMonthly"></canvas></div></div>
 </div>
 
 <!-- TAB 3: COMBUSTÍVEL -->
 <div id="tab-combustivel" class="tab-content">
-  <div class="stats" id="statsFuel"></div>
-  <div class="chart-container"><div class="chart-title">Combustível por Técnico — Mês a Mês (R$)</div><div class="chart-wrapper"><canvas id="chartFuelMonthly"></canvas></div></div>
-  <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Combustível por Técnico — Detalhamento Mensal</div><table id="tableFuelMonthly"></table></div>
-  <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Resumo de Combustível por Técnico</div><table id="tableFuelSummary"></table></div>
-  <div class="section-note">⚠ Dados de litros estimados a partir do custo total dividido pelo preço médio (R$ 6,71/litro). Para dados reais de litros por abastecimento, KM rodados e deslocamento por técnico, é necessário importar a planilha de combustível.</div>
+<div class="stats" id="statsFuel"></div>
+<div class="chart-container"><div class="chart-title">Combustível por Técnico — Mês a Mês (R$)</div><div class="chart-wrapper"><canvas id="chartFuelMonthly"></canvas></div></div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Combustível por Técnico — Detalhamento Mensal</div><table id="tableFuelMonthly"></table></div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Resumo de Combustível por Técnico</div><table id="tableFuelSummary"></table></div>
+<div class="section-note">⚠ Dados de litros estimados: custo / preço médio (R$ 6,71/litro). Para KM rodados e deslocamento por técnico, é necessário importar a planilha de combustível.</div>
 </div>
 
-<div class="footer">Dados: IXC Web (API) · Combustível: planilha de abastecimento (estimado proporcional) · Custo fixo: R$ 4.475,44/mês (salário+encargos+veículo) · Afastamento Jose Fernando (06/04): coberto pelo INSS · Setores 76 e 84 excluídos · Atualizado em 31/08/2026</div>
+<div class="footer">Dados: IXC Web (API) · Combustível: planilha (estimado proporcional) · Custo fixo: R$ 4.475,44/mês · Afastamento Jose Fernando (04/06): INSS · Setores 76 e 84 excluídos · Atualizado em 31/08/2026</div>
 
 <script>
 const FIXO = 4475.44;
 const avgPricePerLiter = 6.715;
 const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul'];
-const EXCLUDE_SECTORS = ['76','84'];
 
 const techs = [
   {nome:'Charles',cor:'#3b82f6',veiculo:'SQX7G99 (Argo)',inicio:'01/01',fim:'31/07',fixoMonths:7.0,osTotal:804,fuelTotal:6069.17,fixoTotal:31328.08,litros:903.8},
@@ -124,10 +121,9 @@ const fixoMonthly = {
   'Pedro Henrique':[0,1437.37,4475.44,4475.44,4475.44,4475.44,4475.44]
 };
 
-// Calculate fuel per month per tech (proportional to OS)
 const fuelMonthly = {};
-techs.forEach(t => {
-  fuelMonthly[t.nome] = meses.map((m,i) => {
+techs.forEach(function(t) {
+  fuelMonthly[t.nome] = meses.map(function(m,i) {
     if(t.osTotal > 0 && osMonthly[t.nome][i] > 0) {
       return t.fuelTotal * (osMonthly[t.nome][i] / t.osTotal);
     }
@@ -135,74 +131,71 @@ techs.forEach(t => {
   });
 });
 
-// Monthly totals
-const monthlyTotals = meses.map((m,i) => {
-  let os=0,fixo=0,fuel=0,ativos=0;
-  techs.forEach(t => {
+const monthlyTotals = meses.map(function(m,i) {
+  var os=0,fixo=0,fuel=0,ativos=0;
+  techs.forEach(function(t) {
     os += osMonthly[t.nome][i];
     fixo += fixoMonthly[t.nome][i];
     fuel += fuelMonthly[t.nome][i];
     if(osMonthly[t.nome][i] > 0) ativos++;
   });
-  return {mes:m,os,fixo,fuel,total:fixo+fuel,cpos:os>0?(fixo+fuel)/os:0,ativos};
+  return {mes:m,os:os,fixo:fixo,fuel:fuel,total:fixo+fuel,cpos:os>0?(fixo+fuel)/os:0,ativos:ativos};
 });
 
-// Grand totals
-const grandOS = techs.reduce((s,t)=>s+t.osTotal,0);
-const grandFixo = techs.reduce((s,t)=>s+t.fixoTotal,0);
-const grandFuel = techs.reduce((s,t)=>s+t.fuelTotal,0);
-const grandTotal = grandFixo + grandFuel;
-const grandCPOS = grandTotal / grandOS;
+var grandOS = techs.reduce(function(s,t){return s+t.osTotal;},0);
+var grandFixo = techs.reduce(function(s,t){return s+t.fixoTotal;},0);
+var grandFuel = techs.reduce(function(s,t){return s+t.fuelTotal;},0);
+var grandTotal = grandFixo + grandFuel;
+var grandCPOS = grandTotal / grandOS;
 
 Chart.defaults.color = '#94a3b8';
 Chart.defaults.font.family = '-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif';
 Chart.defaults.font.size = 11;
 
 // === TAB SWITCH ===
-function showTab(name) {
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
   document.getElementById('tab-'+name).classList.add('active');
-  event.target.classList.add('active');
+  if(btn) btn.classList.add('active');
 }
 
 // === TAB 1: CUSTO ===
-document.getElementById('statsCusto').innerHTML = `
-  <div class="stat"><div class="stat-label">Custo Total (7 meses)</div><div class="stat-value">R$ ${grandTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div class="stat-sub">Fixo: R$ ${grandFixo.toLocaleString('pt-BR',{minimumFractionDigits:0})} + Combustível: R$ ${grandFuel.toLocaleString('pt-BR',{minimumFractionDigits:0})}</div></div>
-  <div class="stat"><div class="stat-label">Total de OS</div><div class="stat-value">${grandOS.toLocaleString('pt-BR')}</div><div class="stat-sub">Excluindo setores 76 e 84</div></div>
-  <div class="stat"><div class="stat-label">Custo por OS</div><div class="stat-value">R$ ${grandCPOS.toFixed(2)}</div><div class="stat-sub">Média geral da equipe</div></div>
-  <div class="stat"><div class="stat-label">Custo Mensal Médio</div><div class="stat-value">R$ ${(grandTotal/7).toLocaleString('pt-BR',{minimumFractionDigits:0})}</div><div class="stat-sub">Inclui meses com equipe reduzida</div></div>
-`;
+document.getElementById('statsCusto').innerHTML =
+  '<div class="stat"><div class="stat-label">Custo Total (7 meses)</div><div class="stat-value">R$ ' + grandTotal.toLocaleString('pt-BR',{minimumFractionDigits:2}) + '</div><div class="stat-sub">Fixo: R$ ' + grandFixo.toLocaleString('pt-BR',{minimumFractionDigits:0}) + ' + Combustível: R$ ' + grandFuel.toLocaleString('pt-BR',{minimumFractionDigits:0}) + '</div></div>' +
+  '<div class="stat"><div class="stat-label">Total de OS</div><div class="stat-value">' + grandOS.toLocaleString('pt-BR') + '</div><div class="stat-sub">Excluindo setores 76 e 84</div></div>' +
+  '<div class="stat"><div class="stat-label">Custo por OS</div><div class="stat-value">R$ ' + grandCPOS.toFixed(2) + '</div><div class="stat-sub">Média geral da equipe</div></div>' +
+  '<div class="stat"><div class="stat-label">Custo Mensal Médio</div><div class="stat-value">R$ ' + (grandTotal/7).toLocaleString('pt-BR',{minimumFractionDigits:0}) + '</div><div class="stat-sub">Inclui meses com equipe reduzida</div></div>';
 
-const colors = {primary:'#3b82f6',green:'#10b981',amber:'#f59e0b',border:'#334155'};
+var colors = {primary:'#3b82f6',green:'#10b981',amber:'#f59e0b',border:'#334155'};
 
-new Chart(document.getElementById('chartCost'),{type:'bar',data:{labels:monthlyTotals.map(m=>m.mes),datasets:[
-  {label:'Custo Fixo',data:monthlyTotals.map(m=>m.fixo),backgroundColor:colors.primary,borderRadius:4,stack:'a'},
-  {label:'Combustível',data:monthlyTotals.map(m=>m.fuel),backgroundColor:colors.green,borderRadius:4,stack:'a'}
-]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:c=>c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2})}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:v=>'R$ '+(v/1000).toFixed(0)+'k'}}}}});
+new Chart(document.getElementById('chartCost'),{type:'bar',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[
+  {label:'Custo Fixo',data:monthlyTotals.map(function(m){return m.fixo;}),backgroundColor:colors.primary,borderRadius:4,stack:'a'},
+  {label:'Combustível',data:monthlyTotals.map(function(m){return m.fuel;}),backgroundColor:colors.green,borderRadius:4,stack:'a'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'k';}}}}}});
 
-new Chart(document.getElementById('chartOS'),{type:'line',data:{labels:monthlyTotals.map(m=>m.mes),datasets:[{label:'OS/mês',data:monthlyTotals.map(m=>m.os),borderColor:colors.primary,backgroundColor:'rgba(59,130,246,0.1)',fill:true,tension:.3,pointRadius:5,pointBackgroundColor:colors.primary}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:colors.border}}}}});
+new Chart(document.getElementById('chartOS'),{type:'line',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[{label:'OS/mês',data:monthlyTotals.map(function(m){return m.os;}),borderColor:colors.primary,backgroundColor:'rgba(59,130,246,0.1)',fill:true,tension:.3,pointRadius:5,pointBackgroundColor:colors.primary}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:colors.border}}}}});
 
-new Chart(document.getElementById('chartCPOS'),{type:'line',data:{labels:monthlyTotals.map(m=>m.mes),datasets:[{label:'Custo/OS',data:monthlyTotals.map(m=>m.cpos),borderColor:colors.amber,backgroundColor:'rgba(245,158,11,0.1)',fill:true,tension:.3,pointRadius:5,pointBackgroundColor:colors.amber}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:colors.border},ticks:{callback:v=>'R$ '+v.toFixed(0)}}}}});
+new Chart(document.getElementById('chartCPOS'),{type:'line',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[{label:'Custo/OS',data:monthlyTotals.map(function(m){return m.cpos;}),borderColor:colors.amber,backgroundColor:'rgba(245,158,11,0.1)',fill:true,tension:.3,pointRadius:5,pointBackgroundColor:colors.amber}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+v.toFixed(0);}}}}}});
 
-new Chart(document.getElementById('chartTechCost'),{type:'bar',data:{labels:techs.map(t=>t.nome),datasets:[
-  {label:'Custo Fixo',data:techs.map(t=>t.fixoTotal),backgroundColor:colors.primary,borderRadius:4,stack:'a'},
-  {label:'Combustível',data:techs.map(t=>t.fuelTotal),backgroundColor:colors.green,borderRadius:4,stack:'a'}
-]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:c=>c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2})}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:v=>'R$ '+(v/1000).toFixed(0)+'k'}}}}});
+new Chart(document.getElementById('chartTechCost'),{type:'bar',data:{labels:techs.map(function(t){return t.nome;}),datasets:[
+  {label:'Custo Fixo',data:techs.map(function(t){return t.fixoTotal;}),backgroundColor:colors.primary,borderRadius:4,stack:'a'},
+  {label:'Combustível',data:techs.map(function(t){return t.fuelTotal;}),backgroundColor:colors.green,borderRadius:4,stack:'a'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'k';}}}}}});
 
 // Table: Tech monthly detail
-let htmlTech = '<thead><tr><th>Técnico</th><th>Mês</th><th>OS</th><th>Custo Fixo</th><th>Combustível</th><th>Custo Total</th><th>Custo/OS</th><th>Status</th></tr></thead><tbody>';
-techs.forEach(t => {
-  meses.forEach((m,i) => {
-    const os = osMonthly[t.nome][i];
-    const fixo = fixoMonthly[t.nome][i];
-    const fuel = fuelMonthly[t.nome][i];
-    const total = fixo + fuel;
-    const cpos = os > 0 ? total/os : 0;
-    const isAfastado = t.afastado && t.afastado.includes(i);
-    const status = isAfastado ? '<span class="badge badge-away">AFASTADO</span>' : (os > 0 ? '<span class="badge badge-active">ATIVO</span>' : '<span class="badge badge-inactive">—</span>');
+var htmlTech = '<thead><tr><th>Técnico</th><th>Mês</th><th>OS</th><th>Custo Fixo</th><th>Combustível</th><th>Custo Total</th><th>Custo/OS</th><th>Status</th></tr></thead><tbody>';
+techs.forEach(function(t) {
+  meses.forEach(function(m,i) {
+    var os = osMonthly[t.nome][i];
+    var fixo = fixoMonthly[t.nome][i];
+    var fuel = fuelMonthly[t.nome][i];
+    var total = fixo + fuel;
+    var cpos = os > 0 ? total/os : 0;
+    var isAfastado = t.afastado && t.afastado.indexOf(i) >= 0;
+    var status = isAfastado ? '<span class="badge badge-away">AFASTADO</span>' : (os > 0 ? '<span class="badge badge-active">ATIVO</span>' : '<span class="badge badge-inactive">—</span>');
     if(os > 0 || fixo > 0 || isAfastado) {
-      htmlTech += `<tr><td>${t.nome}</td><td>${m}</td><td>${os||'—'}</td><td>R$ ${fixo.toFixed(2)}</td><td>${fuel>0?'R$ '+fuel.toFixed(2):'—'}</td><td>R$ ${total.toFixed(2)}</td><td>${os>0?'R$ '+cpos.toFixed(2):'—'}</td><td>${status}</td></tr>`;
+      htmlTech += '<tr><td>' + t.nome + '</td><td>' + m + '</td><td>' + (os||'—') + '</td><td>R$ ' + fixo.toFixed(2) + '</td><td>' + (fuel>0?'R$ '+fuel.toFixed(2):'—') + '</td><td>R$ ' + total.toFixed(2) + '</td><td>' + (os>0?'R$ '+cpos.toFixed(2):'—') + '</td><td>' + status + '</td></tr>';
     }
   });
 });
@@ -210,26 +203,26 @@ htmlTech += '</tbody>';
 document.getElementById('tableTech').innerHTML = htmlTech;
 
 // Table: Summary per tech
-let htmlSum = '<thead><tr><th>Técnico</th><th>Período</th><th>Meses Fixo</th><th>OS Total</th><th>Média OS/mês</th><th>Custo Fixo</th><th>Combustível</th><th>Custo Total</th><th>Custo/OS</th></tr></thead><tbody>';
-techs.forEach(t => {
-  const total = t.fixoTotal + t.fuelTotal;
-  const cpos = total / t.osTotal;
-  const activeMonths = osMonthly[t.nome].filter(o => o > 0).length;
-  htmlSum += `<tr><td>${t.nome}</td><td>${t.inicio}–${t.fim}</td><td>${t.fixoMonths.toFixed(2)}</td><td>${t.osTotal}</td><td>${(t.osTotal/activeMonths).toFixed(0)}</td><td>R$ ${t.fixoTotal.toFixed(2)}</td><td>R$ ${t.fuelTotal.toFixed(2)}</td><td>R$ ${total.toFixed(2)}</td><td>R$ ${cpos.toFixed(2)}</td></tr>`;
+var htmlSum = '<thead><tr><th>Técnico</th><th>Período</th><th>Meses Fixo</th><th>OS Total</th><th>Média OS/mês</th><th>Custo Fixo</th><th>Combustível</th><th>Custo Total</th><th>Custo/OS</th></tr></thead><tbody>';
+techs.forEach(function(t) {
+  var total = t.fixoTotal + t.fuelTotal;
+  var cpos = total / t.osTotal;
+  var activeMonths = osMonthly[t.nome].filter(function(o){return o > 0;}).length;
+  htmlSum += '<tr><td>' + t.nome + '</td><td>' + t.inicio + '–' + t.fim + '</td><td>' + t.fixoMonths.toFixed(2) + '</td><td>' + t.osTotal + '</td><td>' + (t.osTotal/activeMonths).toFixed(0) + '</td><td>R$ ' + t.fixoTotal.toFixed(2) + '</td><td>R$ ' + t.fuelTotal.toFixed(2) + '</td><td>R$ ' + total.toFixed(2) + '</td><td>R$ ' + cpos.toFixed(2) + '</td></tr>';
 });
 htmlSum += '</tbody>';
 document.getElementById('tableSummary').innerHTML = htmlSum;
 
 // Table: Monthly totals
-let htmlMonth = '<thead><tr><th>Mês</th><th>OS Total</th><th>Custo Fixo</th><th>Combustível</th><th>Custo Total</th><th>Custo/OS</th><th>Técnicos Ativos</th></tr></thead><tbody>';
-monthlyTotals.forEach(m => {
-  htmlMonth += `<tr><td>${m.mes}</td><td>${m.os}</td><td>R$ ${m.fixo.toFixed(2)}</td><td>R$ ${m.fuel.toFixed(2)}</td><td>R$ ${m.total.toFixed(2)}</td><td>R$ ${m.cpos.toFixed(2)}</td><td>${m.ativos}</td></tr>`;
+var htmlMonth = '<thead><tr><th>Mês</th><th>OS Total</th><th>Custo Fixo</th><th>Combustível</th><th>Custo Total</th><th>Custo/OS</th><th>Técnicos Ativos</th></tr></thead><tbody>';
+monthlyTotals.forEach(function(m) {
+  htmlMonth += '<tr><td>' + m.mes + '</td><td>' + m.os + '</td><td>R$ ' + m.fixo.toFixed(2) + '</td><td>R$ ' + m.fuel.toFixed(2) + '</td><td>R$ ' + m.total.toFixed(2) + '</td><td>R$ ' + m.cpos.toFixed(2) + '</td><td>' + m.ativos + '</td></tr>';
 });
 htmlMonth += '</tbody>';
 document.getElementById('tableMonthly').innerHTML = htmlMonth;
 
 // === TAB 2: SETORES ===
-const sectorNames = {
+var sectorNames = {
   '1':'Instalação','3':'Atend. Financeiro','5':'Setor 5','13':'Serviço Interno',
   '20':'Estoque','21':'Crescimento de Rede','22':'Manut. Rede','23':'Manut. Cliente',
   '24':'Suporte Técnico','28':'Controlador Manut.','30':'Garantia da Experiência',
@@ -237,192 +230,197 @@ const sectorNames = {
   '58':'Setor 58','62':'Melhoria de Rede','63':'Logística','70':'Separação Materiais'
 };
 
-const techSectorSummary = {"Charles": {"23": 595, "13": 45, "20": 5, "63": 20, "24": 3, "1": 99, "51": 29, "39": 4, "5": 2, "30": 1, "31": 1, "28": 1}, "Jose Fernando": {"23": 602, "63": 29, "13": 44, "51": 46, "1": 2}, "Carlos Arthur": {"30": 1092, "1": 13, "5": 5, "20": 8, "3": 7, "51": 16, "58": 1, "31": 1, "23": 202, "13": 17, "70": 4}, "Marcos Paulo": {"39": 36, "51": 63, "23": 711, "13": 86, "63": 29, "1": 62, "34": 1, "24": 1, "70": 4}, "Pedro Henrique": {"23": 711, "13": 54, "1": 16, "24": 2, "63": 24, "51": 43, "39": 1, "70": 1}};
-const techMonthlySectors = {"Charles": {"Jan": {"23": 121, "13": 4, "20": 2, "63": 4}, "Fev": {"23": 87, "13": 9, "24": 2, "1": 6, "63": 2, "51": 4, "20": 2}, "Mar": {"23": 54, "13": 10, "1": 30, "39": 2, "5": 2, "63": 3, "30": 1, "31": 1}, "Abr": {"13": 5, "23": 34, "51": 5, "1": 26, "24": 1, "63": 2, "20": 1, "39": 1}, "Mai": {"23": 60, "1": 29, "63": 4, "13": 4, "51": 11, "39": 1}, "Jun": {"1": 6, "23": 111, "63": 4, "13": 9, "51": 2}, "Jul": {"23": 127, "13": 4, "51": 7, "1": 2, "28": 1, "63": 1}}, "Jose Fernando": {"Jan": {"23": 54, "63": 1, "13": 6, "51": 1}, "Fev": {"23": 124, "51": 7, "13": 10, "63": 5, "1": 1}, "Mar": {"23": 137, "13": 12, "63": 6, "51": 5}, "Abr": {"51": 17, "23": 132, "63": 8, "13": 6, "1": 1}, "Mai": {"23": 137, "51": 16, "13": 8, "63": 7}, "Jun": {"63": 2, "23": 18, "13": 2}, "Jul": {}}, "Carlos Arthur": {"Jan": {}, "Fev": {"30": 139, "1": 2}, "Mar": {"30": 399, "1": 5, "5": 5, "20": 6, "3": 5, "51": 1, "58": 1}, "Abr": {"30": 244, "1": 3, "3": 2, "31": 1}, "Mai": {"30": 203, "20": 2, "23": 1, "51": 3, "1": 1}, "Jun": {"30": 107}, "Jul": {"51": 5, "23": 93, "13": 9, "70": 1}}, "Marcos Paulo": {"Jan": {"39": 3, "51": 1, "23": 2}, "Fev": {"23": 51, "39": 3, "51": 5, "13": 4}, "Mar": {"23": 111, "13": 24, "39": 14, "63": 6, "51": 3, "1": 2, "34": 1}, "Abr": {"23": 91, "39": 16, "51": 12, "1": 13, "13": 12, "63": 4, "24": 1}, "Mai": {"23": 92, "1": 28, "13": 16, "63": 7, "51": 22}, "Jun": {"23": 119, "51": 9, "13": 9, "63": 6, "1": 6}, "Jul": {"13": 13, "23": 151, "51": 8, "1": 8, "70": 2, "63": 2}}, "Pedro Henrique": {"Jan": {}, "Fev": {"23": 1}, "Mar": {"23": 35, "13": 3, "1": 6}, "Abr": {"13": 8, "23": 103, "24": 1, "63": 5, "1": 3, "51": 11, "39": 1}, "Mai": {"23": 125, "63": 8, "13": 13, "51": 17, "1": 4, "24": 1}, "Jun": {"23": 142, "13": 4, "51": 6, "1": 1, "63": 7}, "Jul": {"13": 20, "23": 177, "63": 2, "51": 7}}};
+var techSectorSummary = {"Charles": {"23": 595, "13": 45, "20": 5, "63": 20, "24": 3, "1": 99, "51": 29, "39": 4, "5": 2, "30": 1, "31": 1, "28": 1}, "Jose Fernando": {"23": 602, "63": 29, "13": 44, "51": 46, "1": 2}, "Carlos Arthur": {"30": 1092, "1": 13, "5": 5, "20": 8, "3": 7, "51": 16, "58": 1, "31": 1, "23": 202, "13": 17, "70": 4}, "Marcos Paulo": {"39": 36, "51": 63, "23": 711, "13": 86, "63": 29, "1": 62, "34": 1, "24": 1, "70": 4}, "Pedro Henrique": {"23": 711, "13": 54, "1": 16, "24": 2, "63": 24, "51": 43, "39": 1, "70": 1}};
+var techMonthlySectors = {"Charles": {"Jan": {"23": 121, "13": 4, "20": 2, "63": 4}, "Fev": {"23": 87, "13": 9, "24": 2, "1": 6, "63": 2, "51": 4, "20": 2}, "Mar": {"23": 54, "13": 10, "1": 30, "39": 2, "5": 2, "63": 3, "30": 1, "31": 1}, "Abr": {"13": 5, "23": 34, "51": 5, "1": 26, "24": 1, "63": 2, "20": 1, "39": 1}, "Mai": {"23": 60, "1": 29, "63": 4, "13": 4, "51": 11, "39": 1}, "Jun": {"1": 6, "23": 111, "63": 4, "13": 9, "51": 2}, "Jul": {"23": 127, "13": 4, "51": 7, "1": 2, "28": 1, "63": 1}}, "Jose Fernando": {"Jan": {"23": 54, "63": 1, "13": 6, "51": 1}, "Fev": {"23": 124, "51": 7, "13": 10, "63": 5, "1": 1}, "Mar": {"23": 137, "13": 12, "63": 6, "51": 5}, "Abr": {"51": 17, "23": 132, "63": 8, "13": 6, "1": 1}, "Mai": {"23": 137, "51": 16, "13": 8, "63": 7}, "Jun": {"63": 2, "23": 18, "13": 2}, "Jul": {}}, "Carlos Arthur": {"Jan": {}, "Fev": {"30": 139, "1": 2}, "Mar": {"30": 399, "1": 5, "5": 5, "20": 6, "3": 5, "51": 1, "58": 1}, "Abr": {"30": 244, "1": 3, "3": 2, "31": 1}, "Mai": {"30": 203, "20": 2, "23": 1, "51": 3, "1": 1}, "Jun": {"30": 107}, "Jul": {"51": 5, "23": 93, "13": 9, "70": 1}}, "Marcos Paulo": {"Jan": {"39": 3, "51": 1, "23": 2}, "Fev": {"23": 51, "39": 3, "51": 5, "13": 4}, "Mar": {"23": 111, "13": 24, "39": 14, "63": 6, "51": 3, "1": 2, "34": 1}, "Abr": {"23": 91, "39": 16, "51": 12, "1": 13, "13": 12, "63": 4, "24": 1}, "Mai": {"23": 92, "1": 28, "13": 16, "63": 7, "51": 22}, "Jun": {"23": 119, "51": 9, "13": 9, "63": 6, "1": 6}, "Jul": {"13": 13, "23": 151, "51": 8, "1": 8, "70": 2, "63": 2}}, "Pedro Henrique": {"Jan": {}, "Fev": {"23": 1}, "Mar": {"23": 35, "13": 3, "1": 6}, "Abr": {"13": 8, "23": 103, "24": 1, "63": 5, "1": 3, "51": 11, "39": 1}, "Mai": {"23": 125, "63": 8, "13": 13, "51": 17, "1": 4, "24": 1}, "Jun": {"23": 142, "13": 4, "51": 6, "1": 1, "63": 7}, "Jul": {"13": 20, "23": 177, "63": 2, "51": 7}}};
 
-// Stats for setores
-const totalSectorOS = Object.values(techSectorSummary).reduce((s,secs)=>s+Object.values(secs).reduce((a,b)=>a+b,0),0);
-const uniqueSectors = new Set();
-Object.values(techSectorSummary).forEach(secs => Object.keys(secs).forEach(s => uniqueSectors.add(s)));
-document.getElementById('statsSetores').innerHTML = `
-  <div class="stat"><div class="stat-label">Total de OS Analisadas</div><div class="stat-value">${totalSectorOS.toLocaleString('pt-BR')}</div><div class="stat-sub">Jan-Jul 2026, sem 76/84</div></div>
-  <div class="stat"><div class="stat-label">Setores Distintos</div><div class="stat-value">${uniqueSectors.size}</div><div class="stat-sub">Setores produtivos mapeados</div></div>
-  <div class="stat"><div class="stat-label">Técnicos Analisados</div><div class="stat-value">5</div><div class="stat-sub">Manutenção Cliente</div></div>
-  <div class="stat"><div class="stat-label">Setor Principal</div><div class="stat-value">23</div><div class="stat-sub">Manutenção Cliente (NOC)</div></div>
-`;
+var totalSectorOS = 0;
+Object.keys(techSectorSummary).forEach(function(k) {
+  Object.keys(techSectorSummary[k]).forEach(function(s) {
+    totalSectorOS += techSectorSummary[k][s];
+  });
+});
 
-// Stacked bar chart: OS by sector per technician
-const allSectors = [...uniqueSectors].sort((a,b) => {
-  const totA = Object.values(techSectorSummary).reduce((s,secs)=>s+(secs[a]||0),0);
-  const totB = Object.values(techSectorSummary).reduce((s,secs)=>s+(secs[b]||0),0);
+var uniqueSectors = new Set();
+Object.keys(techSectorSummary).forEach(function(k) {
+  Object.keys(techSectorSummary[k]).forEach(function(s) { uniqueSectors.add(s); });
+});
+
+document.getElementById('statsSetores').innerHTML =
+  '<div class="stat"><div class="stat-label">Total de OS Analisadas</div><div class="stat-value">' + totalSectorOS + '</div><div class="stat-sub">Jan-Jul 2026, sem 76/84</div></div>' +
+  '<div class="stat"><div class="stat-label">Setores Distintos</div><div class="stat-value">' + uniqueSectors.size + '</div><div class="stat-sub">Setores produtivos mapeados</div></div>' +
+  '<div class="stat"><div class="stat-label">Técnicos</div><div class="stat-value">5</div><div class="stat-sub">Manutenção Cliente</div></div>' +
+  '<div class="stat"><div class="stat-label">Setor Principal</div><div class="stat-value">23</div><div class="stat-sub">Manut. Cliente (NOC)</div></div>';
+
+var allSectors = Array.from(uniqueSectors).sort(function(a,b) {
+  var totA = 0, totB = 0;
+  Object.keys(techSectorSummary).forEach(function(k) {
+    totA += techSectorSummary[k][a] || 0;
+    totB += techSectorSummary[k][b] || 0;
+  });
   return totB - totA;
 });
 
-const sectorColors = ['#3b82f6','#10b981','#f59e0b','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1','#14b8a6','#a855f7','#eab308','#3f6212','#7c2d12','#1e3a8a','#4c1d95','#831843','#0c4a6e'];
-const sectorDatasets = allSectors.map((s,i) => ({
-  label: `${s} - ${sectorNames[s]||s}`,
-  data: techs.map(t => techSectorSummary[t.nome]?.[s] || 0),
-  backgroundColor: sectorColors[i % sectorColors.length],
-  borderRadius: 3,
-  stack: 'a'
-}));
+var sectorColors = ['#3b82f6','#10b981','#f59e0b','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1','#14b8a6','#a855f7','#eab308','#3f6212','#7c2d12','#1e3a8a','#4c1d95','#831843','#0c4a6e'];
+var sectorDatasets = allSectors.map(function(s,i) {
+  return {
+    label: s + ' - ' + (sectorNames[s]||s),
+    data: techs.map(function(t) { return (techSectorSummary[t.nome] && techSectorSummary[t.nome][s]) || 0; }),
+    backgroundColor: sectorColors[i % sectorColors.length],
+    borderRadius: 3,
+    stack: 'a'
+  };
+});
 
-new Chart(document.getElementById('chartSector'),{type:'bar',data:{labels:techs.map(t=>t.nome),datasets:sectorDatasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:12,font:{size:9}}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.raw+' OS'}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:v=>v+''}}}}});
+new Chart(document.getElementById('chartSector'),{type:'bar',data:{labels:techs.map(function(t){return t.nome;}),datasets:sectorDatasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:12,font:{size:9}}},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+c.raw+' OS';}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border}}}}});
 
 // Sector summary table
-let htmlSec = '<thead><tr><th>Técnico</th>';
-allSectors.forEach(s => { htmlSec += `<th>${s}</th>`; });
+var htmlSec = '<thead><tr><th>Técnico</th>';
+allSectors.forEach(function(s) { htmlSec += '<th>' + s + '</th>'; });
 htmlSec += '<th>Total</th></tr></thead><tbody>';
-techs.forEach(t => {
-  htmlSec += `<tr><td>${t.nome}</td>`;
-  let rowTotal = 0;
-  allSectors.forEach(s => {
-    const v = techSectorSummary[t.nome]?.[s] || 0;
+techs.forEach(function(t) {
+  htmlSec += '<tr><td>' + t.nome + '</td>';
+  var rowTotal = 0;
+  allSectors.forEach(function(s) {
+    var v = (techSectorSummary[t.nome] && techSectorSummary[t.nome][s]) || 0;
     rowTotal += v;
-    htmlSec += `<td>${v||'—'}</td>`;
+    htmlSec += '<td>' + (v||'—') + '</td>';
   });
-  htmlSec += `<td><b>${rowTotal}</b></td></tr>`;
+  htmlSec += '<td><b>' + rowTotal + '</b></td></tr>';
 });
-// Total row
 htmlSec += '<tr style="border-top:2px solid var(--border)"><td><b>TOTAL</b></td>';
-allSectors.forEach(s => {
-  const v = techs.reduce((sum,t) => sum + (techSectorSummary[t.nome]?.[s] || 0), 0);
-  htmlSec += `<td><b>${v||'—'}</b></td>`;
+allSectors.forEach(function(s) {
+  var v = techs.reduce(function(sum,t) { return sum + ((techSectorSummary[t.nome] && techSectorSummary[t.nome][s]) || 0); }, 0);
+  htmlSec += '<td><b>' + (v||'—') + '</b></td>';
 });
-const grand = techs.reduce((sum,t) => sum + Object.values(techSectorSummary[t.nome]||{}).reduce((a,b)=>a+b,0), 0);
-htmlSec += `<td><b>${grand}</b></td></tr>`;
-htmlSec += '</tbody>';
+var grandSec = techs.reduce(function(sum,t) { return sum + (techSectorSummary[t.nome] ? Object.values(techSectorSummary[t.nome]).reduce(function(a,b){return a+b;},0) : 0); }, 0);
+htmlSec += '<td><b>' + grandSec + '</b></td></tr></tbody>';
 document.getElementById('tableSectorSummary').innerHTML = htmlSec;
 
 // Tech selector for monthly sectors
-let selectedTechSector = 0;
-const techSelectHtml = techs.map((t,i) => `<button class="tech-btn ${i===0?'active':''}" onclick="selectTechSector(${i})">${t.nome}</button>`).join('');
+var selectedTechSector = 0;
+var techSelectHtml = techs.map(function(t,i) { return '<button class="tech-btn ' + (i===0?'active':'') + '" onclick="selectTechSector(' + i + ')">' + t.nome + '</button>'; }).join('');
 document.getElementById('techSelectSetores').innerHTML = techSelectHtml;
 
 function selectTechSector(i) {
   selectedTechSector = i;
-  document.querySelectorAll('#techSelectSetores .tech-btn').forEach((b,j) => b.classList.toggle('active', j===i));
+  document.querySelectorAll('#techSelectSetores .tech-btn').forEach(function(b,j) { b.classList.toggle('active', j===i); });
   document.getElementById('sectorTechName').textContent = techs[i].nome;
   updateSectorMonthlyTable(i);
   updateSectorMonthlyChart(i);
 }
 
 function updateSectorMonthlyTable(i) {
-  const t = techs[i];
-  const data = techMonthlySectors[t.nome] || {};
-  // Collect all sectors for this tech
-  const techSectors = new Set();
-  Object.values(data).forEach(m => Object.keys(m).forEach(s => techSectors.add(s)));
-  const sortedSectors = [...techSectors].sort((a,b) => {
-    const totA = Object.values(data).reduce((s,m)=>s+(m[a]||0),0);
-    const totB = Object.values(data).reduce((s,m)=>s+(m[b]||0),0);
+  var t = techs[i];
+  var data = techMonthlySectors[t.nome] || {};
+  var techSectors = new Set();
+  Object.values(data).forEach(function(m) { Object.keys(m).forEach(function(s) { techSectors.add(s); }); });
+  var sortedSectors = Array.from(techSectors).sort(function(a,b) {
+    var totA = 0, totB = 0;
+    Object.values(data).forEach(function(m) { totA += m[a]||0; totB += m[b]||0; });
     return totB - totA;
   });
   
-  let html = '<thead><tr><th>Setor</th>';
-  meses.forEach(m => html += `<th>${m}</th>`);
+  var html = '<thead><tr><th>Setor</th>';
+  meses.forEach(function(m) { html += '<th>' + m + '</th>'; });
   html += '<th>Total</th></tr></thead><tbody>';
-  sortedSectors.forEach(s => {
-    html += `<tr><td>${s} - ${sectorNames[s]||s}</td>`;
-    let total = 0;
-    meses.forEach(m => {
-      const v = data[m]?.[s] || 0;
+  sortedSectors.forEach(function(s) {
+    html += '<tr><td>' + s + ' - ' + (sectorNames[s]||s) + '</td>';
+    var total = 0;
+    meses.forEach(function(m) {
+      var v = (data[m] && data[m][s]) || 0;
       total += v;
-      html += `<td>${v||'—'}</td>`;
+      html += '<td>' + (v||'—') + '</td>';
     });
-    html += `<td><b>${total}</b></td></tr>`;
+    html += '<td><b>' + total + '</b></td></tr>';
   });
-  // Total row
   html += '<tr style="border-top:2px solid var(--border)"><td><b>TOTAL</b></td>';
-  meses.forEach(m => {
-    const v = Object.values(data[m]||{}).reduce((a,b)=>a+b,0);
-    html += `<td><b>${v||'—'}</b></td>`;
+  meses.forEach(function(m) {
+    var v = data[m] ? Object.values(data[m]).reduce(function(a,b){return a+b;},0) : 0;
+    html += '<td><b>' + (v||'—') + '</b></td>';
   });
-  const total = Object.values(data).reduce((s,m)=>s+Object.values(m).reduce((a,b)=>a+b,0),0);
-  html += `<td><b>${total}</b></td></tr></tbody>';
+  var totalAll = Object.values(data).reduce(function(s,m) { return s + (m ? Object.values(m).reduce(function(a,b){return a+b;},0) : 0); }, 0);
+  html += '<td><b>' + totalAll + '</b></td></tr></tbody>';
   document.getElementById('tableSectorMonthly').innerHTML = html;
 }
 
-let sectorChart = null;
+var sectorChart = null;
 function updateSectorMonthlyChart(i) {
-  const t = techs[i];
-  const data = techMonthlySectors[t.nome] || {};
-  const techSectors = new Set();
-  Object.values(data).forEach(m => Object.keys(m).forEach(s => techSectors.add(s)));
-  const sortedSectors = [...techSectors].sort((a,b) => {
-    const totA = Object.values(data).reduce((s,m)=>s+(m[a]||0),0);
-    const totB = Object.values(data).reduce((s,m)=>s+(m[b]||0),0);
+  var t = techs[i];
+  var data = techMonthlySectors[t.nome] || {};
+  var techSectors = new Set();
+  Object.values(data).forEach(function(m) { Object.keys(m).forEach(function(s) { techSectors.add(s); }); });
+  var sortedSectors = Array.from(techSectors).sort(function(a,b) {
+    var totA = 0, totB = 0;
+    Object.values(data).forEach(function(m) { totA += m[a]||0; totB += m[b]||0; });
     return totB - totA;
-  }).slice(0, 8); // Top 8 sectors
+  }).slice(0, 8);
   
-  const datasets = sortedSectors.map((s,j) => ({
-    label: `${s} - ${sectorNames[s]||s}`,
-    data: meses.map(m => data[m]?.[s] || 0),
-    backgroundColor: sectorColors[j % sectorColors.length],
-    borderRadius: 3,
-    stack: 'a'
-  }));
+  var datasets = sortedSectors.map(function(s,j) {
+    return {
+      label: s + ' - ' + (sectorNames[s]||s),
+      data: meses.map(function(m) { return (data[m] && data[m][s]) || 0; }),
+      backgroundColor: sectorColors[j % sectorColors.length],
+      borderRadius: 3,
+      stack: 'a'
+    };
+  });
   
   if(sectorChart) sectorChart.destroy();
-  sectorChart = new Chart(document.getElementById('chartSectorMonthly'),{type:'bar',data:{labels:meses,datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:12,font:{size:9}}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.raw+' OS'}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border}}}}});
+  sectorChart = new Chart(document.getElementById('chartSectorMonthly'),{type:'bar',data:{labels:meses,datasets:datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:12,font:{size:9}}},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+c.raw+' OS';}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border}}}}});
 }
 
-// Initialize sector tab
 selectTechSector(0);
 
 // === TAB 3: COMBUSTÍVEL ===
-const totalLiters = techs.reduce((s,t)=>s+t.litros,0);
-const totalFuelCost = techs.reduce((s,t)=>s+t.fuelTotal,0);
-const totalRefuelings = 73; // from entity
-document.getElementById('statsFuel').innerHTML = `
-  <div class="stat"><div class="stat-label">Litros Totais (estimado)</div><div class="stat-value">${totalLiters.toLocaleString('pt-BR',{minimumFractionDigits:1})} L</div><div class="stat-sub">Calculado: custo / R$ ${avgPricePerLiter.toFixed(2)}/litro</div></div>
-  <div class="stat"><div class="stat-label">Custo Combustível Total</div><div class="stat-value">R$ ${totalFuelCost.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div class="stat-sub">Jan-Jul 2026, equipe MC</div></div>
-  <div class="stat"><div class="stat-label">Preço Médio/Litro</div><div class="stat-value">R$ ${avgPricePerLiter.toFixed(2)}</div><div class="stat-sub">Média ponderada do período</div></div>
-  <div class="stat"><div class="stat-label">Abastecimentos</div><div class="stat-value">${totalRefuelings}</div><div class="stat-sub">Registros na planilha</div></div>
-  <div class="stat"><div class="stat-label">Litros por OS</div><div class="stat-value">${(totalLiters/grandOS).toFixed(3)} L</div><div class="stat-sub">Média da equipe</div></div>
-  <div class="stat"><div class="stat-label">Custo Comb. por OS</div><div class="stat-value">R$ ${(totalFuelCost/grandOS).toFixed(2)}</div><div class="stat-sub">Combustível / OS</div></div>
-`;
+var totalLiters = techs.reduce(function(s,t){return s+t.litros;},0);
+var totalFuelCost = techs.reduce(function(s,t){return s+t.fuelTotal;},0);
+var totalRefuelings = 73;
 
-// Fuel monthly chart (stacked bar per tech)
-new Chart(document.getElementById('chartFuelMonthly'),{type:'bar',data:{labels:meses,datasets:techs.map(t=>({
-  label:t.nome,
-  data:meses.map((m,i)=>fuelMonthly[t.nome][i]),
-  backgroundColor:t.cor,
-  borderRadius:3,
-  stack:'a'
-}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:12}},tooltip:{callbacks:{label:c=>c.dataset.label+': R$ '+c.raw.toFixed(2)}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:v=>'R$ '+(v/1000).toFixed(1)+'k'}}}}});
+document.getElementById('statsFuel').innerHTML =
+  '<div class="stat"><div class="stat-label">Litros Totais (est.)</div><div class="stat-value">' + totalLiters.toFixed(1) + ' L</div><div class="stat-sub">custo / R$ ' + avgPricePerLiter.toFixed(2) + '/litro</div></div>' +
+  '<div class="stat"><div class="stat-label">Custo Combustível</div><div class="stat-value">R$ ' + totalFuelCost.toLocaleString('pt-BR',{minimumFractionDigits:2}) + '</div><div class="stat-sub">Jan-Jul 2026, equipe MC</div></div>' +
+  '<div class="stat"><div class="stat-label">Preço Médio/Litro</div><div class="stat-value">R$ ' + avgPricePerLiter.toFixed(2) + '</div><div class="stat-sub">Média ponderada do período</div></div>' +
+  '<div class="stat"><div class="stat-label">Abastecimentos</div><div class="stat-value">' + totalRefuelings + '</div><div class="stat-sub">Registros na planilha</div></div>' +
+  '<div class="stat"><div class="stat-label">Litros por OS</div><div class="stat-value">' + (totalLiters/grandOS).toFixed(3) + ' L</div><div class="stat-sub">Média da equipe</div></div>' +
+  '<div class="stat"><div class="stat-label">Custo Comb./OS</div><div class="stat-value">R$ ' + (totalFuelCost/grandOS).toFixed(2) + '</div><div class="stat-sub">Combustível / OS</div></div>';
 
-// Fuel monthly table
-let htmlFuel = '<thead><tr><th>Técnico</th><th>Veículo</th>';
-meses.forEach(m => htmlFuel += `<th>${m}</th>`);
+new Chart(document.getElementById('chartFuelMonthly'),{type:'bar',data:{labels:meses,datasets:techs.map(function(t) {
+  return {
+    label:t.nome,
+    data:meses.map(function(m,i) { return fuelMonthly[t.nome][i]; }),
+    backgroundColor:t.cor,
+    borderRadius:3,
+    stack:'a'
+  };
+})},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:12}},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toFixed(2);}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(1)+'k';}}}}}});
+
+var htmlFuel = '<thead><tr><th>Técnico</th><th>Veículo</th>';
+meses.forEach(function(m) { htmlFuel += '<th>' + m + '</th>'; });
 htmlFuel += '<th>Total (R$)</th><th>Total (L)</th><th>L/OS</th></tr></thead><tbody>';
-techs.forEach(t => {
-  htmlFuel += `<tr><td>${t.nome}</td><td style="text-align:left;font-size:.6875rem">${t.veiculo}</td>`;
-  meses.forEach((m,i) => {
-    const f = fuelMonthly[t.nome][i];
-    htmlFuel += `<td>${f>0?'R$ '+f.toFixed(2):'—'}</td>`;
+techs.forEach(function(t) {
+  htmlFuel += '<tr><td>' + t.nome + '</td><td style="text-align:left;font-size:.6875rem">' + t.veiculo + '</td>';
+  meses.forEach(function(m,i) {
+    var f = fuelMonthly[t.nome][i];
+    htmlFuel += '<td>' + (f>0?'R$ '+f.toFixed(2):'—') + '</td>';
   });
-  htmlFuel += `<td>R$ ${t.fuelTotal.toFixed(2)}</td><td>${t.litros.toFixed(1)}</td><td>${(t.litros/t.osTotal).toFixed(3)}</td></tr>`;
+  htmlFuel += '<td>R$ ' + t.fuelTotal.toFixed(2) + '</td><td>' + t.litros.toFixed(1) + '</td><td>' + (t.litros/t.osTotal).toFixed(3) + '</td></tr>';
 });
-// Total row
 htmlFuel += '<tr style="border-top:2px solid var(--border)"><td><b>TOTAL</b></td><td></td>';
-meses.forEach((m,i) => {
-  const f = techs.reduce((s,t)=>s+fuelMonthly[t.nome][i],0);
-  htmlFuel += `<td><b>R$ ${f.toFixed(2)}</b></td>`;
+meses.forEach(function(m,i) {
+  var f = techs.reduce(function(s,t){return s+fuelMonthly[t.nome][i];},0);
+  htmlFuel += '<td><b>R$ ' + f.toFixed(2) + '</b></td>';
 });
-htmlFuel += `<td><b>R$ ${totalFuelCost.toFixed(2)}</b></td><td><b>${totalLiters.toFixed(1)}</b></td><td><b>${(totalLiters/grandOS).toFixed(3)}</b></td></tr></tbody>`;
+htmlFuel += '<td><b>R$ ' + totalFuelCost.toFixed(2) + '</b></td><td><b>' + totalLiters.toFixed(1) + '</b></td><td><b>' + (totalLiters/grandOS).toFixed(3) + '</b></td></tr></tbody>';
 document.getElementById('tableFuelMonthly').innerHTML = htmlFuel;
 
-// Fuel summary table
-let htmlFuelSum = '<thead><tr><th>Técnico</th><th>Veículo</th><th>Início</th><th>Fim</th><th>OS Total</th><th>Combustível (R$)</th><th>Litros (est.)</th><th>R$/OS</th><th>L/OS</th><th>R$/Litro</th></tr></thead><tbody>';
-techs.forEach(t => {
-  const rpos = t.fuelTotal / t.osTotal;
-  const lpos = t.litros / t.osTotal;
-  htmlFuelSum += `<tr><td>${t.nome}</td><td style="text-align:left;font-size:.6875rem">${t.veiculo}</td><td>${t.inicio}</td><td>${t.fim}</td><td>${t.osTotal}</td><td>R$ ${t.fuelTotal.toFixed(2)}</td><td>${t.litros.toFixed(1)} L</td><td>R$ ${rpos.toFixed(2)}</td><td>${lpos.toFixed(3)} L</td><td>R$ ${avgPricePerLiter.toFixed(2)}</td></tr>`;
+var htmlFuelSum = '<thead><tr><th>Técnico</th><th>Veículo</th><th>Início</th><th>Fim</th><th>OS Total</th><th>Combustível (R$)</th><th>Litros (est.)</th><th>R$/OS</th><th>L/OS</th><th>R$/Litro</th></tr></thead><tbody>';
+techs.forEach(function(t) {
+  var rpos = t.fuelTotal / t.osTotal;
+  var lpos = t.litros / t.osTotal;
+  htmlFuelSum += '<tr><td>' + t.nome + '</td><td style="text-align:left;font-size:.6875rem">' + t.veiculo + '</td><td>' + t.inicio + '</td><td>' + t.fim + '</td><td>' + t.osTotal + '</td><td>R$ ' + t.fuelTotal.toFixed(2) + '</td><td>' + t.litros.toFixed(1) + ' L</td><td>R$ ' + rpos.toFixed(2) + '</td><td>' + lpos.toFixed(3) + ' L</td><td>R$ ' + avgPricePerLiter.toFixed(2) + '</td></tr>';
 });
 htmlFuelSum += '</tbody>';
 document.getElementById('tableFuelSummary').innerHTML = htmlFuelSum;
-
 </script>
 </body>
 </html>
