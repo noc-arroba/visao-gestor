@@ -295,6 +295,102 @@ document.getElementById('tableProjecao').innerHTML=htmlP;
 
 // === FIM DECISÃO ===
 
+// === PREVISIBILIDADE ===
+var salarioEncargos=3941.44;
+var custoVeiculo=534.00;
+var custoCombustivel=852;
+var custoTotalTech=salarioEncargos+custoVeiculo+custoCombustivel;
+var custoFixoTech=salarioEncargos+custoVeiculo;
+var custoTercOS=50;
+var prodMedia=150;
+var prodCons=130;
+var prodOtim=170;
+var manutDemanda=575;
+var instDemanda=323;
+var totalDemanda=manutDemanda+instDemanda;
+var custoAtual=4*custoTotalTech+instDemanda*custoTercOS;
+
+// Stat cards
+document.getElementById('statsPrevisao').innerHTML=
+'<div class="stat"><div class="stat-label">Demanda Total</div><div class="stat-value">'+totalDemanda+' OS/mês</div><div class="stat-sub">'+manutDemanda+' manut + '+instDemanda+' instalação</div></div>'
++'<div class="stat"><div class="stat-label">Custo por Técnico</div><div class="stat-value">R$ '+(custoTotalTech).toLocaleString('pt-BR')+'</div><div class="stat-sub">R$ '+(salarioEncargos).toLocaleString('pt-BR')+' fixo + R$ '+custoCombustivel+' comb.</div></div>'
++'<div class="stat"><div class="stat-label">Equipe Necessária</div><div class="stat-value" style="color:var(--green)">6 técnicos</div><div class="stat-sub">'+totalDemanda+' ÷ 150 OS/mês = 6 techs</div></div>'
++'<div class="stat"><div class="stat-label">Custo Projetado</div><div class="stat-value" style="color:var(--green)">R$ '+(6*custoTotalTech).toLocaleString('pt-BR')+'</div><div class="stat-sub">vs atual R$ '+custoAtual.toLocaleString('pt-BR')+' → -R$ '+(custoAtual-6*custoTotalTech).toLocaleString('pt-BR')+'/mês</div></div>';
+
+// Chart: Team size by demand scenario
+var growthLabels=['Atual','+10%','+20%','+30%','+50%','+75%','+100%'];
+var growthFactors=[1,1.1,1.2,1.3,1.5,1.75,2];
+var techsCons=[],techsMedia=[],techsOtim=[];
+growthFactors.forEach(function(f){
+  var d=totalDemanda*f;
+  techsCons.push(Math.ceil(d/prodCons));
+  techsMedia.push(Math.ceil(d/prodMedia));
+  techsOtim.push(Math.ceil(d/prodOtim));
+});
+new Chart(document.getElementById('chartPrevisaoTechs'),{type:'bar',data:{labels:growthLabels,datasets:[
+{label:'Conservador (130 OS/mês)',data:techsCons,backgroundColor:'#ef4444',borderRadius:4},
+{label:'Média (150 OS/mês)',data:techsMedia,backgroundColor:'#3b82f6',borderRadius:4},
+{label:'Otimista (170 OS/mês)',data:techsOtim,backgroundColor:'#10b981',borderRadius:4}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},
+scales:{y:{grid:{color:colors.border},title:{display:true,text:'Nº de técnicos'},ticks:{stepSize:1}},x:{grid:{display:false}}}}});
+
+// Chart: Cost by team size
+var techSizes=[4,5,6,7,8,9,10,11,12];
+var custosEquipe=techSizes.map(function(n){return Math.round(n*custoTotalTech);});
+var custoPorOS=techSizes.map(function(n){
+  var cap=n*prodMedia;
+  var demanda=Math.min(totalDemanda,cap);
+  return Math.round(n*custoTotalTech/demanda*100)/100;
+});
+new Chart(document.getElementById('chartPrevisaoCusto'),{type:'bar',data:{labels:techSizes.map(function(t){return t+' techs';}),datasets:[
+{label:'Custo Total/mês (R$)',data:custosEquipe,backgroundColor:techSizes.map(function(n){return n===6?'#10b981':'#3b82f6';}),borderRadius:4,yAxisID:'y'},
+{label:'Custo/OS (R$)',data:custoPorOS,borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.2)',type:'line',tension:.3,pointRadius:4,pointBackgroundColor:'#f59e0b',yAxisID:'y1'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},
+tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR');}}}},
+scales:{y:{position:'left',grid:{color:colors.border},title:{display:true,text:'R$ / mês'}},
+y1:{position:'right',grid:{display:false},title:{display:true,text:'R$ / OS'}}}}});
+
+// Table: Growth scenarios
+var htmlC='<thead><tr><th>Cenário</th><th>Demanda (OS/mês)</th><th>Techs (130 OS/mês)</th><th>Techs (150 OS/mês)</th><th>Techs (170 OS/mês)</th><th>Custo/mês (150)</th><th>Custo/OS</th><th>vs Atual</th></tr></thead><tbody>';
+htmlC+='<tr style="font-weight:700"><td>ATUAL (4+terc)</td><td>'+totalDemanda+'</td><td>—</td><td>4 + terc.</td><td>—</td><td>R$ '+custoAtual.toLocaleString('pt-BR')+'</td><td>R$ '+(custoAtual/totalDemanda).toFixed(2)+'</td><td>—</td></tr>';
+growthLabels.forEach(function(label,i){
+  var f=growthFactors[i];
+  var d=Math.round(totalDemanda*f);
+  var tc=Math.ceil(d/prodCons);
+  var tm=Math.ceil(d/prodMedia);
+  var to=Math.ceil(d/prodOtim);
+  var custo=tm*custoTotalTech;
+  var cpos=custo/d;
+  var diff=custo-custoAtual;
+  var pct=(diff/custoAtual*100).toFixed(0);
+  var isOptimal=(tm===6);
+  htmlC+='<tr '+(isOptimal?'style="background:rgba(16,185,129,.1);font-weight:700"':'')+'><td>'+label+'</td><td>'+d+'</td><td>'+tc+'</td><td><strong>'+tm+'</strong></td><td>'+to+'</td><td>R$ '+custo.toLocaleString('pt-BR')+'</td><td>R$ '+cpos.toFixed(2)+'</td><td style="color:'+(diff<0?'var(--green)':'var(--red)')+'">'+(diff<0?'-':'+')+'R$ '+Math.abs(diff).toLocaleString('pt-BR')+' ('+(diff<0?'-':'+')+pct+'%)</td></tr>';
+});
+htmlC+='</tbody>';
+document.getElementById('tableCrescimento').innerHTML=htmlC;
+
+// Table: Detailed cost by team size
+var htmlD='<thead><tr><th>Techs</th><th>Capacidade (OS/mês)</th><th>Salários+Encargos</th><th>Veículos</th><th>Combustível</th><th>Custo Total/mês</th><th>Custo/OS (atual)</th><th>vs 4+Terc.</th></tr></thead><tbody>';
+techSizes.forEach(function(n){
+  var cap=n*prodMedia;
+  var sal=n*salarioEncargos;
+  var veic=n*custoVeiculo;
+  var comb=n*custoCombustivel;
+  var total=n*custoTotalTech;
+  var demanda=Math.min(totalDemanda,cap);
+  var cpos=total/demanda;
+  var diff=total-custoAtual;
+  var pct=(diff/custoAtual*100).toFixed(1);
+  var isOptimal=(n===6);
+  var cobertura=cap>=totalDemanda?'<span style="color:var(--green)">✓ cobre</span>':'<span style="color:var(--red)">✗ não cobre</span>';
+  htmlD+='<tr '+(isOptimal?'style="background:rgba(16,185,129,.1);font-weight:700"':'')+'><td>'+n+'</td><td>'+cap+' '+cobertura+'</td><td>R$ '+sal.toLocaleString('pt-BR')+'</td><td>R$ '+veic.toLocaleString('pt-BR')+'</td><td>R$ '+comb.toLocaleString('pt-BR')+'</td><td><strong>R$ '+total.toLocaleString('pt-BR')+'</strong></td><td>R$ '+cpos.toFixed(2)+'</td><td style="color:'+(diff<0?'var(--green)':'var(--red)')+'">'+(diff<0?'-':'+')+'R$ '+Math.abs(diff).toLocaleString('pt-BR')+' ('+(diff<0?'-':'+')+pct+'%)</td></tr>';
+});
+htmlD+='</tbody>';
+document.getElementById('tableCustoEquipe').innerHTML=htmlD;
+
+// === FIM PREVISIBILIDADE ===
+
+
 
 // === FATURAMENTO ===
 var ARPU=91.23;
@@ -524,6 +620,15 @@ tr:hover{background:rgba(59,130,246,.05)}
 <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Pontos de Decisão (Break-Even) — Quando Contratar</div><table id="tableBreakEvenDecisao"></table></div>
 <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Projeção Mensal — Custo com 4 vs 6 Técnicos (7 meses)</div><table id="tableProjecao"></table></div>
 </div>
+<div class="chart-container" style="border-top:2px solid var(--green);padding-top:20px;margin-top:8px"><div class="chart-title" style="color:var(--green);font-size:1.1rem">📋 Previsibilidade — Equipe Própia Cobre Toda a Demanda</div><p style="color:var(--muted);font-size:.75rem;margin-bottom:14px">Modelo preditivo com base em produtividade real · Custo por técnico: R$ 4.475,44 fixo + R$ 852 combustível = R$ 5.327,44/mês</p></div>
+<div class="stats" id="statsPrevisao"></div>
+<div class="grid-2">
+<div class="chart-container"><div class="chart-title">Tamanho da Equipe por Cenário de Demanda</div><div class="chart-wrapper"><canvas id="chartPrevisaoTechs"></canvas></div></div>
+<div class="chart-container"><div class="chart-title">Custo Mensal por Tamanho de Equipe</div><div class="chart-wrapper"><canvas id="chartPrevisaoCusto"></canvas></div></div>
+</div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Cenários de Crescimento — Demanda × Equipe × Custo</div><table id="tableCrescimento"></table></div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Custo Detalhado por Tamanho de Equipe</div><table id="tableCustoEquipe"></table></div>
+
 
 <div class="footer">Dados: IXC Web (API) + Planilha de Combustível (Bd_TickeckLOG) · Custo fixo: R$ 4.475,44/mês · Combustível: dados reais por abastecimento · Afastamento Jose Fernando (04/06): INSS · Setores 76 e 84 excluídos · Atualizado em 31/08/2026</div>
 <script>
@@ -897,6 +1002,102 @@ htmlP+='</tbody>';
 document.getElementById('tableProjecao').innerHTML=htmlP;
 
 // === FIM DECISÃO ===
+
+// === PREVISIBILIDADE ===
+var salarioEncargos=3941.44;
+var custoVeiculo=534.00;
+var custoCombustivel=852;
+var custoTotalTech=salarioEncargos+custoVeiculo+custoCombustivel;
+var custoFixoTech=salarioEncargos+custoVeiculo;
+var custoTercOS=50;
+var prodMedia=150;
+var prodCons=130;
+var prodOtim=170;
+var manutDemanda=575;
+var instDemanda=323;
+var totalDemanda=manutDemanda+instDemanda;
+var custoAtual=4*custoTotalTech+instDemanda*custoTercOS;
+
+// Stat cards
+document.getElementById('statsPrevisao').innerHTML=
+'<div class="stat"><div class="stat-label">Demanda Total</div><div class="stat-value">'+totalDemanda+' OS/mês</div><div class="stat-sub">'+manutDemanda+' manut + '+instDemanda+' instalação</div></div>'
++'<div class="stat"><div class="stat-label">Custo por Técnico</div><div class="stat-value">R$ '+(custoTotalTech).toLocaleString('pt-BR')+'</div><div class="stat-sub">R$ '+(salarioEncargos).toLocaleString('pt-BR')+' fixo + R$ '+custoCombustivel+' comb.</div></div>'
++'<div class="stat"><div class="stat-label">Equipe Necessária</div><div class="stat-value" style="color:var(--green)">6 técnicos</div><div class="stat-sub">'+totalDemanda+' ÷ 150 OS/mês = 6 techs</div></div>'
++'<div class="stat"><div class="stat-label">Custo Projetado</div><div class="stat-value" style="color:var(--green)">R$ '+(6*custoTotalTech).toLocaleString('pt-BR')+'</div><div class="stat-sub">vs atual R$ '+custoAtual.toLocaleString('pt-BR')+' → -R$ '+(custoAtual-6*custoTotalTech).toLocaleString('pt-BR')+'/mês</div></div>';
+
+// Chart: Team size by demand scenario
+var growthLabels=['Atual','+10%','+20%','+30%','+50%','+75%','+100%'];
+var growthFactors=[1,1.1,1.2,1.3,1.5,1.75,2];
+var techsCons=[],techsMedia=[],techsOtim=[];
+growthFactors.forEach(function(f){
+  var d=totalDemanda*f;
+  techsCons.push(Math.ceil(d/prodCons));
+  techsMedia.push(Math.ceil(d/prodMedia));
+  techsOtim.push(Math.ceil(d/prodOtim));
+});
+new Chart(document.getElementById('chartPrevisaoTechs'),{type:'bar',data:{labels:growthLabels,datasets:[
+{label:'Conservador (130 OS/mês)',data:techsCons,backgroundColor:'#ef4444',borderRadius:4},
+{label:'Média (150 OS/mês)',data:techsMedia,backgroundColor:'#3b82f6',borderRadius:4},
+{label:'Otimista (170 OS/mês)',data:techsOtim,backgroundColor:'#10b981',borderRadius:4}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},
+scales:{y:{grid:{color:colors.border},title:{display:true,text:'Nº de técnicos'},ticks:{stepSize:1}},x:{grid:{display:false}}}}});
+
+// Chart: Cost by team size
+var techSizes=[4,5,6,7,8,9,10,11,12];
+var custosEquipe=techSizes.map(function(n){return Math.round(n*custoTotalTech);});
+var custoPorOS=techSizes.map(function(n){
+  var cap=n*prodMedia;
+  var demanda=Math.min(totalDemanda,cap);
+  return Math.round(n*custoTotalTech/demanda*100)/100;
+});
+new Chart(document.getElementById('chartPrevisaoCusto'),{type:'bar',data:{labels:techSizes.map(function(t){return t+' techs';}),datasets:[
+{label:'Custo Total/mês (R$)',data:custosEquipe,backgroundColor:techSizes.map(function(n){return n===6?'#10b981':'#3b82f6';}),borderRadius:4,yAxisID:'y'},
+{label:'Custo/OS (R$)',data:custoPorOS,borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.2)',type:'line',tension:.3,pointRadius:4,pointBackgroundColor:'#f59e0b',yAxisID:'y1'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},
+tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR');}}}},
+scales:{y:{position:'left',grid:{color:colors.border},title:{display:true,text:'R$ / mês'}},
+y1:{position:'right',grid:{display:false},title:{display:true,text:'R$ / OS'}}}}});
+
+// Table: Growth scenarios
+var htmlC='<thead><tr><th>Cenário</th><th>Demanda (OS/mês)</th><th>Techs (130 OS/mês)</th><th>Techs (150 OS/mês)</th><th>Techs (170 OS/mês)</th><th>Custo/mês (150)</th><th>Custo/OS</th><th>vs Atual</th></tr></thead><tbody>';
+htmlC+='<tr style="font-weight:700"><td>ATUAL (4+terc)</td><td>'+totalDemanda+'</td><td>—</td><td>4 + terc.</td><td>—</td><td>R$ '+custoAtual.toLocaleString('pt-BR')+'</td><td>R$ '+(custoAtual/totalDemanda).toFixed(2)+'</td><td>—</td></tr>';
+growthLabels.forEach(function(label,i){
+  var f=growthFactors[i];
+  var d=Math.round(totalDemanda*f);
+  var tc=Math.ceil(d/prodCons);
+  var tm=Math.ceil(d/prodMedia);
+  var to=Math.ceil(d/prodOtim);
+  var custo=tm*custoTotalTech;
+  var cpos=custo/d;
+  var diff=custo-custoAtual;
+  var pct=(diff/custoAtual*100).toFixed(0);
+  var isOptimal=(tm===6);
+  htmlC+='<tr '+(isOptimal?'style="background:rgba(16,185,129,.1);font-weight:700"':'')+'><td>'+label+'</td><td>'+d+'</td><td>'+tc+'</td><td><strong>'+tm+'</strong></td><td>'+to+'</td><td>R$ '+custo.toLocaleString('pt-BR')+'</td><td>R$ '+cpos.toFixed(2)+'</td><td style="color:'+(diff<0?'var(--green)':'var(--red)')+'">'+(diff<0?'-':'+')+'R$ '+Math.abs(diff).toLocaleString('pt-BR')+' ('+(diff<0?'-':'+')+pct+'%)</td></tr>';
+});
+htmlC+='</tbody>';
+document.getElementById('tableCrescimento').innerHTML=htmlC;
+
+// Table: Detailed cost by team size
+var htmlD='<thead><tr><th>Techs</th><th>Capacidade (OS/mês)</th><th>Salários+Encargos</th><th>Veículos</th><th>Combustível</th><th>Custo Total/mês</th><th>Custo/OS (atual)</th><th>vs 4+Terc.</th></tr></thead><tbody>';
+techSizes.forEach(function(n){
+  var cap=n*prodMedia;
+  var sal=n*salarioEncargos;
+  var veic=n*custoVeiculo;
+  var comb=n*custoCombustivel;
+  var total=n*custoTotalTech;
+  var demanda=Math.min(totalDemanda,cap);
+  var cpos=total/demanda;
+  var diff=total-custoAtual;
+  var pct=(diff/custoAtual*100).toFixed(1);
+  var isOptimal=(n===6);
+  var cobertura=cap>=totalDemanda?'<span style="color:var(--green)">✓ cobre</span>':'<span style="color:var(--red)">✗ não cobre</span>';
+  htmlD+='<tr '+(isOptimal?'style="background:rgba(16,185,129,.1);font-weight:700"':'')+'><td>'+n+'</td><td>'+cap+' '+cobertura+'</td><td>R$ '+sal.toLocaleString('pt-BR')+'</td><td>R$ '+veic.toLocaleString('pt-BR')+'</td><td>R$ '+comb.toLocaleString('pt-BR')+'</td><td><strong>R$ '+total.toLocaleString('pt-BR')+'</strong></td><td>R$ '+cpos.toFixed(2)+'</td><td style="color:'+(diff<0?'var(--green)':'var(--red)')+'">'+(diff<0?'-':'+')+'R$ '+Math.abs(diff).toLocaleString('pt-BR')+' ('+(diff<0?'-':'+')+pct+'%)</td></tr>';
+});
+htmlD+='</tbody>';
+document.getElementById('tableCustoEquipe').innerHTML=htmlD;
+
+// === FIM PREVISIBILIDADE ===
+
 
 
 // === FATURAMENTO ===
