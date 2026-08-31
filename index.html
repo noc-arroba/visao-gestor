@@ -38,24 +38,26 @@ tr:hover{background:rgba(59,130,246,.05)}
 .badge-active{background:rgba(16,185,129,.15);color:var(--green)}
 .badge-away{background:rgba(245,158,11,.15);color:var(--amber)}
 .badge-inactive{background:rgba(148,163,184,.1);color:var(--muted)}
-.section-note{color:var(--muted);font-size:.6875rem;font-style:italic;margin-top:8px;padding:8px 12px;background:rgba(245,158,11,.05);border-radius:8px;border:1px solid rgba(245,158,11,.15)}
+.alert-box{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:16px;margin-bottom:20px}
+.alert-title{color:var(--red);font-size:.875rem;font-weight:600;margin-bottom:8px}
+.alert-item{color:var(--text);font-size:.8125rem;margin-bottom:4px}
 .footer{color:var(--muted);font-size:.625rem;text-align:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--border)}
 .tech-select{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
 .tech-btn{padding:6px 14px;border-radius:99px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;font-size:.75rem;font-weight:600;transition:all .2s}
 .tech-btn:hover{color:var(--text)}
 .tech-btn.active{color:var(--text);border-color:var(--primary)}
+.km-good{color:var(--green)}.km-bad{color:var(--red)}.km-warn{color:var(--amber)}
 </style>
 </head>
 <body>
 <h1>Visão Gestor — Manutenção Cliente</h1>
-<p class="subtitle">Arroba Banda Larga · Janeiro a Julho 2026 · 5 Técnicos · Custo proporcional por dias trabalhados · Setores 76 e 84 excluídos</p>
+<p class="subtitle">Arroba Banda Larga · Janeiro a Julho 2026 · 5 Técnicos · Custo proporcional por dias trabalhados · Setores 76 e 84 excluídos · Combustível: dados reais da planilha</p>
 <div class="tabs">
 <button class="tab active" onclick="showTab('custo',this)">Custo</button>
 <button class="tab" onclick="showTab('setores',this)">Setores</button>
 <button class="tab" onclick="showTab('combustivel',this)">Combustível</button>
+<button class="tab" onclick="showTab('analitico',this)">Custo Analítico</button>
 </div>
-
-<!-- TAB 1: CUSTO -->
 <div id="tab-custo" class="tab-content active">
 <div class="stats" id="statsCusto"></div>
 <div class="chart-container"><div class="chart-title">Custo Mensal — Fixo vs Combustível</div><div class="chart-wrapper"><canvas id="chartCost"></canvas></div></div>
@@ -68,8 +70,6 @@ tr:hover{background:rgba(59,130,246,.05)}
 <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Resumo por Técnico (7 meses)</div><table id="tableSummary"></table></div>
 <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Resumo Mensal da Equipe</div><table id="tableMonthly"></table></div>
 </div>
-
-<!-- TAB 2: SETORES -->
 <div id="tab-setores" class="tab-content">
 <div class="stats" id="statsSetores"></div>
 <div class="chart-container"><div class="chart-title">Distribuição de OS por Setor — Por Técnico</div><div class="chart-wrapper-lg"><canvas id="chartSector"></canvas></div></div>
@@ -80,347 +80,108 @@ tr:hover{background:rgba(59,130,246,.05)}
 </div>
 <div class="chart-container"><div class="chart-title">Evolução de Setores — <span id="sectorTechName">Charles</span></div><div class="chart-wrapper"><canvas id="chartSectorMonthly"></canvas></div></div>
 </div>
-
-<!-- TAB 3: COMBUSTÍVEL -->
 <div id="tab-combustivel" class="tab-content">
 <div class="stats" id="statsFuel"></div>
 <div class="chart-container"><div class="chart-title">Combustível por Técnico — Mês a Mês (R$)</div><div class="chart-wrapper"><canvas id="chartFuelMonthly"></canvas></div></div>
 <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Combustível por Técnico — Detalhamento Mensal</div><table id="tableFuelMonthly"></table></div>
 <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Resumo de Combustível por Técnico</div><table id="tableFuelSummary"></table></div>
-<div class="section-note">⚠ Dados de litros estimados: custo / preço médio (R$ 6,71/litro). Para KM rodados e deslocamento por técnico, é necessário importar a planilha de combustível.</div>
 </div>
-
-<div class="footer">Dados: IXC Web (API) · Combustível: planilha (estimado proporcional) · Custo fixo: R$ 4.475,44/mês · Afastamento Jose Fernando (04/06): INSS · Setores 76 e 84 excluídos · Atualizado em 31/08/2026</div>
-
+<div id="tab-analitico" class="tab-content">
+<div class="stats" id="statsAnalitico"></div>
+<div class="alert-box" id="alertAnomalies"></div>
+<div class="chart-container"><div class="chart-title">Análise de Eficiência — KM/L por Técnico (Mês a Mês)</div><div class="chart-wrapper"><canvas id="chartEfficiency"></canvas></div></div>
+<div class="chart-container"><div class="chart-title">Custo Total por Técnico — Fixo vs Combustível (Real)</div><div class="chart-wrapper-sm"><canvas id="chartAnaliticoCost"></canvas></div></div>
+<div class="chart-container"><div class="chart-title">Selecione o Técnico para Análise Detalhada</div>
+<div class="tech-select" id="techSelectAnalitico"></div>
+</div>
+<div id="analiticoContent">
+<div class="chart-container"><div class="chart-title">KM Rodados vs Litros Consumidos — <span id="analiticoTechName">Charles</span></div><div class="chart-wrapper"><canvas id="chartAnaliticoKM"></canvas></div></div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Análise Completa — <span id="analiticoTableTitle">Charles</span></div><table id="tableAnalitico"></table></div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">OS por Setor — <span id="analiticoSectorTitle">Charles</span></div><table id="tableAnaliticoSector"></table></div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Combustível Detalhado — <span id="analiticoFuelTitle">Charles</span> (Dados Reais da Planilha)</div><table id="tableAnaliticoFuel"></table></div>
+</div>
+</div>
+<div class="footer">Dados: IXC Web (API) + Planilha de Combustível (Bd_TickeckLOG) · Custo fixo: R$ 4.475,44/mês · Combustível: dados reais por abastecimento · Afastamento Jose Fernando (04/06): INSS · Setores 76 e 84 excluídos · Atualizado em 31/08/2026</div>
 <script>
+const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul"];
+const techs = [{"nome": "Charles", "cor": "#3b82f6", "veiculo": "ARGO (SQX7G99)", "placa": "SQX7G99", "inicio": "01/01", "fim": "31/07", "fixoMonths": 7.0, "osTotal": 804, "fuelTotal": 6069.17, "fixoTotal": 31328.08, "litros": 903.74, "km": 8499.0, "km_l": 9.4, "abastecimentos": 25}, {"nome": "Jose Fernando", "cor": "#f59e0b", "veiculo": "ONIX (LUG3H26)", "placa": "LUG3H26", "inicio": "04/01", "fim": "04/06 (afastado)", "fixoMonths": 5.04, "osTotal": 723, "fuelTotal": 4703.8, "fixoTotal": 22540.82, "litros": 676.68, "km": 4438.0, "km_l": 6.56, "abastecimentos": 17}, {"nome": "Carlos Arthur", "cor": "#10b981", "veiculo": "ONIX (LUG3H26)", "placa": "LUG3H26", "inicio": "01/07 (MC)", "fim": "31/07", "fixoMonths": 1.0, "osTotal": 108, "fuelTotal": 1015.47, "fixoTotal": 4475.44, "litros": 148.84, "km": 1312.0, "km_l": 8.81, "abastecimentos": 3}, {"nome": "Marcos Paulo", "cor": "#8b5cf6", "veiculo": "ARGO (SQX7G68)", "placa": "SQX7G68", "inicio": "19/01", "fim": "31/07", "fixoMonths": 6.42, "osTotal": 877, "fuelTotal": 4769.01, "fixoTotal": 28729.44, "litros": 684.57, "km": 6935.0, "km_l": 10.13, "abastecimentos": 19}, {"nome": "Pedro Henrique", "cor": "#ec4899", "veiculo": "CERATO (LUM3183)", "placa": "LUM3183", "inicio": "20/02", "fim": "31/07", "fixoMonths": 5.32, "osTotal": 711, "fuelTotal": 2833.6, "fixoTotal": 23815.73, "litros": 409.26, "km": 2887.0, "km_l": 7.05, "abastecimentos": 9}];
+const osMonthly = {"Charles": {"01": 131, "02": 112, "03": 103, "04": 75, "05": 109, "06": 132, "07": 142}, "Jose Fernando": {"01": 62, "02": 147, "03": 160, "04": 164, "05": 168, "06": 22}, "Carlos Arthur": {"07": 108}, "Marcos Paulo": {"01": 6, "02": 63, "03": 161, "04": 149, "05": 165, "06": 149, "07": 184}, "Pedro Henrique": {"02": 1, "03": 44, "04": 132, "05": 168, "06": 160, "07": 206}};
+const fixoMonthly = {"Charles": {"01": 4475.44, "02": 4475.44, "03": 4475.44, "04": 4475.44, "05": 4475.44, "06": 4475.44, "07": 4475.44}, "Jose Fernando": {"01": 4042.332903225806, "02": 4475.44, "03": 4475.44, "04": 4475.44, "05": 4475.44, "06": 596.7253333333333}, "Carlos Arthur": {"07": 4475.44}, "Marcos Paulo": {"01": 1876.7974193548387, "02": 4475.44, "03": 4475.44, "04": 4475.44, "05": 4475.44, "06": 4475.44, "07": 4475.44}, "Pedro Henrique": {"02": 1438.5342857142857, "03": 4475.44, "04": 4475.44, "05": 4475.44, "06": 4475.44, "07": 4475.44}};
+const fuelMonthly = {"Charles": [1015.36, 1078.4, 849.93, 785.64, 766.2, 542.5, 1031.14], "Jose Fernando": [299.98, 1269.72, 926.55, 931.26, 936.23, 340.06, 0], "Carlos Arthur": [0, 0, 0, 0, 0, 0, 1015.47], "Marcos Paulo": [0, 249.94, 939.02, 841.68, 892.9, 1029.58, 815.89], "Pedro Henrique": [0, 0, 0, 658.24, 923.69, 653.2, 598.47]};
+const fuelDetail = {"Charles": [{"litros": 153.57, "valor": 1015.36, "km": 1450.0, "km_l": 9.44, "odo_in": 30984.0, "odo_out": 32096.0, "abast": 4}, {"litros": 162.55, "valor": 1078.4, "km": 1503.0, "km_l": 9.25, "odo_in": 32445.0, "odo_out": 33599.0, "abast": 5}, {"litros": 124.02, "valor": 849.93, "km": 1245.0, "km_l": 10.04, "odo_in": 33990.0, "odo_out": 34844.0, "abast": 3}, {"litros": 115.71, "valor": 785.64, "km": 1760.0, "km_l": 15.21, "odo_in": 35246.0, "odo_out": 36604.0, "abast": 3}, {"litros": 113.36, "valor": 766.2, "km": 667.0, "km_l": 5.88, "odo_in": 36431.0, "odo_out": 37271.0, "abast": 3}, {"litros": 80.39, "valor": 542.5, "km": 355.0, "km_l": 4.42, "odo_in": 50708.0, "odo_out": 37626.0, "abast": 3}, {"litros": 154.14, "valor": 1031.14, "km": 1519.0, "km_l": 9.85, "odo_in": 38015.0, "odo_out": 39145.0, "abast": 4}], "Jose Fernando": [{"litros": 44.84, "valor": 299.98, "km": 583.0, "km_l": 13.0, "odo_in": 78849.0, "odo_out": 78849.0, "abast": 1}, {"litros": 187.0, "valor": 1269.72, "km": 1064.0, "km_l": 5.69, "odo_in": 79126.0, "odo_out": 79913.0, "abast": 5}, {"litros": 130.38, "valor": 926.55, "km": 766.0, "km_l": 5.88, "odo_in": 80171.0, "odo_out": 80679.0, "abast": 4}, {"litros": 129.96, "valor": 931.26, "km": 867.0, "km_l": 6.67, "odo_in": 80988.0, "odo_out": 81546.0, "abast": 3}, {"litros": 134.42, "valor": 936.23, "km": 824.0, "km_l": 6.13, "odo_in": 81855.0, "odo_out": 82370.0, "abast": 3}, {"litros": 50.08, "valor": 340.06, "km": 334.0, "km_l": 6.67, "odo_in": 82704.0, "odo_out": 82704.0, "abast": 1}, {"litros": 0, "valor": 0, "km": 0, "km_l": 0, "odo_in": 0, "odo_out": 0, "abast": 0}], "Carlos Arthur": [{"litros": 0, "valor": 0, "km": 0, "km_l": 0, "odo_in": 0, "odo_out": 0, "abast": 0}, {"litros": 0, "valor": 0, "km": 0, "km_l": 0, "odo_in": 0, "odo_out": 0, "abast": 0}, {"litros": 0, "valor": 0, "km": 0, "km_l": 0, "odo_in": 0, "odo_out": 0, "abast": 0}, {"litros": 0, "valor": 0, "km": 0, "km_l": 0, "odo_in": 0, "odo_out": 0, "abast": 0}, {"litros": 0, "valor": 0, "km": 0, "km_l": 0, "odo_in": 0, "odo_out": 0, "abast": 0}, {"litros": 0, "valor": 0, "km": 0, "km_l": 0, "odo_in": 0, "odo_out": 0, "abast": 0}, {"litros": 148.84, "valor": 1015.47, "km": 1312.0, "km_l": 8.81, "odo_in": 83136.0, "odo_out": 84016.0, "abast": 3}], "Marcos Paulo": [{"litros": 0, "valor": 0, "km": 0, "km_l": 0, "odo_in": 0, "odo_out": 0, "abast": 0}, {"litros": 36.81, "valor": 249.94, "km": 237.0, "km_l": 6.44, "odo_in": 25651.0, "odo_out": 25651.0, "abast": 1}, {"litros": 135.82, "valor": 939.02, "km": 1423.0, "km_l": 10.48, "odo_in": 26051.0, "odo_out": 27074.0, "abast": 4}, {"litros": 116.54, "valor": 841.68, "km": 1213.0, "km_l": 10.41, "odo_in": 27441.0, "odo_out": 28287.0, "abast": 3}, {"litros": 127.55, "valor": 892.9, "km": 1261.0, "km_l": 9.89, "odo_in": 28687.0, "odo_out": 50328.0, "abast": 4}, {"litros": 149.43, "valor": 1029.58, "km": 1577.0, "km_l": 10.55, "odo_in": 29609.0, "odo_out": 30787.0, "abast": 4}, {"litros": 118.42, "valor": 815.89, "km": 1224.0, "km_l": 10.34, "odo_in": 31171.0, "odo_out": 32011.0, "abast": 3}], "Pedro Henrique": [{"litros": 0, "valor": 0, "km": 0, "km_l": 0, "odo_in": 0, "odo_out": 0, "abast": 0}, {"litros": 0, "valor": 0, "km": 0, "km_l": 0, "odo_in": 0, "odo_out": 0, "abast": 0}, {"litros": 0, "valor": 0, "km": 0, "km_l": 0, "odo_in": 0, "odo_out": 0, "abast": 0}, {"litros": 91.63, "valor": 658.24, "km": 564.0, "km_l": 6.16, "odo_in": 61953.0, "odo_out": 62234.0, "abast": 2}, {"litros": 133.29, "valor": 923.69, "km": 931.0, "km_l": 6.98, "odo_in": 62558.0, "odo_out": 63165.0, "abast": 3}, {"litros": 96.2, "valor": 653.2, "km": 730.0, "km_l": 7.59, "odo_in": 63526.0, "odo_out": 63895.0, "abast": 2}, {"litros": 88.14, "valor": 598.47, "km": 662.0, "km_l": 7.51, "odo_in": 64249.0, "odo_out": 64557.0, "abast": 2}]};
+const sectorMonthly = {"Charles": {"01": {"SETOR DE MANUTENÇÃO CLIENTE": 121, "SERVIÇO INTERNO": 4, "ESTOQUE": 2, "SETOR DE LOGÍSTICA": 4}, "02": {"SETOR DE MANUTENÇÃO CLIENTE": 87, "SERVIÇO INTERNO": 9, "SETOR DE SUPORTE TÉCNICO": 2, "INSTALAÇÃO": 6, "SETOR DE LOGÍSTICA": 2, "MELHORIA CLIENTE": 4, "ESTOQUE": 2}, "03": {"SETOR DE MANUTENÇÃO CLIENTE": 54, "SERVIÇO INTERNO": 10, "INSTALAÇÃO": 30, "SETOR DE RETIRADA DE EQUIPAMENTO": 2, "SETOR DE ATENDIMENTO COMERCIAL": 2, "SETOR DE LOGÍSTICA": 3, "GARANTIA DA EXPERIÊNCIA": 1, "COBRANÇA": 1}, "04": {"SERVIÇO INTERNO": 5, "SETOR DE MANUTENÇÃO CLIENTE": 34, "MELHORIA CLIENTE": 5, "INSTALAÇÃO": 26, "SETOR DE SUPORTE TÉCNICO": 1, "SETOR DE LOGÍSTICA": 2, "ESTOQUE": 1, "SETOR DE RETIRADA DE EQUIPAMENTO": 1}, "05": {"SETOR DE MANUTENÇÃO CLIENTE": 60, "INSTALAÇÃO": 29, "SETOR DE LOGÍSTICA": 4, "SERVIÇO INTERNO": 4, "MELHORIA CLIENTE": 11, "SETOR DE RETIRADA DE EQUIPAMENTO": 1}, "06": {"INSTALAÇÃO": 6, "SETOR DE MANUTENÇÃO CLIENTE": 111, "SETOR DE LOGÍSTICA": 4, "SERVIÇO INTERNO": 9, "MELHORIA CLIENTE": 2}, "07": {"SETOR DE MANUTENÇÃO CLIENTE": 127, "SERVIÇO INTERNO": 4, "MELHORIA CLIENTE": 7, "INSTALAÇÃO": 2, "CONTROLADOR MANUTENÇÃO": 1, "SETOR DE LOGÍSTICA": 1}, "08": {"SETOR DE MANUTENÇÃO CLIENTE": 1}}, "Jose Fernando": {"01": {"SETOR DE MANUTENÇÃO CLIENTE": 54, "SETOR DE LOGÍSTICA": 1, "SERVIÇO INTERNO": 6, "MELHORIA CLIENTE": 1}, "02": {"SETOR DE MANUTENÇÃO CLIENTE": 124, "MELHORIA CLIENTE": 7, "SERVIÇO INTERNO": 10, "SETOR DE LOGÍSTICA": 5, "INSTALAÇÃO": 1}, "03": {"SETOR DE MANUTENÇÃO CLIENTE": 137, "SERVIÇO INTERNO": 12, "SETOR DE LOGÍSTICA": 6, "MELHORIA CLIENTE": 5}, "04": {"MELHORIA CLIENTE": 17, "SETOR DE MANUTENÇÃO CLIENTE": 132, "SETOR DE LOGÍSTICA": 8, "SERVIÇO INTERNO": 6, "INSTALAÇÃO": 1}, "05": {"SETOR DE MANUTENÇÃO CLIENTE": 137, "MELHORIA CLIENTE": 16, "SERVIÇO INTERNO": 8, "SETOR DE LOGÍSTICA": 7}, "06": {"SETOR DE LOGÍSTICA": 2, "SETOR DE MANUTENÇÃO CLIENTE": 18, "SERVIÇO INTERNO": 2}}, "Carlos Arthur": {"02": {"GARANTIA DA EXPERIÊNCIA": 139, "INSTALAÇÃO": 2}, "03": {"GARANTIA DA EXPERIÊNCIA": 399, "INSTALAÇÃO": 5, "SETOR DE ATENDIMENTO COMERCIAL": 5, "ESTOQUE": 6, "ATENDIMENTO FINANCEIRO (CLIENTE)": 5, "MELHORIA CLIENTE": 1, "SETOR DE RENOVAÇÃO DE CONTRATO": 1}, "04": {"GARANTIA DA EXPERIÊNCIA": 244, "INSTALAÇÃO": 3, "ATENDIMENTO FINANCEIRO (CLIENTE)": 2, "COBRANÇA": 1}, "05": {"GARANTIA DA EXPERIÊNCIA": 203, "ESTOQUE": 2, "SETOR DE MANUTENÇÃO CLIENTE": 1, "MELHORIA CLIENTE": 3, "INSTALAÇÃO": 1}, "06": {"GARANTIA DA EXPERIÊNCIA": 107}, "07": {"MELHORIA CLIENTE": 5, "SETOR DE MANUTENÇÃO CLIENTE": 93, "SERVIÇO INTERNO": 9, "SEPARAÇÃO DE MATERIAIS PARA COLABORADOR": 1}, "08": {"SETOR DE MANUTENÇÃO CLIENTE": 108, "MELHORIA CLIENTE": 7, "SERVIÇO INTERNO": 8, "SEPARAÇÃO DE MATERIAIS PARA COLABORADOR": 3, "INSTALAÇÃO": 2}}, "Marcos Paulo": {"01": {"SETOR DE RETIRADA DE EQUIPAMENTO": 3, "MELHORIA CLIENTE": 1, "SETOR DE MANUTENÇÃO CLIENTE": 2}, "02": {"SETOR DE MANUTENÇÃO CLIENTE": 51, "SETOR DE RETIRADA DE EQUIPAMENTO": 3, "MELHORIA CLIENTE": 5, "SERVIÇO INTERNO": 4}, "03": {"SETOR DE MANUTENÇÃO CLIENTE": 111, "SERVIÇO INTERNO": 24, "SETOR DE RETIRADA DE EQUIPAMENTO": 14, "SETOR DE LOGÍSTICA": 6, "MELHORIA CLIENTE": 3, "INSTALAÇÃO": 2, "SETOR DE T.I": 1}, "04": {"SETOR DE MANUTENÇÃO CLIENTE": 91, "SETOR DE RETIRADA DE EQUIPAMENTO": 16, "MELHORIA CLIENTE": 12, "INSTALAÇÃO": 13, "SERVIÇO INTERNO": 12, "SETOR DE LOGÍSTICA": 4, "SETOR DE SUPORTE TÉCNICO": 1}, "05": {"SETOR DE MANUTENÇÃO CLIENTE": 92, "INSTALAÇÃO": 28, "SERVIÇO INTERNO": 16, "SETOR DE LOGÍSTICA": 7, "MELHORIA CLIENTE": 22}, "06": {"SETOR DE MANUTENÇÃO CLIENTE": 119, "MELHORIA CLIENTE": 9, "SERVIÇO INTERNO": 9, "SETOR DE LOGÍSTICA": 6, "INSTALAÇÃO": 6}, "07": {"SERVIÇO INTERNO": 13, "SETOR DE MANUTENÇÃO CLIENTE": 151, "MELHORIA CLIENTE": 8, "INSTALAÇÃO": 8, "SEPARAÇÃO DE MATERIAIS PARA COLABORADOR": 2, "SETOR DE LOGÍSTICA": 2}, "08": {"SETOR DE MANUTENÇÃO CLIENTE": 94, "SETOR DE LOGÍSTICA": 4, "SERVIÇO INTERNO": 8, "INSTALAÇÃO": 5, "MELHORIA CLIENTE": 3, "SEPARAÇÃO DE MATERIAIS PARA COLABORADOR": 2}}, "Pedro Henrique": {"02": {"SETOR DE MANUTENÇÃO CLIENTE": 1}, "03": {"SETOR DE MANUTENÇÃO CLIENTE": 35, "SERVIÇO INTERNO": 3, "INSTALAÇÃO": 6}, "04": {"SERVIÇO INTERNO": 8, "SETOR DE MANUTENÇÃO CLIENTE": 103, "SETOR DE SUPORTE TÉCNICO": 1, "SETOR DE LOGÍSTICA": 5, "INSTALAÇÃO": 3, "MELHORIA CLIENTE": 11, "SETOR DE RETIRADA DE EQUIPAMENTO": 1}, "05": {"SETOR DE MANUTENÇÃO CLIENTE": 125, "SETOR DE LOGÍSTICA": 8, "SERVIÇO INTERNO": 13, "MELHORIA CLIENTE": 17, "INSTALAÇÃO": 4, "SETOR DE SUPORTE TÉCNICO": 1}, "06": {"SETOR DE MANUTENÇÃO CLIENTE": 142, "SERVIÇO INTERNO": 4, "MELHORIA CLIENTE": 6, "INSTALAÇÃO": 1, "SETOR DE LOGÍSTICA": 7}, "07": {"SERVIÇO INTERNO": 20, "SETOR DE MANUTENÇÃO CLIENTE": 177, "SETOR DE LOGÍSTICA": 2, "MELHORIA CLIENTE": 7}, "08": {"SETOR DE MANUTENÇÃO CLIENTE": 128, "MELHORIA CLIENTE": 2, "SERVIÇO INTERNO": 6, "SETOR DE LOGÍSTICA": 2, "INSTALAÇÃO": 2, "SEPARAÇÃO DE MATERIAIS PARA COLABORADOR": 1}}};
+const sectorNames = {"1": "Instalação", "3": "Atend. Financeiro", "5": "Setor 5", "13": "Serviço Interno", "20": "Estoque", "21": "Crescimento de Rede", "22": "Manut. Rede", "23": "Manut. Cliente", "24": "Suporte Técnico", "28": "Controlador Manut.", "30": "Garantia da Experiência", "31": "Cobrança", "34": "Setor 34", "39": "Retirada de Equipamento", "51": "Melhoria Cliente", "58": "Setor 58", "62": "Melhoria de Rede", "63": "Logística", "70": "Separação Materiais"};
 const FIXO = 4475.44;
-const avgPricePerLiter = 6.715;
-const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul'];
-
-const techs = [
-  {nome:'Charles',cor:'#3b82f6',veiculo:'SQX7G99 (Argo)',inicio:'01/01',fim:'31/07',fixoMonths:7.0,osTotal:804,fuelTotal:6069.17,fixoTotal:31328.08,litros:903.8},
-  {nome:'Jose Fernando',cor:'#f59e0b',veiculo:'N/A',inicio:'04/01',fim:'04/06 (afastado)',fixoMonths:5.04,osTotal:723,fuelTotal:4703.80,fixoTotal:22540.82,litros:700.5,afastado:[6]},
-  {nome:'Carlos Arthur',cor:'#10b981',veiculo:'LUG3H26 (Onix)',inicio:'01/07 (MC)',fim:'31/07',fixoMonths:1.0,osTotal:108,fuelTotal:88.59,fixoTotal:4475.44,litros:13.2},
-  {nome:'Marcos Paulo',cor:'#8b5cf6',veiculo:'SQX7G68 (Argo)',inicio:'19/01',fim:'31/07',fixoMonths:6.42,osTotal:877,fuelTotal:4769.01,fixoTotal:28729.44,litros:710.2},
-  {nome:'Pedro Henrique',cor:'#ec4899',veiculo:'N/A',inicio:'20/02',fim:'31/07',fixoMonths:5.32,osTotal:711,fuelTotal:2833.60,fixoTotal:23815.73,litros:422.0}
-];
-
-const osMonthly = {
-  'Charles':[131,112,103,75,109,132,142],
-  'Jose Fernando':[62,147,160,164,168,22,0],
-  'Carlos Arthur':[0,0,0,0,0,0,108],
-  'Marcos Paulo':[6,63,161,149,165,149,184],
-  'Pedro Henrique':[0,1,44,132,168,160,206]
-};
-
-const fixoMonthly = {
-  'Charles':[4475.44,4475.44,4475.44,4475.44,4475.44,4475.44,4475.44],
-  'Jose Fernando':[4041.32,4475.44,4475.44,4475.44,4475.44,595.39,0],
-  'Carlos Arthur':[0,0,0,0,0,0,4475.44],
-  'Marcos Paulo':[1875.41,4475.44,4475.44,4475.44,4475.44,4475.44,4475.44],
-  'Pedro Henrique':[0,1437.37,4475.44,4475.44,4475.44,4475.44,4475.44]
-};
-
-const fuelMonthly = {};
-techs.forEach(function(t) {
-  fuelMonthly[t.nome] = meses.map(function(m,i) {
-    if(t.osTotal > 0 && osMonthly[t.nome][i] > 0) {
-      return t.fuelTotal * (osMonthly[t.nome][i] / t.osTotal);
-    }
-    return 0;
-  });
-});
-
-const monthlyTotals = meses.map(function(m,i) {
-  var os=0,fixo=0,fuel=0,ativos=0;
-  techs.forEach(function(t) {
-    os += osMonthly[t.nome][i];
-    fixo += fixoMonthly[t.nome][i];
-    fuel += fuelMonthly[t.nome][i];
-    if(osMonthly[t.nome][i] > 0) ativos++;
-  });
-  return {mes:m,os:os,fixo:fixo,fuel:fuel,total:fixo+fuel,cpos:os>0?(fixo+fuel)/os:0,ativos:ativos};
-});
-
-var grandOS = techs.reduce(function(s,t){return s+t.osTotal;},0);
-var grandFixo = techs.reduce(function(s,t){return s+t.fixoTotal;},0);
-var grandFuel = techs.reduce(function(s,t){return s+t.fuelTotal;},0);
-var grandTotal = grandFixo + grandFuel;
-var grandCPOS = grandTotal / grandOS;
-
-Chart.defaults.color = '#94a3b8';
-Chart.defaults.font.family = '-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif';
-Chart.defaults.font.size = 11;
-
-// === TAB SWITCH ===
-function showTab(name, btn) {
-  document.querySelectorAll('.tab-content').forEach(function(t) { t.classList.remove('active'); });
-  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-  document.getElementById('tab-'+name).classList.add('active');
-  if(btn) btn.classList.add('active');
-}
-
-// === TAB 1: CUSTO ===
-document.getElementById('statsCusto').innerHTML =
-  '<div class="stat"><div class="stat-label">Custo Total (7 meses)</div><div class="stat-value">R$ ' + grandTotal.toLocaleString('pt-BR',{minimumFractionDigits:2}) + '</div><div class="stat-sub">Fixo: R$ ' + grandFixo.toLocaleString('pt-BR',{minimumFractionDigits:0}) + ' + Combustível: R$ ' + grandFuel.toLocaleString('pt-BR',{minimumFractionDigits:0}) + '</div></div>' +
-  '<div class="stat"><div class="stat-label">Total de OS</div><div class="stat-value">' + grandOS.toLocaleString('pt-BR') + '</div><div class="stat-sub">Excluindo setores 76 e 84</div></div>' +
-  '<div class="stat"><div class="stat-label">Custo por OS</div><div class="stat-value">R$ ' + grandCPOS.toFixed(2) + '</div><div class="stat-sub">Média geral da equipe</div></div>' +
-  '<div class="stat"><div class="stat-label">Custo Mensal Médio</div><div class="stat-value">R$ ' + (grandTotal/7).toLocaleString('pt-BR',{minimumFractionDigits:0}) + '</div><div class="stat-sub">Inclui meses com equipe reduzida</div></div>';
-
-var colors = {primary:'#3b82f6',green:'#10b981',amber:'#f59e0b',border:'#334155'};
-
-new Chart(document.getElementById('chartCost'),{type:'bar',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[
-  {label:'Custo Fixo',data:monthlyTotals.map(function(m){return m.fixo;}),backgroundColor:colors.primary,borderRadius:4,stack:'a'},
-  {label:'Combustível',data:monthlyTotals.map(function(m){return m.fuel;}),backgroundColor:colors.green,borderRadius:4,stack:'a'}
-]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'k';}}}}}});
-
+const monthlyTotals = meses.map(function(m,i){var os=0,fixo=0,fuel=0,ativos=0;techs.forEach(function(t){os+=osMonthly[t.nome][i];fixo+=fixoMonthly[t.nome][i];fuel+=fuelMonthly[t.nome][i];if(osMonthly[t.nome][i]>0)ativos++;});return{mes:m,os:os,fixo:fixo,fuel:fuel,total:fixo+fuel,cpos:os>0?(fixo+fuel)/os:0,ativos:ativos};});
+var grandOS=techs.reduce(function(s,t){return s+t.osTotal;},0);
+var grandFixo=techs.reduce(function(s,t){return s+t.fixoTotal;},0);
+var grandFuel=techs.reduce(function(s,t){return s+t.fuelTotal;},0);
+var grandTotal=grandFixo+grandFuel;
+var grandCPOS=grandTotal/grandOS;
+var grandKM=techs.reduce(function(s,t){return s+t.km;},0);
+var grandLitros=techs.reduce(function(s,t){return s+t.litros;},0);
+Chart.defaults.color='#94a3b8';
+Chart.defaults.font.family='-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif';
+Chart.defaults.font.size=11;
+function showTab(name,btn){document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.getElementById('tab-'+name).classList.add('active');if(btn)btn.classList.add('active');}
+var colors={primary:'#3b82f6',green:'#10b981',amber:'#f59e0b',border:'#334155',red:'#ef4444'};
+// TAB1
+document.getElementById('statsCusto').innerHTML='<div class="stat"><div class="stat-label">Custo Total (7 meses)</div><div class="stat-value">R$ '+grandTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})+'</div><div class="stat-sub">Fixo: R$ '+grandFixo.toLocaleString('pt-BR',{minimumFractionDigits:0})+' + Combustível: R$ '+grandFuel.toLocaleString('pt-BR',{minimumFractionDigits:0})+'</div></div><div class="stat"><div class="stat-label">Total de OS</div><div class="stat-value">'+grandOS.toLocaleString('pt-BR')+'</div><div class="stat-sub">Excluindo setores 76 e 84</div></div><div class="stat"><div class="stat-label">Custo por OS</div><div class="stat-value">R$ '+grandCPOS.toFixed(2)+'</div><div class="stat-sub">Média geral da equipe</div></div><div class="stat"><div class="stat-label">Custo Mensal Médio</div><div class="stat-value">R$ '+(grandTotal/7).toLocaleString('pt-BR',{minimumFractionDigits:0})+'</div><div class="stat-sub">Inclui meses com equipe reduzida</div></div>';
+new Chart(document.getElementById('chartCost'),{type:'bar',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[{label:'Custo Fixo',data:monthlyTotals.map(function(m){return m.fixo;}),backgroundColor:colors.primary,borderRadius:4,stack:'a'},{label:'Combustível',data:monthlyTotals.map(function(m){return m.fuel;}),backgroundColor:colors.green,borderRadius:4,stack:'a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'k';}}}}}});
 new Chart(document.getElementById('chartOS'),{type:'line',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[{label:'OS/mês',data:monthlyTotals.map(function(m){return m.os;}),borderColor:colors.primary,backgroundColor:'rgba(59,130,246,0.1)',fill:true,tension:.3,pointRadius:5,pointBackgroundColor:colors.primary}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:colors.border}}}}});
-
 new Chart(document.getElementById('chartCPOS'),{type:'line',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[{label:'Custo/OS',data:monthlyTotals.map(function(m){return m.cpos;}),borderColor:colors.amber,backgroundColor:'rgba(245,158,11,0.1)',fill:true,tension:.3,pointRadius:5,pointBackgroundColor:colors.amber}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+v.toFixed(0);}}}}}});
-
-new Chart(document.getElementById('chartTechCost'),{type:'bar',data:{labels:techs.map(function(t){return t.nome;}),datasets:[
-  {label:'Custo Fixo',data:techs.map(function(t){return t.fixoTotal;}),backgroundColor:colors.primary,borderRadius:4,stack:'a'},
-  {label:'Combustível',data:techs.map(function(t){return t.fuelTotal;}),backgroundColor:colors.green,borderRadius:4,stack:'a'}
-]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'k';}}}}}});
-
-// Table: Tech monthly detail
-var htmlTech = '<thead><tr><th>Técnico</th><th>Mês</th><th>OS</th><th>Custo Fixo</th><th>Combustível</th><th>Custo Total</th><th>Custo/OS</th><th>Status</th></tr></thead><tbody>';
-techs.forEach(function(t) {
-  meses.forEach(function(m,i) {
-    var os = osMonthly[t.nome][i];
-    var fixo = fixoMonthly[t.nome][i];
-    var fuel = fuelMonthly[t.nome][i];
-    var total = fixo + fuel;
-    var cpos = os > 0 ? total/os : 0;
-    var isAfastado = t.afastado && t.afastado.indexOf(i) >= 0;
-    var status = isAfastado ? '<span class="badge badge-away">AFASTADO</span>' : (os > 0 ? '<span class="badge badge-active">ATIVO</span>' : '<span class="badge badge-inactive">—</span>');
-    if(os > 0 || fixo > 0 || isAfastado) {
-      htmlTech += '<tr><td>' + t.nome + '</td><td>' + m + '</td><td>' + (os||'—') + '</td><td>R$ ' + fixo.toFixed(2) + '</td><td>' + (fuel>0?'R$ '+fuel.toFixed(2):'—') + '</td><td>R$ ' + total.toFixed(2) + '</td><td>' + (os>0?'R$ '+cpos.toFixed(2):'—') + '</td><td>' + status + '</td></tr>';
-    }
-  });
-});
-htmlTech += '</tbody>';
-document.getElementById('tableTech').innerHTML = htmlTech;
-
-// Table: Summary per tech
-var htmlSum = '<thead><tr><th>Técnico</th><th>Período</th><th>Meses Fixo</th><th>OS Total</th><th>Média OS/mês</th><th>Custo Fixo</th><th>Combustível</th><th>Custo Total</th><th>Custo/OS</th></tr></thead><tbody>';
-techs.forEach(function(t) {
-  var total = t.fixoTotal + t.fuelTotal;
-  var cpos = total / t.osTotal;
-  var activeMonths = osMonthly[t.nome].filter(function(o){return o > 0;}).length;
-  htmlSum += '<tr><td>' + t.nome + '</td><td>' + t.inicio + '–' + t.fim + '</td><td>' + t.fixoMonths.toFixed(2) + '</td><td>' + t.osTotal + '</td><td>' + (t.osTotal/activeMonths).toFixed(0) + '</td><td>R$ ' + t.fixoTotal.toFixed(2) + '</td><td>R$ ' + t.fuelTotal.toFixed(2) + '</td><td>R$ ' + total.toFixed(2) + '</td><td>R$ ' + cpos.toFixed(2) + '</td></tr>';
-});
-htmlSum += '</tbody>';
-document.getElementById('tableSummary').innerHTML = htmlSum;
-
-// Table: Monthly totals
-var htmlMonth = '<thead><tr><th>Mês</th><th>OS Total</th><th>Custo Fixo</th><th>Combustível</th><th>Custo Total</th><th>Custo/OS</th><th>Técnicos Ativos</th></tr></thead><tbody>';
-monthlyTotals.forEach(function(m) {
-  htmlMonth += '<tr><td>' + m.mes + '</td><td>' + m.os + '</td><td>R$ ' + m.fixo.toFixed(2) + '</td><td>R$ ' + m.fuel.toFixed(2) + '</td><td>R$ ' + m.total.toFixed(2) + '</td><td>R$ ' + m.cpos.toFixed(2) + '</td><td>' + m.ativos + '</td></tr>';
-});
-htmlMonth += '</tbody>';
-document.getElementById('tableMonthly').innerHTML = htmlMonth;
-
-// === TAB 2: SETORES ===
-var sectorNames = {
-  '1':'Instalação','3':'Atend. Financeiro','5':'Setor 5','13':'Serviço Interno',
-  '20':'Estoque','21':'Crescimento de Rede','22':'Manut. Rede','23':'Manut. Cliente',
-  '24':'Suporte Técnico','28':'Controlador Manut.','30':'Garantia da Experiência',
-  '31':'Cobrança','34':'Setor 34','39':'Retirada de Equipamento','51':'Melhoria Cliente',
-  '58':'Setor 58','62':'Melhoria de Rede','63':'Logística','70':'Separação Materiais'
-};
-
-var techSectorSummary = {"Charles": {"23": 595, "13": 45, "20": 5, "63": 20, "24": 3, "1": 99, "51": 29, "39": 4, "5": 2, "30": 1, "31": 1, "28": 1}, "Jose Fernando": {"23": 602, "63": 29, "13": 44, "51": 46, "1": 2}, "Carlos Arthur": {"30": 1092, "1": 13, "5": 5, "20": 8, "3": 7, "51": 16, "58": 1, "31": 1, "23": 202, "13": 17, "70": 4}, "Marcos Paulo": {"39": 36, "51": 63, "23": 711, "13": 86, "63": 29, "1": 62, "34": 1, "24": 1, "70": 4}, "Pedro Henrique": {"23": 711, "13": 54, "1": 16, "24": 2, "63": 24, "51": 43, "39": 1, "70": 1}};
-var techMonthlySectors = {"Charles": {"Jan": {"23": 121, "13": 4, "20": 2, "63": 4}, "Fev": {"23": 87, "13": 9, "24": 2, "1": 6, "63": 2, "51": 4, "20": 2}, "Mar": {"23": 54, "13": 10, "1": 30, "39": 2, "5": 2, "63": 3, "30": 1, "31": 1}, "Abr": {"13": 5, "23": 34, "51": 5, "1": 26, "24": 1, "63": 2, "20": 1, "39": 1}, "Mai": {"23": 60, "1": 29, "63": 4, "13": 4, "51": 11, "39": 1}, "Jun": {"1": 6, "23": 111, "63": 4, "13": 9, "51": 2}, "Jul": {"23": 127, "13": 4, "51": 7, "1": 2, "28": 1, "63": 1}}, "Jose Fernando": {"Jan": {"23": 54, "63": 1, "13": 6, "51": 1}, "Fev": {"23": 124, "51": 7, "13": 10, "63": 5, "1": 1}, "Mar": {"23": 137, "13": 12, "63": 6, "51": 5}, "Abr": {"51": 17, "23": 132, "63": 8, "13": 6, "1": 1}, "Mai": {"23": 137, "51": 16, "13": 8, "63": 7}, "Jun": {"63": 2, "23": 18, "13": 2}, "Jul": {}}, "Carlos Arthur": {"Jan": {}, "Fev": {"30": 139, "1": 2}, "Mar": {"30": 399, "1": 5, "5": 5, "20": 6, "3": 5, "51": 1, "58": 1}, "Abr": {"30": 244, "1": 3, "3": 2, "31": 1}, "Mai": {"30": 203, "20": 2, "23": 1, "51": 3, "1": 1}, "Jun": {"30": 107}, "Jul": {"51": 5, "23": 93, "13": 9, "70": 1}}, "Marcos Paulo": {"Jan": {"39": 3, "51": 1, "23": 2}, "Fev": {"23": 51, "39": 3, "51": 5, "13": 4}, "Mar": {"23": 111, "13": 24, "39": 14, "63": 6, "51": 3, "1": 2, "34": 1}, "Abr": {"23": 91, "39": 16, "51": 12, "1": 13, "13": 12, "63": 4, "24": 1}, "Mai": {"23": 92, "1": 28, "13": 16, "63": 7, "51": 22}, "Jun": {"23": 119, "51": 9, "13": 9, "63": 6, "1": 6}, "Jul": {"13": 13, "23": 151, "51": 8, "1": 8, "70": 2, "63": 2}}, "Pedro Henrique": {"Jan": {}, "Fev": {"23": 1}, "Mar": {"23": 35, "13": 3, "1": 6}, "Abr": {"13": 8, "23": 103, "24": 1, "63": 5, "1": 3, "51": 11, "39": 1}, "Mai": {"23": 125, "63": 8, "13": 13, "51": 17, "1": 4, "24": 1}, "Jun": {"23": 142, "13": 4, "51": 6, "1": 1, "63": 7}, "Jul": {"13": 20, "23": 177, "63": 2, "51": 7}}};
-
-var totalSectorOS = 0;
-Object.keys(techSectorSummary).forEach(function(k) {
-  Object.keys(techSectorSummary[k]).forEach(function(s) {
-    totalSectorOS += techSectorSummary[k][s];
-  });
-});
-
-var uniqueSectors = new Set();
-Object.keys(techSectorSummary).forEach(function(k) {
-  Object.keys(techSectorSummary[k]).forEach(function(s) { uniqueSectors.add(s); });
-});
-
-document.getElementById('statsSetores').innerHTML =
-  '<div class="stat"><div class="stat-label">Total de OS Analisadas</div><div class="stat-value">' + totalSectorOS + '</div><div class="stat-sub">Jan-Jul 2026, sem 76/84</div></div>' +
-  '<div class="stat"><div class="stat-label">Setores Distintos</div><div class="stat-value">' + uniqueSectors.size + '</div><div class="stat-sub">Setores produtivos mapeados</div></div>' +
-  '<div class="stat"><div class="stat-label">Técnicos</div><div class="stat-value">5</div><div class="stat-sub">Manutenção Cliente</div></div>' +
-  '<div class="stat"><div class="stat-label">Setor Principal</div><div class="stat-value">23</div><div class="stat-sub">Manut. Cliente (NOC)</div></div>';
-
-var allSectors = Array.from(uniqueSectors).sort(function(a,b) {
-  var totA = 0, totB = 0;
-  Object.keys(techSectorSummary).forEach(function(k) {
-    totA += techSectorSummary[k][a] || 0;
-    totB += techSectorSummary[k][b] || 0;
-  });
-  return totB - totA;
-});
-
-var sectorColors = ['#3b82f6','#10b981','#f59e0b','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1','#14b8a6','#a855f7','#eab308','#3f6212','#7c2d12','#1e3a8a','#4c1d95','#831843','#0c4a6e'];
-var sectorDatasets = allSectors.map(function(s,i) {
-  return {
-    label: s + ' - ' + (sectorNames[s]||s),
-    data: techs.map(function(t) { return (techSectorSummary[t.nome] && techSectorSummary[t.nome][s]) || 0; }),
-    backgroundColor: sectorColors[i % sectorColors.length],
-    borderRadius: 3,
-    stack: 'a'
-  };
-});
-
+new Chart(document.getElementById('chartTechCost'),{type:'bar',data:{labels:techs.map(function(t){return t.nome;}),datasets:[{label:'Custo Fixo',data:techs.map(function(t){return t.fixoTotal;}),backgroundColor:colors.primary,borderRadius:4,stack:'a'},{label:'Combustível',data:techs.map(function(t){return t.fuelTotal;}),backgroundColor:colors.green,borderRadius:4,stack:'a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'k';}}}}}});
+var htmlTech='<thead><tr><th>Técnico</th><th>Mês</th><th>OS</th><th>Custo Fixo</th><th>Combustível</th><th>Custo Total</th><th>Custo/OS</th></tr></thead><tbody>';
+techs.forEach(function(t){meses.forEach(function(m,i){var os=osMonthly[t.nome][i];var fixo=fixoMonthly[t.nome][i];var fuel=fuelMonthly[t.nome][i];var total=fixo+fuel;var cpos=os>0?total/os:0;if(os>0||fixo>0){htmlTech+='<tr><td>'+t.nome+'</td><td>'+m+'</td><td>'+(os||'—')+'</td><td>R$ '+fixo.toFixed(2)+'</td><td>'+(fuel>0?'R$ '+fuel.toFixed(2):'—')+'</td><td>R$ '+total.toFixed(2)+'</td><td>'+(os>0?'R$ '+cpos.toFixed(2):'—')+'</td></tr>';}});});
+htmlTech+='</tbody>';document.getElementById('tableTech').innerHTML=htmlTech;
+var htmlSum='<thead><tr><th>Técnico</th><th>Veículo</th><th>Período</th><th>OS Total</th><th>Custo Fixo</th><th>Combustível</th><th>Custo Total</th><th>Custo/OS</th><th>KM Total</th><th>KM/L</th></tr></thead><tbody>';
+techs.forEach(function(t){var total=t.fixoTotal+t.fuelTotal;var cpos=total/t.osTotal;htmlSum+='<tr><td>'+t.nome+'</td><td>'+t.veiculo+'</td><td>'+t.inicio+'–'+t.fim+'</td><td>'+t.osTotal+'</td><td>R$ '+t.fixoTotal.toFixed(2)+'</td><td>R$ '+t.fuelTotal.toFixed(2)+'</td><td>R$ '+total.toFixed(2)+'</td><td>R$ '+cpos.toFixed(2)+'</td><td>'+t.km.toLocaleString('pt-BR')+'</td><td>'+(t.km_l>0?t.km_l.toFixed(2):'—')+'</td></tr>';});
+htmlSum+='</tbody>';document.getElementById('tableSummary').innerHTML=htmlSum;
+var htmlMonth='<thead><tr><th>Mês</th><th>OS Total</th><th>Custo Fixo</th><th>Combustível</th><th>Custo Total</th><th>Custo/OS</th><th>Ativos</th></tr></thead><tbody>';
+monthlyTotals.forEach(function(m){htmlMonth+='<tr><td>'+m.mes+'</td><td>'+m.os+'</td><td>R$ '+m.fixo.toFixed(2)+'</td><td>R$ '+m.fuel.toFixed(2)+'</td><td>R$ '+m.total.toFixed(2)+'</td><td>R$ '+m.cpos.toFixed(2)+'</td><td>'+m.ativos+'</td></tr>';});
+htmlMonth+='</tbody>';document.getElementById('tableMonthly').innerHTML=htmlMonth;
+// TAB2
+var allSectors=[];techs.forEach(function(t){Object.keys(sectorMonthly[t.nome]||{}).forEach(function(mk){Object.keys(sectorMonthly[t.nome][mk]||{}).forEach(function(sector){if(allSectors.indexOf(sector)<0)allSectors.push(sector);});});});allSectors.sort();
+var totalOSsectors=0;techs.forEach(function(t){Object.keys(sectorMonthly[t.nome]||{}).forEach(function(mk){Object.keys(sectorMonthly[t.nome][mk]||{}).forEach(function(sector){totalOSsectors+=sectorMonthly[t.nome][mk][sector];});});});
+document.getElementById('statsSetores').innerHTML='<div class="stat"><div class="stat-label">Total de OS</div><div class="stat-value">'+totalOSsectors.toLocaleString('pt-BR')+'</div><div class="stat-sub">Jan-Jul 2026, sem 76/84</div></div><div class="stat"><div class="stat-label">Setores Distintos</div><div class="stat-value">'+allSectors.length+'</div><div class="stat-sub">Setores produtivos mapeados</div></div><div class="stat"><div class="stat-label">Técnicos</div><div class="stat-value">'+techs.length+'</div><div class="stat-sub">Manutenção Cliente</div></div><div class="stat"><div class="stat-label">Setor Principal</div><div class="stat-value">23</div><div class="stat-sub">Manut. Cliente (NOC)</div></div>';
+var sectorColors=['#3b82f6','#10b981','#f59e0b','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#6366f1','#14b8a6','#e879f9','#a78bfa','#fb7185','#2dd4bf','#facc15','#60a5fa'];
+var sectorDatasets=allSectors.map(function(s,i){return{label:s.replace('SETOR DE ','').replace('SETOR ',''),data:techs.map(function(t){var total=0;Object.keys(sectorMonthly[t.nome]||{}).forEach(function(mk){if(sectorMonthly[t.nome][mk]&&sectorMonthly[t.nome][mk][s])total+=sectorMonthly[t.nome][mk][s];});return total;}),backgroundColor:sectorColors[i%sectorColors.length],borderRadius:2,stack:'a'};});
 new Chart(document.getElementById('chartSector'),{type:'bar',data:{labels:techs.map(function(t){return t.nome;}),datasets:sectorDatasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:12,font:{size:9}}},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+c.raw+' OS';}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border}}}}});
-
-// Sector summary table
-var htmlSec = '<thead><tr><th>Técnico</th>';
-allSectors.forEach(function(s) { htmlSec += '<th>' + s + '</th>'; });
-htmlSec += '<th>Total</th></tr></thead><tbody>';
-techs.forEach(function(t) {
-  htmlSec += '<tr><td>' + t.nome + '</td>';
-  var rowTotal = 0;
-  allSectors.forEach(function(s) {
-    var v = (techSectorSummary[t.nome] && techSectorSummary[t.nome][s]) || 0;
-    rowTotal += v;
-    htmlSec += '<td>' + (v||'—') + '</td>';
-  });
-  htmlSec += '<td><b>' + rowTotal + '</b></td></tr>';
-});
-htmlSec += '<tr style="border-top:2px solid var(--border)"><td><b>TOTAL</b></td>';
-allSectors.forEach(function(s) {
-  var v = techs.reduce(function(sum,t) { return sum + ((techSectorSummary[t.nome] && techSectorSummary[t.nome][s]) || 0); }, 0);
-  htmlSec += '<td><b>' + (v||'—') + '</b></td>';
-});
-var grandSec = techs.reduce(function(sum,t) { return sum + (techSectorSummary[t.nome] ? Object.values(techSectorSummary[t.nome]).reduce(function(a,b){return a+b;},0) : 0); }, 0);
-htmlSec += '<td><b>' + grandSec + '</b></td></tr></tbody>';
-document.getElementById('tableSectorSummary').innerHTML = htmlSec;
-
-// Tech selector for monthly sectors
-var selectedTechSector = 0;
-var techSelectHtml = techs.map(function(t,i) { return '<button class="tech-btn ' + (i===0?'active':'') + '" onclick="selectTechSector(' + i + ')">' + t.nome + '</button>'; }).join('');
-document.getElementById('techSelectSetores').innerHTML = techSelectHtml;
-
-function selectTechSector(i) {
-  selectedTechSector = i;
-  document.querySelectorAll('#techSelectSetores .tech-btn').forEach(function(b,j) { b.classList.toggle('active', j===i); });
-  document.getElementById('sectorTechName').textContent = techs[i].nome;
-  updateSectorMonthlyTable(i);
-  updateSectorMonthlyChart(i);
-}
-
-function updateSectorMonthlyTable(i) {
-  var t = techs[i];
-  var data = techMonthlySectors[t.nome] || {};
-  var techSectors = new Set();
-  Object.values(data).forEach(function(m) { Object.keys(m).forEach(function(s) { techSectors.add(s); }); });
-  var sortedSectors = Array.from(techSectors).sort(function(a,b) {
-    var totA = 0, totB = 0;
-    Object.values(data).forEach(function(m) { totA += m[a]||0; totB += m[b]||0; });
-    return totB - totA;
-  });
-  
-  var html = '<thead><tr><th>Setor</th>';
-  meses.forEach(function(m) { html += '<th>' + m + '</th>'; });
-  html += '<th>Total</th></tr></thead><tbody>';
-  sortedSectors.forEach(function(s) {
-    html += '<tr><td>' + s + ' - ' + (sectorNames[s]||s) + '</td>';
-    var total = 0;
-    meses.forEach(function(m) {
-      var v = (data[m] && data[m][s]) || 0;
-      total += v;
-      html += '<td>' + (v||'—') + '</td>';
-    });
-    html += '<td><b>' + total + '</b></td></tr>';
-  });
-  html += '<tr style="border-top:2px solid var(--border)"><td><b>TOTAL</b></td>';
-  meses.forEach(function(m) {
-    var v = data[m] ? Object.values(data[m]).reduce(function(a,b){return a+b;},0) : 0;
-    html += '<td><b>' + (v||'—') + '</b></td>';
-  });
-  var totalAll = Object.values(data).reduce(function(s,m) { return s + (m ? Object.values(m).reduce(function(a,b){return a+b;},0) : 0); }, 0);
-  html += '<td><b>' + totalAll + '</b></td></tr></tbody>';
-  document.getElementById('tableSectorMonthly').innerHTML = html;
-}
-
-var sectorChart = null;
-function updateSectorMonthlyChart(i) {
-  var t = techs[i];
-  var data = techMonthlySectors[t.nome] || {};
-  var techSectors = new Set();
-  Object.values(data).forEach(function(m) { Object.keys(m).forEach(function(s) { techSectors.add(s); }); });
-  var sortedSectors = Array.from(techSectors).sort(function(a,b) {
-    var totA = 0, totB = 0;
-    Object.values(data).forEach(function(m) { totA += m[a]||0; totB += m[b]||0; });
-    return totB - totA;
-  }).slice(0, 8);
-  
-  var datasets = sortedSectors.map(function(s,j) {
-    return {
-      label: s + ' - ' + (sectorNames[s]||s),
-      data: meses.map(function(m) { return (data[m] && data[m][s]) || 0; }),
-      backgroundColor: sectorColors[j % sectorColors.length],
-      borderRadius: 3,
-      stack: 'a'
-    };
-  });
-  
-  if(sectorChart) sectorChart.destroy();
-  sectorChart = new Chart(document.getElementById('chartSectorMonthly'),{type:'bar',data:{labels:meses,datasets:datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:12,font:{size:9}}},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+c.raw+' OS';}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border}}}}});
-}
-
-selectTechSector(0);
-
-// === TAB 3: COMBUSTÍVEL ===
-var totalLiters = techs.reduce(function(s,t){return s+t.litros;},0);
-var totalFuelCost = techs.reduce(function(s,t){return s+t.fuelTotal;},0);
-var totalRefuelings = 73;
-
-document.getElementById('statsFuel').innerHTML =
-  '<div class="stat"><div class="stat-label">Litros Totais (est.)</div><div class="stat-value">' + totalLiters.toFixed(1) + ' L</div><div class="stat-sub">custo / R$ ' + avgPricePerLiter.toFixed(2) + '/litro</div></div>' +
-  '<div class="stat"><div class="stat-label">Custo Combustível</div><div class="stat-value">R$ ' + totalFuelCost.toLocaleString('pt-BR',{minimumFractionDigits:2}) + '</div><div class="stat-sub">Jan-Jul 2026, equipe MC</div></div>' +
-  '<div class="stat"><div class="stat-label">Preço Médio/Litro</div><div class="stat-value">R$ ' + avgPricePerLiter.toFixed(2) + '</div><div class="stat-sub">Média ponderada do período</div></div>' +
-  '<div class="stat"><div class="stat-label">Abastecimentos</div><div class="stat-value">' + totalRefuelings + '</div><div class="stat-sub">Registros na planilha</div></div>' +
-  '<div class="stat"><div class="stat-label">Litros por OS</div><div class="stat-value">' + (totalLiters/grandOS).toFixed(3) + ' L</div><div class="stat-sub">Média da equipe</div></div>' +
-  '<div class="stat"><div class="stat-label">Custo Comb./OS</div><div class="stat-value">R$ ' + (totalFuelCost/grandOS).toFixed(2) + '</div><div class="stat-sub">Combustível / OS</div></div>';
-
-new Chart(document.getElementById('chartFuelMonthly'),{type:'bar',data:{labels:meses,datasets:techs.map(function(t) {
-  return {
-    label:t.nome,
-    data:meses.map(function(m,i) { return fuelMonthly[t.nome][i]; }),
-    backgroundColor:t.cor,
-    borderRadius:3,
-    stack:'a'
-  };
-})},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:12}},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toFixed(2);}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(1)+'k';}}}}}});
-
-var htmlFuel = '<thead><tr><th>Técnico</th><th>Veículo</th>';
-meses.forEach(function(m) { htmlFuel += '<th>' + m + '</th>'; });
-htmlFuel += '<th>Total (R$)</th><th>Total (L)</th><th>L/OS</th></tr></thead><tbody>';
-techs.forEach(function(t) {
-  htmlFuel += '<tr><td>' + t.nome + '</td><td style="text-align:left;font-size:.6875rem">' + t.veiculo + '</td>';
-  meses.forEach(function(m,i) {
-    var f = fuelMonthly[t.nome][i];
-    htmlFuel += '<td>' + (f>0?'R$ '+f.toFixed(2):'—') + '</td>';
-  });
-  htmlFuel += '<td>R$ ' + t.fuelTotal.toFixed(2) + '</td><td>' + t.litros.toFixed(1) + '</td><td>' + (t.litros/t.osTotal).toFixed(3) + '</td></tr>';
-});
-htmlFuel += '<tr style="border-top:2px solid var(--border)"><td><b>TOTAL</b></td><td></td>';
-meses.forEach(function(m,i) {
-  var f = techs.reduce(function(s,t){return s+fuelMonthly[t.nome][i];},0);
-  htmlFuel += '<td><b>R$ ' + f.toFixed(2) + '</b></td>';
-});
-htmlFuel += '<td><b>R$ ' + totalFuelCost.toFixed(2) + '</b></td><td><b>' + totalLiters.toFixed(1) + '</b></td><td><b>' + (totalLiters/grandOS).toFixed(3) + '</b></td></tr></tbody>';
-document.getElementById('tableFuelMonthly').innerHTML = htmlFuel;
-
-var htmlFuelSum = '<thead><tr><th>Técnico</th><th>Veículo</th><th>Início</th><th>Fim</th><th>OS Total</th><th>Combustível (R$)</th><th>Litros (est.)</th><th>R$/OS</th><th>L/OS</th><th>R$/Litro</th></tr></thead><tbody>';
-techs.forEach(function(t) {
-  var rpos = t.fuelTotal / t.osTotal;
-  var lpos = t.litros / t.osTotal;
-  htmlFuelSum += '<tr><td>' + t.nome + '</td><td style="text-align:left;font-size:.6875rem">' + t.veiculo + '</td><td>' + t.inicio + '</td><td>' + t.fim + '</td><td>' + t.osTotal + '</td><td>R$ ' + t.fuelTotal.toFixed(2) + '</td><td>' + t.litros.toFixed(1) + ' L</td><td>R$ ' + rpos.toFixed(2) + '</td><td>' + lpos.toFixed(3) + ' L</td><td>R$ ' + avgPricePerLiter.toFixed(2) + '</td></tr>';
-});
-htmlFuelSum += '</tbody>';
-document.getElementById('tableFuelSummary').innerHTML = htmlFuelSum;
+var htmlSec='<thead><tr><th>Setor</th>';techs.forEach(function(t){htmlSec+='<th>'+t.nome+'</th>';});htmlSec+='<th>Total</th></tr></thead><tbody>';
+allSectors.forEach(function(s){var rowTotal=0;htmlSec+='<tr><td>'+s.replace('SETOR DE ','').replace('SETOR ','')+'</td>';techs.forEach(function(t){var total=0;Object.keys(sectorMonthly[t.nome]||{}).forEach(function(mk){if(sectorMonthly[t.nome][mk]&&sectorMonthly[t.nome][mk][s])total+=sectorMonthly[t.nome][mk][s];});rowTotal+=total;htmlSec+='<td>'+(total>0?total:'—')+'</td>';});htmlSec+='<td><strong>'+rowTotal+'</strong></td></tr>';});
+htmlSec+='</tbody>';document.getElementById('tableSectorSummary').innerHTML=htmlSec;
+var currentSectorTech=techs[0].nome;
+function renderSectorMonthly(){var techData=sectorMonthly[currentSectorTech]||{};var html='<thead><tr><th>Setor</th>';meses.forEach(function(m){html+='<th>'+m+'</th>';});html+='<th>Total</th></tr></thead><tbody>';var sectorTotals={};Object.keys(techData).forEach(function(mk){Object.keys(techData[mk]).forEach(function(sector){if(!sectorTotals[sector])sectorTotals[sector]={};sectorTotals[sector][mk]=techData[mk][sector];});});Object.keys(sectorTotals).sort().forEach(function(sector){var total=0;html+='<tr><td>'+sector.replace('SETOR DE ','').replace('SETOR ','')+'</td>';for(var i=1;i<=7;i++){var mk=String(i).padStart(2,'0');var val=sectorTotals[sector][mk]||0;total+=val;html+='<td>'+(val>0?val:'—')+'</td>';}html+='<td><strong>'+total+'</strong></td></tr>';});html+='</tbody>';document.getElementById('tableSectorMonthly').innerHTML=html;document.getElementById('sectorTechName').textContent=currentSectorTech;var chartData=Object.keys(sectorTotals).map(function(sector,idx){var data=[];for(var i=1;i<=7;i++){var mk=String(i).padStart(2,'0');data.push(sectorTotals[sector][mk]||0);}return{label:sector.replace('SETOR DE ','').replace('SETOR ',''),data:data,borderColor:sectorColors[idx%sectorColors.length],backgroundColor:'transparent',tension:.3,pointRadius:3};}).filter(function(d){return d.data.reduce(function(s,v){return s+v;},0)>0;}).slice(0,8);var ctx=document.getElementById('chartSectorMonthly');if(window.sectorChart)window.sectorChart.destroy();window.sectorChart=new Chart(ctx,{type:'line',data:{labels:meses,datasets:chartData},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{boxWidth:12,font:{size:9}}}},scales:{y:{beginAtZero:true,grid:{color:colors.border}}}}});}
+var techButtonsHtml='';techs.forEach(function(t,i){techButtonsHtml+='<button class="tech-btn '+(i===0?'active':'')+'" onclick="selectSectorTech(\''+t.nome+'\',this)">'+t.nome+'</button>';});document.getElementById('techSelectSetores').innerHTML=techButtonsHtml;
+function selectSectorTech(name,btn){currentSectorTech=name;document.querySelectorAll('#techSelectSetores .tech-btn').forEach(function(b){b.classList.remove('active');});if(btn)btn.classList.add('active');renderSectorMonthly();}
+renderSectorMonthly();
+// TAB3
+document.getElementById('statsFuel').innerHTML='<div class="stat"><div class="stat-label">Litros Totais</div><div class="stat-value">'+grandLitros.toLocaleString('pt-BR',{minimumFractionDigits:1})+' L</div><div class="stat-sub">Dados reais da planilha</div></div><div class="stat"><div class="stat-label">Custo Combustível</div><div class="stat-value">R$ '+grandFuel.toLocaleString('pt-BR',{minimumFractionDigits:2})+'</div><div class="stat-sub">Jan-Jul 2026, equipe MC</div></div><div class="stat"><div class="stat-label">KM Total Rodado</div><div class="stat-value">'+grandKM.toLocaleString('pt-BR')+' km</div><div class="stat-sub">Odômetro da planilha</div></div><div class="stat"><div class="stat-label">Consumo Médio</div><div class="stat-value">'+(grandKM/grandLitros).toFixed(2)+' km/L</div><div class="stat-sub">Média da equipe</div></div><div class="stat"><div class="stat-label">Abastecimentos</div><div class="stat-value">'+techs.reduce(function(s,t){return s+t.abastecimentos;},0)+'</div><div class="stat-sub">Registros na planilha</div></div><div class="stat"><div class="stat-label">Custo Comb./OS</div><div class="stat-value">R$ '+(grandFuel/grandOS).toFixed(2)+'</div><div class="stat-sub">Combustível / OS</div></div>';
+var fuelDatasets=techs.map(function(t){return{label:t.nome,data:fuelMonthly[t.nome],backgroundColor:t.cor,borderRadius:2,stack:'a'};});
+new Chart(document.getElementById('chartFuelMonthly'),{type:'bar',data:{labels:meses,datasets:fuelDatasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(1)+'k';}}}}}});
+var htmlFuel='<thead><tr><th>Técnico</th><th>Veículo</th><th>Mês</th><th>Abast.</th><th>Litros</th><th>R$ Total</th><th>R$/L</th><th>KM</th><th>KM/L</th><th>Odômetro Inicial</th><th>Odômetro Final</th></tr></thead><tbody>';
+techs.forEach(function(t){meses.forEach(function(m,i){var fd=fuelDetail[t.nome][i];if(fd&&fd.valor>0){htmlFuel+='<tr><td>'+t.nome+'</td><td>'+t.veiculo+'</td><td>'+m+'</td><td>'+fd.abast+'</td><td>'+fd.litros.toFixed(2)+'</td><td>R$ '+fd.valor.toFixed(2)+'</td><td>R$ '+(fd.valor/fd.litros).toFixed(3)+'</td><td>'+fd.km.toLocaleString('pt-BR')+'</td><td class="'+(fd.km_l>=9?'km-good':(fd.km_l>=7?'km-warn':'km-bad'))+'">'+(fd.km_l>0?fd.km_l.toFixed(2):'—')+'</td><td>'+fd.odo_in.toLocaleString('pt-BR')+'</td><td>'+fd.odo_out.toLocaleString('pt-BR')+'</td></tr>';}});});
+htmlFuel+='</tbody>';document.getElementById('tableFuelMonthly').innerHTML=htmlFuel;
+var htmlFuelSum='<thead><tr><th>Técnico</th><th>Veículo</th><th>Placa</th><th>Abast.</th><th>Litros</th><th>R$ Total</th><th>R$/L Médio</th><th>KM Total</th><th>KM/L Médio</th><th>R$/OS</th><th>KM/OS</th></tr></thead><tbody>';
+techs.forEach(function(t){var rpos=t.fuelTotal/t.osTotal;var kmpos=t.km/t.osTotal;var avgPrice=t.litros>0?t.fuelTotal/t.litros:0;var kmClass=t.km_l>=9?'km-good':(t.km_l>=7?'km-warn':'km-bad');htmlFuelSum+='<tr><td>'+t.nome+'</td><td>'+t.veiculo+'</td><td>'+t.placa+'</td><td>'+t.abastecimentos+'</td><td>'+t.litros.toFixed(2)+'</td><td>R$ '+t.fuelTotal.toFixed(2)+'</td><td>R$ '+avgPrice.toFixed(3)+'</td><td>'+t.km.toLocaleString('pt-BR')+'</td><td class="'+kmClass+'">'+(t.km_l>0?t.km_l.toFixed(2):'—')+'</td><td>R$ '+rpos.toFixed(2)+'</td><td>'+kmpos.toFixed(1)+'</td></tr>';});
+htmlFuelSum+='</tbody>';document.getElementById('tableFuelSummary').innerHTML=htmlFuelSum;
+// TAB4
+document.getElementById('statsAnalitico').innerHTML='<div class="stat"><div class="stat-label">Custo Total Real</div><div class="stat-value">R$ '+grandTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})+'</div><div class="stat-sub">Fixo + Combustível real</div></div><div class="stat"><div class="stat-label">Custo/OS Real</div><div class="stat-value">R$ '+grandCPOS.toFixed(2)+'</div><div class="stat-sub">'+grandOS.toLocaleString('pt-BR')+' OS</div></div><div class="stat"><div class="stat-label">KM Total Equipe</div><div class="stat-value">'+grandKM.toLocaleString('pt-BR')+' km</div><div class="stat-sub">'+grandLitros.toFixed(0)+' litros · '+(grandKM/grandLitros).toFixed(1)+' km/L</div></div><div class="stat"><div class="stat-label">Melhor KM/L</div><div class="stat-value">'+techs.reduce(function(b,t){return t.km_l>b.km_l?t:b;},{km_l:0}).km_l.toFixed(2)+' km/L</div><div class="stat-sub">'+techs.reduce(function(b,t){return t.km_l>b.km_l?t:b;},{nome:''}).nome+'</div></div>';
+var efficiencyDatasets=techs.map(function(t){var data=[];for(var i=0;i<7;i++){var fd=fuelDetail[t.nome][i];data.push(fd&&fd.km_l>0?fd.km_l:null);}return{label:t.nome,data:data,borderColor:t.cor,backgroundColor:'transparent',tension:.3,pointRadius:4,spanGaps:true};});
+new Chart(document.getElementById('chartEfficiency'),{type:'line',data:{labels:meses,datasets:efficiencyDatasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+c.raw.toFixed(2)+' km/L';}}}},scales:{y:{beginAtZero:true,suggestedMax:12,grid:{color:colors.border},title:{display:true,text:'KM/L'}},x:{grid:{display:false}}}}});
+var anomalies=[];
+techs.forEach(function(t){if(t.km_l>0&&t.km_l<7){anomalies.push({tech:t.nome,type:'low_kml',desc:'Consumo abaixo de 7 km/L ('+t.km_l.toFixed(2)+') — possível problema mecânico ou rota ineficiente'});}});
+for(var mi=0;mi<7;mi++){techs.forEach(function(t){var fd=fuelDetail[t.nome][mi];if(fd&&fd.km_l>0&&fd.litros>30){if(fd.km_l<5){anomalies.push({tech:t.nome,type:'very_low',desc:meses[mi]+': KM/L crítico de '+fd.km_l.toFixed(2)+' ('+fd.litros.toFixed(0)+'L, '+fd.km+'km)'});}if(mi>0){var prev=fuelDetail[t.nome][mi-1];if(prev&&prev.odo_out>0&&fd.odo_in>0&&fd.odo_in<prev.odo_out-1000){anomalies.push({tech:t.nome,type:'odo_jump',desc:meses[mi]+': Odômetro saltou de '+prev.odo_out.toLocaleString('pt-BR')+' para '+fd.odo_in.toLocaleString('pt-BR')+' — possível erro de registro'});}}}});}
+var alertHtml='<div class="alert-title">⚠ Alertas de Eficiência ('+anomalies.length+')</div>';
+anomalies.forEach(function(a){var icon=a.type==='odo_jump'?'📊':(a.type==='very_low'?'🔴':'🟡');alertHtml+='<div class="alert-item">'+icon+' <strong>'+a.tech+'</strong> — '+a.desc+'</div>';});
+if(anomalies.length===0)alertHtml='<div class="alert-title">✓ Nenhum alerta de eficiência detectado</div>';
+document.getElementById('alertAnomalies').innerHTML=alertHtml;
+new Chart(document.getElementById('chartAnaliticoCost'),{type:'bar',data:{labels:techs.map(function(t){return t.nome;}),datasets:[{label:'Custo Fixo',data:techs.map(function(t){return t.fixoTotal;}),backgroundColor:colors.primary,borderRadius:4,stack:'a'},{label:'Combustível (Real)',data:techs.map(function(t){return t.fuelTotal;}),backgroundColor:colors.green,borderRadius:4,stack:'a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'k';}}}}}});
+var currentAnaliticoTech=techs[0].nome;
+function renderAnalitico(){var t=techs.find(function(x){return x.nome===currentAnaliticoTech;});var kmData=[],litrosData=[];for(var i=0;i<7;i++){var fd=fuelDetail[t.nome][i];kmData.push(fd&&fd.km>0?fd.km:0);litrosData.push(fd&&fd.litros>0?fd.litros:0);}var ctx=document.getElementById('chartAnaliticoKM');if(window.analiticoChart)window.analiticoChart.destroy();window.analiticoChart=new Chart(ctx,{type:'bar',data:{labels:meses,datasets:[{label:'KM Rodados',data:kmData,backgroundColor:t.cor,borderRadius:4,yAxisID:'y'},{label:'Litros',data:litrosData,backgroundColor:colors.green,borderRadius:4,yAxisID:'y1'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{y:{type:'linear',position:'left',title:{display:true,text:'KM'},grid:{color:colors.border}},y1:{type:'linear',position:'right',title:{display:true,text:'Litros'},grid:{display:false}}}}}});document.getElementById('analiticoTechName').textContent=t.nome;document.getElementById('analiticoTableTitle').textContent=t.nome;document.getElementById('analiticoSectorTitle').textContent=t.nome;document.getElementById('analiticoFuelTitle').textContent=t.nome;var html='<thead><tr><th>Mês</th><th>OS</th><th>Custo Fixo</th><th>Combustível</th><th>Litros</th><th>KM</th><th>KM/L</th><th>Custo Total</th><th>Custo/OS</th><th>R$ Comb/OS</th><th>KM/OS</th></tr></thead><tbody>';var totOS=0,totFixo=0,totFuel=0,totLitros=0,totKM=0;meses.forEach(function(m,i){var os=osMonthly[t.nome][i];var fixo=fixoMonthly[t.nome][i];var fd=fuelDetail[t.nome][i];var fuel=fd?fd.valor:0;var litros=fd?fd.litros:0;var km=fd?fd.km:0;var kmL=fd&&fd.km_l>0?fd.km_l:0;var total=fixo+fuel;var cpos=os>0?total/os:0;var rFuelOS=os>0?fuel/os:0;var kmOS=os>0?km/os:0;totOS+=os;totFixo+=fixo,totFuel+=fuel,totLitros+=litros,totKM+=km;var kmClass=kmL>=9?'km-good':(kmL>=7?'km-warn':(kmL>0?'km-bad':''));if(os>0||fixo>0||fuel>0){html+='<tr><td>'+m+'</td><td>'+(os||'—')+'</td><td>R$ '+fixo.toFixed(2)+'</td><td>'+(fuel>0?'R$ '+fuel.toFixed(2):'—')+'</td><td>'+(litros>0?litros.toFixed(2):'—')+'</td><td>'+(km>0?km.toLocaleString('pt-BR'):'—')+'</td><td class="'+kmClass+'">'+(kmL>0?kmL.toFixed(2):'—')+'</td><td>R$ '+total.toFixed(2)+'</td><td>'+(os>0?'R$ '+cpos.toFixed(2):'—')+'</td><td>'+(os>0?'R$ '+rFuelOS.toFixed(2):'—')+'</td><td>'+(os>0?kmOS.toFixed(1):'—')+'</td></tr>';}});html+='<tr style="border-top:2px solid var(--border);font-weight:700"><td>TOTAL</td><td>'+totOS+'</td><td>R$ '+totFixo.toFixed(2)+'</td><td>R$ '+totFuel.toFixed(2)+'</td><td>'+totLitros.toFixed(2)+'</td><td>'+totKM.toLocaleString('pt-BR')+'</td><td>'+(totLitros>0?(totKM/totLitros).toFixed(2):'—')+'</td><td>R$ '+(totFixo+totFuel).toFixed(2)+'</td><td>R$ '+(totOS>0?(totFixo+totFuel)/totOS:0).toFixed(2)+'</td><td>R$ '+(totOS>0?totFuel/totOS:0).toFixed(2)+'</td><td>'+(totOS>0?(totKM/totOS).toFixed(1):'—')+'</td></tr>';html+='</tbody>';document.getElementById('tableAnalitico').innerHTML=html;var techSectors=sectorMonthly[t.nome]||{};var sectorAgg={};Object.keys(techSectors).forEach(function(mk){Object.keys(techSectors[mk]).forEach(function(sector){if(!sectorAgg[sector])sectorAgg[sector]=0;sectorAgg[sector]+=techSectors[mk][sector];});});var htmlSec='<thead><tr><th>Setor</th><th>Total OS</th><th>% do Total</th><th>Custo Atribuído</th><th>Custo/OS Setor</th></tr></thead><tbody>';var totalTechOS=Object.values(sectorAgg).reduce(function(s,v){return s+v;},0);var totalTechCost=t.fixoTotal+t.fuelTotal;Object.keys(sectorAgg).sort(function(a,b){return sectorAgg[b]-sectorAgg[a];}).forEach(function(sector){var pct=(sectorAgg[sector]/totalTechOS*100).toFixed(1);var sectorCost=totalTechCost*(sectorAgg[sector]/totalTechOS);var sectorCPOS=sectorCost/sectorAgg[sector];htmlSec+='<tr><td>'+sector.replace('SETOR DE ','').replace('SETOR ','')+'</td><td>'+sectorAgg[sector]+'</td><td>'+pct+'%</td><td>R$ '+sectorCost.toFixed(2)+'</td><td>R$ '+sectorCPOS.toFixed(2)+'</td></tr>';});htmlSec+='</tbody>';document.getElementById('tableAnaliticoSector').innerHTML=htmlSec;var htmlF='<thead><tr><th>Mês</th><th>Abast.</th><th>Litros</th><th>R$ Total</th><th>R$/L</th><th>KM</th><th>KM/L</th><th>Odômetro Inicial</th><th>Odômetro Final</th><th>KM no Período</th></tr></thead><tbody>';var totAbast=0,totL=0,totV=0,totK=0;meses.forEach(function(m,i){var fd=fuelDetail[t.nome][i];if(fd&&fd.valor>0){var kmPeriod=fd.odo_out-fd.odo_in;totAbast+=fd.abast,totL+=fd.litros,totV+=fd.valor,totK+=fd.km;var kmClass=fd.km_l>=9?'km-good':(fd.km_l>=7?'km-warn':'km-bad');htmlF+='<tr><td>'+m+'</td><td>'+fd.abast+'</td><td>'+fd.litros.toFixed(2)+'</td><td>R$ '+fd.valor.toFixed(2)+'</td><td>R$ '+(fd.valor/fd.litros).toFixed(3)+'</td><td>'+fd.km.toLocaleString('pt-BR')+'</td><td class="'+kmClass+'">'+(fd.km_l>0?fd.km_l.toFixed(2):'—')+'</td><td>'+fd.odo_in.toLocaleString('pt-BR')+'</td><td>'+fd.odo_out.toLocaleString('pt-BR')+'</td><td>'+kmPeriod.toLocaleString('pt-BR')+'</td></tr>';}});htmlF+='<tr style="border-top:2px solid var(--border);font-weight:700"><td>TOTAL</td><td>'+totAbast+'</td><td>'+totL.toFixed(2)+'</td><td>R$ '+totV.toFixed(2)+'</td><td>R$ '+(totL>0?totV/totL:0).toFixed(3)+'</td><td>'+totK.toLocaleString('pt-BR')+'</td><td>'+(totL>0?totK/totL:0).toFixed(2)+'</td><td>—</td><td>—</td><td>—</td></tr>';htmlF+='</tbody>';document.getElementById('tableAnaliticoFuel').innerHTML=htmlF;}
+var analiticoButtonsHtml='';techs.forEach(function(t,i){analiticoButtonsHtml+='<button class="tech-btn '+(i===0?'active':'')+'" onclick="selectAnaliticoTech(\''+t.nome+'\',this)">'+t.nome+'</button>';});document.getElementById('techSelectAnalitico').innerHTML=analiticoButtonsHtml;
+function selectAnaliticoTech(name,btn){currentAnaliticoTech=name;document.querySelectorAll('#techSelectAnalitico .tech-btn').forEach(function(b){b.classList.remove('active');});if(btn)btn.classList.add('active');renderAnalitico();}
+renderAnalitico();
 </script>
 </body>
 </html>
