@@ -122,6 +122,94 @@ document.getElementById('tableSimulacao').innerHTML=htmlSim;
 
 // === FIM VISÃO ESTRATÉGICA ===
 
+// === FATURAMENTO ===
+var ARPU=91.23;
+var totalActive=14872;
+var totalMRR=totalActive*ARPU;
+
+var tercInstall=[218,292,312,323,343,359,323];
+var intOS=[257,270,434,429,611,424,598];
+var tercNewMRR=tercInstall.map(function(v){return Math.round(v*ARPU);});
+var intMRR=intOS.map(function(v){return Math.round(v*ARPU);});
+
+// Cumulative MRR from installations
+var tercCumMRR=[];
+var cum=0;
+tercNewMRR.forEach(function(v){cum+=v;tercCumMRR.push(cum);});
+
+// Faturamento total no perodo (cumulative MRR each month)
+var tercFaturado=[];
+tercCumMRR.forEach(function(v){tercFaturado.push(v);});
+var totalTercFaturado=tercFaturado.reduce(function(s,v){return s+v;},0);
+
+var intFaturado=intMRR.reduce(function(s,v){return s+v;},0);
+var tercCusto=108500;
+var intCusto=130281;
+
+// Stat cards
+document.getElementById('statsFaturamento').innerHTML=
+'<div class="stat"><div class="stat-label">MRR Total da Operação</div><div class="stat-value">R$ '+(totalMRR/1000).toFixed(1)+'K/mês</div><div class="stat-sub">'+totalActive.toLocaleString('pt-BR')+' contratos ativos × R$ '+ARPU.toFixed(2)+'</div></div>'
++'<div class="stat"><div class="stat-label">Novo MRR (Instalações 7m)</div><div class="stat-value">R$ '+(tercCumMRR[6]/1000).toFixed(1)+'K/mês</div><div class="stat-sub">'+(tercInstall.reduce(function(s,v){return s+v;},0))+' instalações no perodo</div></div>'
++'<div class="stat"><div class="stat-label">Faturamento Gerado (Terc.)</div><div class="stat-value">R$ '+(totalTercFaturado/1000).toFixed(0)+'K</div><div class="stat-sub">ROI: '+(totalTercFaturado/tercCusto).toFixed(1)+'x sobre R$ '+tercCusto.toLocaleString('pt-BR')+'</div></div>'
++'<div class="stat"><div class="stat-label">Faturamento Suportado (Int.)</div><div class="stat-value">R$ '+(intFaturado/1000).toFixed(0)+'K</div><div class="stat-sub">ROI: '+(intFaturado/intCusto).toFixed(1)+'x sobre R$ '+intCusto.toLocaleString('pt-BR')+'</div></div>';
+
+// Chart: New MRR by month
+new Chart(document.getElementById('chartFaturamentoMRR'),{type:'bar',data:{labels:meses,datasets:[
+{label:'Terceirizados (Instalação)',data:tercNewMRR,backgroundColor:'#f59e0b',borderRadius:4,stack:'a'},
+{label:'Internos (Manutenção)',data:intMRR,backgroundColor:'#3b82f6',borderRadius:4,stack:'a'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},
+tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR');}}}},
+scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},title:{display:true,text:'R$ / mês'}}}}});
+
+// Chart: Cumulative MRR growth
+new Chart(document.getElementById('chartFaturamentoAcum'),{type:'line',data:{labels:meses,datasets:[
+{label:'MRR Acumulado de Instalações',data:tercCumMRR,borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.1)',fill:true,tension:.3,pointRadius:4,pointBackgroundColor:'#f59e0b'},
+{label:'MRR Atendido por MC (mensal)',data:intMRR,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.1)',fill:true,tension:.3,pointRadius:4,pointBackgroundColor:'#3b82f6'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},
+tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR')+'/mês';}}}},
+scales:{y:{grid:{color:colors.border},title:{display:true,text:'R$ / mês (MRR)'}}}}});
+
+// Chart: ROI Terc - monthly faturamento vs custo
+var tercCustoMonthly=tercInstall.map(function(v){return v*50;});
+new Chart(document.getElementById('chartROITerc'),{type:'bar',data:{labels:meses,datasets:[
+{label:'Faturamento (MRR)',data:tercFaturado,backgroundColor:'#10b981',borderRadius:4},
+{label:'Custo (R$50/OS)',data:tercCustoMonthly,backgroundColor:'#ef4444',borderRadius:4}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},
+tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR');}}}},
+scales:{y:{grid:{color:colors.border},title:{display:true,text:'R$'}}}}});
+
+// Chart: ROI Int - monthly MRR served vs custo
+var intCustoMonthly=[31328,22541,4475,28729,44754,44754,44754]; // approximate from dashboard
+new Chart(document.getElementById('chartROIInt'),{type:'bar',data:{labels:meses,datasets:[
+{label:'MRR Atendido',data:intMRR,backgroundColor:'#10b981',borderRadius:4},
+{label:'Custo Fixo',data:intCustoMonthly,backgroundColor:'#ef4444',borderRadius:4}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},
+tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR');}}}},
+scales:{y:{grid:{color:colors.border},title:{display:true,text:'R$'}}}}});
+
+// Table: Monthly faturamento breakdown
+var htmlFat='<thead><tr><th>Mês</th><th>Inst. Terc.</th><th>Novo MRR Terc.</th><th>MRR Acum.</th><th>Faturado Terc.</th><th>OS Interno</th><th>MRR Servido Int.</th><th>Faturado Int.</th><th>Total Faturado</th></tr></thead><tbody>';
+var totInst=0,totNewMRR=0,totFatT=0,totOS=0,totFatI=0;
+for(var i=0;i<7;i++){
+totInst+=tercInstall[i];totNewMRR+=tercNewMRR[i];totFatT+=tercFaturado[i];
+totOS+=intOS[i];totFatI+=intMRR[i];
+htmlFat+='<tr><td><strong>'+meses[i]+'</strong></td><td>'+tercInstall[i]+'</td><td>R$ '+tercNewMRR[i].toLocaleString('pt-BR')+'</td><td>R$ '+tercCumMRR[i].toLocaleString('pt-BR')+'</td><td>R$ '+tercFaturado[i].toLocaleString('pt-BR')+'</td><td>'+intOS[i]+'</td><td>R$ '+intMRR[i].toLocaleString('pt-BR')+'</td><td>R$ '+intMRR[i].toLocaleString('pt-BR')+'</td><td><strong>R$ '+(tercFaturado[i]+intMRR[i]).toLocaleString('pt-BR')+'</strong></td></tr>';
+}
+htmlFat+='<tr style="border-top:2px solid var(--border);font-weight:700"><td>TOTAL</td><td>'+totInst+'</td><td>R$ '+totNewMRR.toLocaleString('pt-BR')+'</td><td>—</td><td>R$ '+totFatT.toLocaleString('pt-BR')+'</td><td>'+totOS+'</td><td>—</td><td>R$ '+totFatI.toLocaleString('pt-BR')+'</td><td>R$ '+(totFatT+totFatI).toLocaleString('pt-BR')+'</td></tr>';
+htmlFat+='</tbody>';
+document.getElementById('tableFaturamento').innerHTML=htmlFat;
+
+// Table: ROI summary
+var htmlROI='<thead><tr><th>Equipe</th><th>Função</th><th>Faturamento (7m)</th><th>Custo (7m)</th><th>Margem</th><th>ROI</th><th>MRR Criado/Mantido</th></tr></thead><tbody>';
+htmlROI+='<tr><td><strong>Terceirizados (4)</strong></td><td>Instalação (Setor 1)</td><td>R$ '+totFatT.toLocaleString('pt-BR')+'</td><td>R$ '+tercCusto.toLocaleString('pt-BR')+'</td><td style="color:var(--green)">R$ '+(totFatT-tercCusto).toLocaleString('pt-BR')+'</td><td style="color:var(--green)">'+(totFatT/tercCusto).toFixed(1)+'x</td><td>R$ '+tercCumMRR[6].toLocaleString('pt-BR')+'/mês</td></tr>';
+htmlROI+='<tr><td><strong>Internos MC (5)</strong></td><td>Manutenção (Todos setores)</td><td>R$ '+totFatI.toLocaleString('pt-BR')+'</td><td>R$ '+intCusto.toLocaleString('pt-BR')+'</td><td style="color:var(--green)">R$ '+(totFatI-intCusto).toLocaleString('pt-BR')+'</td><td style="color:var(--green)">'+(totFatI/intCusto).toFixed(1)+'x</td><td>'+totOS+' OS atendidas</td></tr>';
+htmlROI+='<tr style="border-top:2px solid var(--border);font-weight:700"><td>TOTAL</td><td>—</td><td>R$ '+(totFatT+totFatI).toLocaleString('pt-BR')+'</td><td>R$ '+(tercCusto+intCusto).toLocaleString('pt-BR')+'</td><td style="color:var(--green)">R$ '+((totFatT+totFatI)-tercCusto-intCusto).toLocaleString('pt-BR')+'</td><td>'+((totFatT+totFatI)/(tercCusto+intCusto)).toFixed(1)+'x</td><td>—</td></tr>';
+htmlROI+='</tbody>';
+document.getElementById('tableROI').innerHTML=htmlROI;
+
+// === FIM FATURAMENTO ===
+
+
 </script>
 <style>
 :root{--bg:#0f172a;--card:#1e293b;--border:#334155;--text:#f1f5f9;--muted:#94a3b8;--primary:#3b82f6;--green:#10b981;--red:#ef4444;--amber:#f59e0b;--purple:#8b5cf6;--pink:#ec4899}
@@ -235,6 +323,18 @@ tr:hover{background:rgba(59,130,246,.05)}
 <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Análise Break-Even — CLT vs Terceirizado (R$ 50/OS)</div><table id="tableBreakEven"></table></div>
 <div class="chart-container"><div class="chart-title">Simulação de Cenários — Internalização dos Terceirizados</div><div class="chart-wrapper"><canvas id="chartSimulacao"></canvas></div></div>
 <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Simulação de Cenários — Custo Mensal por Modelo</div><table id="tableSimulacao"></table></div>
+
+<div class="chart-container" style="border-top:2px solid var(--amber);padding-top:20px;margin-top:8px"><div class="chart-title" style="color:var(--amber);font-size:1.1rem">💰 Faturamento por Equipe</div><p style="color:var(--muted);font-size:.75rem;margin-bottom:14px">ARPU médio: R$ 91,23 · 14.872 contratos ativos · MRR total: R$ 1.356.772/mês</p></div>
+<div class="stats" id="statsFaturamento"></div>
+<div class="chart-container"><div class="chart-title">Novo MRR por Mês — Instalações (Terceirizados + Internos)</div><div class="chart-wrapper"><canvas id="chartFaturamentoMRR"></canvas></div></div>
+<div class="chart-container"><div class="chart-title">MRR Acumulado — Crescimento da Receita Mensal Recorrente</div><div class="chart-wrapper"><canvas id="chartFaturamentoAcum"></canvas></div></div>
+<div class="grid-2">
+<div class="chart-container"><div class="chart-title">Faturamento vs Custo — Terceirizados (Instalação)</div><div class="chart-wrapper-sm"><canvas id="chartROITerc"></canvas></div></div>
+<div class="chart-container"><div class="chart-title">Faturamento vs Custo — Internos (Manutenção)</div><div class="chart-wrapper-sm"><canvas id="chartROIInt"></canvas></div></div>
+</div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Faturamento Mensal Detalhado por Equipe</div><table id="tableFaturamento"></table></div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Resumo de ROI por Equipe (7 meses)</div><table id="tableROI"></table></div>
+
 </div>
 
 <div class="footer">Dados: IXC Web (API) + Planilha de Combustível (Bd_TickeckLOG) · Custo fixo: R$ 4.475,44/mês · Combustível: dados reais por abastecimento · Afastamento Jose Fernando (04/06): INSS · Setores 76 e 84 excluídos · Atualizado em 31/08/2026</div>
@@ -436,6 +536,94 @@ htmlSim+='</tbody>';
 document.getElementById('tableSimulacao').innerHTML=htmlSim;
 
 // === FIM VISÃO ESTRATÉGICA ===
+
+// === FATURAMENTO ===
+var ARPU=91.23;
+var totalActive=14872;
+var totalMRR=totalActive*ARPU;
+
+var tercInstall=[218,292,312,323,343,359,323];
+var intOS=[257,270,434,429,611,424,598];
+var tercNewMRR=tercInstall.map(function(v){return Math.round(v*ARPU);});
+var intMRR=intOS.map(function(v){return Math.round(v*ARPU);});
+
+// Cumulative MRR from installations
+var tercCumMRR=[];
+var cum=0;
+tercNewMRR.forEach(function(v){cum+=v;tercCumMRR.push(cum);});
+
+// Faturamento total no perodo (cumulative MRR each month)
+var tercFaturado=[];
+tercCumMRR.forEach(function(v){tercFaturado.push(v);});
+var totalTercFaturado=tercFaturado.reduce(function(s,v){return s+v;},0);
+
+var intFaturado=intMRR.reduce(function(s,v){return s+v;},0);
+var tercCusto=108500;
+var intCusto=130281;
+
+// Stat cards
+document.getElementById('statsFaturamento').innerHTML=
+'<div class="stat"><div class="stat-label">MRR Total da Operação</div><div class="stat-value">R$ '+(totalMRR/1000).toFixed(1)+'K/mês</div><div class="stat-sub">'+totalActive.toLocaleString('pt-BR')+' contratos ativos × R$ '+ARPU.toFixed(2)+'</div></div>'
++'<div class="stat"><div class="stat-label">Novo MRR (Instalações 7m)</div><div class="stat-value">R$ '+(tercCumMRR[6]/1000).toFixed(1)+'K/mês</div><div class="stat-sub">'+(tercInstall.reduce(function(s,v){return s+v;},0))+' instalações no perodo</div></div>'
++'<div class="stat"><div class="stat-label">Faturamento Gerado (Terc.)</div><div class="stat-value">R$ '+(totalTercFaturado/1000).toFixed(0)+'K</div><div class="stat-sub">ROI: '+(totalTercFaturado/tercCusto).toFixed(1)+'x sobre R$ '+tercCusto.toLocaleString('pt-BR')+'</div></div>'
++'<div class="stat"><div class="stat-label">Faturamento Suportado (Int.)</div><div class="stat-value">R$ '+(intFaturado/1000).toFixed(0)+'K</div><div class="stat-sub">ROI: '+(intFaturado/intCusto).toFixed(1)+'x sobre R$ '+intCusto.toLocaleString('pt-BR')+'</div></div>';
+
+// Chart: New MRR by month
+new Chart(document.getElementById('chartFaturamentoMRR'),{type:'bar',data:{labels:meses,datasets:[
+{label:'Terceirizados (Instalação)',data:tercNewMRR,backgroundColor:'#f59e0b',borderRadius:4,stack:'a'},
+{label:'Internos (Manutenção)',data:intMRR,backgroundColor:'#3b82f6',borderRadius:4,stack:'a'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},
+tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR');}}}},
+scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},title:{display:true,text:'R$ / mês'}}}}});
+
+// Chart: Cumulative MRR growth
+new Chart(document.getElementById('chartFaturamentoAcum'),{type:'line',data:{labels:meses,datasets:[
+{label:'MRR Acumulado de Instalações',data:tercCumMRR,borderColor:'#f59e0b',backgroundColor:'rgba(245,158,11,.1)',fill:true,tension:.3,pointRadius:4,pointBackgroundColor:'#f59e0b'},
+{label:'MRR Atendido por MC (mensal)',data:intMRR,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.1)',fill:true,tension:.3,pointRadius:4,pointBackgroundColor:'#3b82f6'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},
+tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR')+'/mês';}}}},
+scales:{y:{grid:{color:colors.border},title:{display:true,text:'R$ / mês (MRR)'}}}}});
+
+// Chart: ROI Terc - monthly faturamento vs custo
+var tercCustoMonthly=tercInstall.map(function(v){return v*50;});
+new Chart(document.getElementById('chartROITerc'),{type:'bar',data:{labels:meses,datasets:[
+{label:'Faturamento (MRR)',data:tercFaturado,backgroundColor:'#10b981',borderRadius:4},
+{label:'Custo (R$50/OS)',data:tercCustoMonthly,backgroundColor:'#ef4444',borderRadius:4}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},
+tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR');}}}},
+scales:{y:{grid:{color:colors.border},title:{display:true,text:'R$'}}}}});
+
+// Chart: ROI Int - monthly MRR served vs custo
+var intCustoMonthly=[31328,22541,4475,28729,44754,44754,44754]; // approximate from dashboard
+new Chart(document.getElementById('chartROIInt'),{type:'bar',data:{labels:meses,datasets:[
+{label:'MRR Atendido',data:intMRR,backgroundColor:'#10b981',borderRadius:4},
+{label:'Custo Fixo',data:intCustoMonthly,backgroundColor:'#ef4444',borderRadius:4}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},
+tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR');}}}},
+scales:{y:{grid:{color:colors.border},title:{display:true,text:'R$'}}}}});
+
+// Table: Monthly faturamento breakdown
+var htmlFat='<thead><tr><th>Mês</th><th>Inst. Terc.</th><th>Novo MRR Terc.</th><th>MRR Acum.</th><th>Faturado Terc.</th><th>OS Interno</th><th>MRR Servido Int.</th><th>Faturado Int.</th><th>Total Faturado</th></tr></thead><tbody>';
+var totInst=0,totNewMRR=0,totFatT=0,totOS=0,totFatI=0;
+for(var i=0;i<7;i++){
+totInst+=tercInstall[i];totNewMRR+=tercNewMRR[i];totFatT+=tercFaturado[i];
+totOS+=intOS[i];totFatI+=intMRR[i];
+htmlFat+='<tr><td><strong>'+meses[i]+'</strong></td><td>'+tercInstall[i]+'</td><td>R$ '+tercNewMRR[i].toLocaleString('pt-BR')+'</td><td>R$ '+tercCumMRR[i].toLocaleString('pt-BR')+'</td><td>R$ '+tercFaturado[i].toLocaleString('pt-BR')+'</td><td>'+intOS[i]+'</td><td>R$ '+intMRR[i].toLocaleString('pt-BR')+'</td><td>R$ '+intMRR[i].toLocaleString('pt-BR')+'</td><td><strong>R$ '+(tercFaturado[i]+intMRR[i]).toLocaleString('pt-BR')+'</strong></td></tr>';
+}
+htmlFat+='<tr style="border-top:2px solid var(--border);font-weight:700"><td>TOTAL</td><td>'+totInst+'</td><td>R$ '+totNewMRR.toLocaleString('pt-BR')+'</td><td>—</td><td>R$ '+totFatT.toLocaleString('pt-BR')+'</td><td>'+totOS+'</td><td>—</td><td>R$ '+totFatI.toLocaleString('pt-BR')+'</td><td>R$ '+(totFatT+totFatI).toLocaleString('pt-BR')+'</td></tr>';
+htmlFat+='</tbody>';
+document.getElementById('tableFaturamento').innerHTML=htmlFat;
+
+// Table: ROI summary
+var htmlROI='<thead><tr><th>Equipe</th><th>Função</th><th>Faturamento (7m)</th><th>Custo (7m)</th><th>Margem</th><th>ROI</th><th>MRR Criado/Mantido</th></tr></thead><tbody>';
+htmlROI+='<tr><td><strong>Terceirizados (4)</strong></td><td>Instalação (Setor 1)</td><td>R$ '+totFatT.toLocaleString('pt-BR')+'</td><td>R$ '+tercCusto.toLocaleString('pt-BR')+'</td><td style="color:var(--green)">R$ '+(totFatT-tercCusto).toLocaleString('pt-BR')+'</td><td style="color:var(--green)">'+(totFatT/tercCusto).toFixed(1)+'x</td><td>R$ '+tercCumMRR[6].toLocaleString('pt-BR')+'/mês</td></tr>';
+htmlROI+='<tr><td><strong>Internos MC (5)</strong></td><td>Manutenção (Todos setores)</td><td>R$ '+totFatI.toLocaleString('pt-BR')+'</td><td>R$ '+intCusto.toLocaleString('pt-BR')+'</td><td style="color:var(--green)">R$ '+(totFatI-intCusto).toLocaleString('pt-BR')+'</td><td style="color:var(--green)">'+(totFatI/intCusto).toFixed(1)+'x</td><td>'+totOS+' OS atendidas</td></tr>';
+htmlROI+='<tr style="border-top:2px solid var(--border);font-weight:700"><td>TOTAL</td><td>—</td><td>R$ '+(totFatT+totFatI).toLocaleString('pt-BR')+'</td><td>R$ '+(tercCusto+intCusto).toLocaleString('pt-BR')+'</td><td style="color:var(--green)">R$ '+((totFatT+totFatI)-tercCusto-intCusto).toLocaleString('pt-BR')+'</td><td>'+((totFatT+totFatI)/(tercCusto+intCusto)).toFixed(1)+'x</td><td>—</td></tr>';
+htmlROI+='</tbody>';
+document.getElementById('tableROI').innerHTML=htmlROI;
+
+// === FIM FATURAMENTO ===
+
 
 </script>
 </body>
