@@ -122,6 +122,180 @@ document.getElementById('tableSimulacao').innerHTML=htmlSim;
 
 // === FIM VISÃO ESTRATÉGICA ===
 
+// === ABA DECISÃO ===
+var custoCLT=4475;
+var custoTerc=50;
+var capTech=150;
+var manutDemanda=575;
+var techsAtuais=4;
+var volumeAtual=323;
+
+// Stat cards
+var custoAtual=techsAtuais*custoCLT+volumeAtual*custoTerc;
+var custoOtimo=6*custoCLT+Math.max(0,volumeAtual-2*capTech)*custoTerc;
+var economia=custoAtual-custoOtimo;
+document.getElementById('statsDecisao').innerHTML=
+'<div class="stat"><div class="stat-label">Custo Atual (4 techs)</div><div class="stat-value">R$ '+custoAtual.toLocaleString('pt-BR')+'</div><div class="stat-sub">'+techsAtuais+' internal + '+volumeAtual+' OS terc/mês</div></div>'
++'<div class="stat"><div class="stat-label">Custo Ótimo (6 techs)</div><div class="stat-value" style="color:var(--green)">R$ '+custoOtimo.toLocaleString('pt-BR')+'</div><div class="stat-sub">2 techs novos focados em instalação</div></div>'
++'<div class="stat"><div class="stat-label">Economia Mensal</div><div class="stat-value" style="color:var(--green)">R$ '+economia.toLocaleString('pt-BR')+'</div><div class="stat-sub">R$ '+(economia*7).toLocaleString('pt-BR')+' em 7 meses</div></div>'
++'<div class="stat"><div class="stat-label">Break-Even por Tech</div><div class="stat-value">'+Math.round(custoCLT/custoTerc)+' OS/mês</div><div class="stat-sub">Volume para justificar 1 contratação</div></div>';
+
+// Alert box
+var alertD='<div class="alert-title" style="color:var(--green)">✅ Recomendação de Decisão</div>';
+alertD+='<div class="alert-item">📊 Volume atual de <strong>323 instalações/mês</strong> está entre os break-even points de 239 (6 techs) e 389 (7 techs)</div>';
+alertD+='<div class="alert-item">🎯 <strong>Cenário ótimo: 6 técnicos</strong> (2 novos focados em instalação) → economia de <strong>R$ '+economia.toLocaleString('pt-BR')+'/mês</strong> ('+(economia/custoAtual*100).toFixed(1)+'% de redução)</div>';
+alertD+='<div class="alert-item">💰 Cada técnico novo faz ~150 OS/mês. Custa R$ '+custoCLT+'/mês e substitui R$ '+(150*custoTerc).toLocaleString('pt-BR')+'/mês em terceirização → <strong>net savings R$ '+(150*custoTerc-custoCLT).toLocaleString('pt-BR')+'/mês por tech</strong></div>';
+alertD+='<div class="alert-item">⚠️ Pontos de atenção: (1) novos techs precisam de treinamento em instalação FTTH, (2) período de transição ~30 dias, (3) terceirizado mantém flexibilidade para picos</div>';
+alertD+='<div class="alert-item">🔄 Próximo ponto de decisão: se volume passar de <strong>389 OS/mês</strong>, contratar 3º técnico extra (7 total)</div>';
+document.getElementById('alertDecisao').innerHTML=alertD;
+
+// Chart: Cost vs Volume curve
+var volumes=[];
+for(var v=0;v<=500;v+=10){volumes.push(v);}
+var datasets=[];
+var cores=['#3b82f6','#f59e0b','#10b981','#8b5cf6'];
+for(var n=4;n<=7;n++){
+  var data=[];
+  for(var i=0;i<volumes.length;i++){
+    var v=volumes[i];
+    var extra=n-4;
+    var terc=Math.max(0,v-extra*capTech);
+    data.push(n*custoCLT+terc*custoTerc);
+  }
+  datasets.push({label:n+' técnicos ('+(n-4)+' extra)',data:data,borderColor:cores[n-4],backgroundColor:'transparent',tension:0,borderWidth:2,pointRadius:0});
+}
+// Add current volume marker line
+datasets.push({label:'Volume Atual (323)',data:volumes.map(function(){return null;}),borderColor:'#ef4444',backgroundColor:'transparent',showLine:false,pointRadius:0});
+var ctx1=document.getElementById('chartDecisaoCurva');
+// Custom plugin for vertical line and break-even annotations
+var verticalLinePlugin={
+  id:'verticalLine',
+  afterDraw:function(chart){
+    var ctx=chart.ctx;
+    var x=chart.scales.x.getPixelForValue(323);
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x,chart.chartArea.top);
+    ctx.lineTo(x,chart.chartArea.bottom);
+    ctx.strokeStyle='#ef4444';
+    ctx.lineWidth=2;
+    ctx.setLineDash([5,5]);
+    ctx.stroke();
+    ctx.fillStyle='#ef4444';
+    ctx.font='bold 11px sans-serif';
+    ctx.fillText('ATUAL: 323 OS/mês',x+5,chart.chartArea.top+15);
+    // Break-even lines
+    var be=[89,239,389];
+    be.forEach(function(bv,idx){
+      var bx=chart.scales.x.getPixelForValue(bv);
+      ctx.beginPath();
+      ctx.moveTo(bx,chart.chartArea.top+30);
+      ctx.lineTo(bx,chart.chartArea.bottom);
+      ctx.strokeStyle='rgba(245,158,11,.5)';
+      ctx.lineWidth:1;
+      ctx.setLineDash([3,3]);
+      ctx.stroke();
+      ctx.fillStyle='#f59e0b';
+      ctx.font='10px sans-serif';
+      ctx.fillText('BE: '+bv,bx+3,chart.chartArea.top+30+idx*15+15);
+    });
+    ctx.restore();
+  }
+};
+new Chart(ctx1,{type:'line',data:{labels:volumes,datasets:datasets},
+options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',
+tooltip:{callbacks:{title:function(c){return c[0].label+' OS/mês';},label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR');}}}}},
+scales:{x:{type:'linear',title:{display:true,text:'Instalações por mês (OS)'},grid:{color:colors.border}},
+y:{title:{display:true,text:'Custo mensal (R$)'},grid:{color:colors.border},
+ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'K';}}}}}},plugins:[verticalLinePlugin]});
+
+// Chart: Scenario comparison at current volume
+var cenarios=['4 techs\n(atual)','5 techs','6 techs\n(ótimo)','7 techs','8 techs'];
+var custosCenario=[];
+var internalOS=[];
+var tercOS=[];
+for(var n=4;n<=8;n++){
+  var extra=n-4;
+  var inst_int=Math.min(extra*capTech,volumeAtual);
+  var inst_terc=Math.max(0,volumeAtual-extra*capTech);
+  var custo=n*custoCLT+inst_terc*custoTerc;
+  custosCenario.push(custo);
+  internalOS.push(inst_int);
+  tercOS.push(inst_terc);
+}
+new Chart(document.getElementById('chartDecisaoCenarios'),{type:'bar',data:{labels:cenarios,datasets:[
+{label:'Custo Total (R$/mês)',data:custosCenario,backgroundColor:custosCenario.map(function(v,i){return i===2?'#10b981':(v<custosCenario[0]?'#3b82f6':'#f59e0b');}),borderRadius:4}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},
+tooltip:{callbacks:{label:function(c){return 'R$ '+c.raw.toLocaleString('pt-BR')+'/mês';}}}},
+scales:{y:{grid:{color:colors.border},title:{display:true,text:'R$ / mês'}}}}});
+
+// Chart: Capacity allocation
+new Chart(document.getElementById('chartDecisaoCapacidade'),{type:'bar',data:{labels:['Atual (4)','Ótimo (6)'],datasets:[
+{label:'Manutenção (4 techs)',data:[manutDemanda,manutDemanda],backgroundColor:'#3b82f6',borderRadius:4,stack:'a'},
+{label:'Instalação (internos)',data:[0,300],backgroundColor:'#10b981',borderRadius:4,stack:'a'},
+{label:'Instalação (terceirizados)',data:[323,23],backgroundColor:'#f59e0b',borderRadius:4,stack:'a'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',
+tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+c.raw+' OS/mês';}}}},
+scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},title:{display:true,text:'OS / mês'}}}}});
+
+// Table: Scenario comparison
+var htmlC='<thead><tr><th>Cenário</th><th>Techs</th><th>Techs Extra</th><th>Inst. Interno</th><th>Inst. Terc.</th><th>Custo CLT</th><th>Custo Terc.</th><th>Custo Total</th><th>vs Atual</th><th>% Terc.</th></tr></thead><tbody>';
+for(var n=4;n<=8;n++){
+  var extra=n-4;
+  var inst_int=Math.min(extra*capTech,volumeAtual);
+  var inst_terc=Math.max(0,volumeAtual-extra*capTech);
+  var custo_clt=n*custoCLT;
+  var custo_terc=inst_terc*custoTerc;
+  var total=custo_clt+custo_terc;
+  var diff=total-custoAtual;
+  var pct_terc=(inst_terc/volumeAtual*100).toFixed(1);
+  var isOptimal=(n===6);
+  var rowStyle=isOptimal?'style="background:rgba(16,185,129,.1);font-weight:700"':'';
+  var diffColor=diff<0?'var(--green)':'var(--red)';
+  var diffStr=diff<0?'-R$ '+Math.abs(diff).toLocaleString('pt-BR'):'+R$ '+diff.toLocaleString('pt-BR');
+  htmlC+='<tr '+rowStyle+'><td>'+(isOptimal?'⭐ ÓTIMO':'Cenário')+'</td><td>'+n+'</td><td>'+(extra>0?'+'+extra:'—')+'</td><td>'+inst_int+'</td><td>'+inst_terc+'</td><td>R$ '+custo_clt.toLocaleString('pt-BR')+'</td><td>R$ '+custo_terc.toLocaleString('pt-BR')+'</td><td><strong>R$ '+total.toLocaleString('pt-BR')+'</strong></td><td style="color:'+diffColor+'">'+diffStr+'</td><td>'+pct_terc+'%</td></tr>';
+}
+htmlC+='</tbody>';
+document.getElementById('tableDecisaoCenarios').innerHTML=htmlC;
+
+// Table: Break-even points
+var htmlBE='<thead><tr><th>Decisão</th><th>Volume Break-Even</th><th>Quando</th><th>Custo Antes</th><th>Custo Depois</th><th>Economia/mês</th></tr></thead><tbody>';
+var bePoints=[
+  {k:1,n:5,vol:89,desc:'Contratar 1º técnico extra (5 total)'},
+  {k:2,n:6,vol:239,desc:'Contratar 2º técnico extra (6 total)'},
+  {k:3,n:7,vol:389,desc:'Contratar 3º técnico extra (7 total)'},
+  {k:4,n:8,vol:539,desc:'Contratar 4º técnico extra (8 total)'}
+];
+bePoints.forEach(function(bp){
+  var antes=(bp.n-1)*custoCLT+bp.vol*custoTerc;
+  var depois=bp.n*custoCLT+Math.max(0,bp.vol-(bp.k)*capTech)*custoTerc;
+  var econ=antes-depois;
+  var isCurrent=(bp.vol<=volumeAtual&&bp.k===2)||(bp.vol<=volumeAtual&&bp.k<3);
+  var whenStr=bp.vol<=volumeAtual?'<span style="color:var(--green)">JÁ PASSOU (atual: '+volumeAtual+')</span>':'Volume > '+bp.vol+' OS/mês';
+  htmlBE+='<tr '+(bp.n===6?'style="background:rgba(16,185,129,.1);font-weight:700"':'')+'><td>'+bp.desc+'</td><td><strong>'+bp.vol+' OS/mês</strong></td><td>'+whenStr+'</td><td>R$ '+antes.toLocaleString('pt-BR')+'</td><td>R$ '+depois.toLocaleString('pt-BR')+'</td><td style="color:'+(econ>0?'var(--green)':'var(--red)')+'">R$ '+econ.toLocaleString('pt-BR')+'</td></tr>';
+});
+htmlBE+='</tbody>';
+document.getElementById('tableBreakEvenDecisao').innerHTML=htmlBE;
+
+// Table: Monthly projection 4 vs 6 techs
+var instTrend=[218,292,312,323,343,359,323];
+var htmlP='<thead><tr><th>Mês</th><th>Instalações</th><th>Custo 4 techs</th><th>Custo 6 techs</th><th>Economia</th><th>Cumulado</th></tr></thead><tbody>';
+var cumEcon=0;
+meses.forEach(function(m,i){
+  var v=instTrend[i];
+  var c4=4*custoCLT+v*custoTerc;
+  var c6=6*custoCLT+Math.max(0,v-2*capTech)*custoTerc;
+  var econ=c4-c6;
+  cumEcon+=econ;
+  htmlP+='<tr><td><strong>'+m+'</strong></td><td>'+v+' OS</td><td>R$ '+c4.toLocaleString('pt-BR')+'</td><td style="color:var(--green)">R$ '+c6.toLocaleString('pt-BR')+'</td><td style="color:var(--green)">R$ '+econ.toLocaleString('pt-BR')+'</td><td style="font-weight:700;color:var(--green)">R$ '+cumEcon.toLocaleString('pt-BR')+'</td></tr>';
+});
+htmlP+='<tr style="border-top:2px solid var(--border);font-weight:700"><td>TOTAL</td><td>'+instTrend.reduce(function(s,v){return s+v;},0)+' OS</td><td>R$ '+(4*custoCLT*7+instTrend.reduce(function(s,v){return s+v;},0)*custoTerc).toLocaleString('pt-BR')+'</td><td>R$ '+(6*custoCLT*7+Math.max(0,instTrend.reduce(function(s,v){return s+v;},0)-2*capTech*7)*custoTerc).toLocaleString('pt-BR')+'</td><td style="color:var(--green)">R$ '+cumEcon.toLocaleString('pt-BR')+'</td><td>—</td></tr>';
+htmlP+='</tbody>';
+document.getElementById('tableProjecao').innerHTML=htmlP;
+
+// === FIM DECISÃO ===
+
+
 // === FATURAMENTO ===
 var ARPU=91.23;
 var totalActive=14872;
@@ -264,6 +438,7 @@ tr:hover{background:rgba(59,130,246,.05)}
 <button class="tab" onclick="showTab('combustivel',this)">Combustível</button>
 <button class="tab" onclick="showTab('analitico',this)">Custo Analítico</button>
 <button class="tab" onclick="showTab('estrategica',this)">Visão Estratégica</button>
+<button class="tab" onclick="showTab('decisao',this)">Decisão</button>
 </div>
 <div id="tab-custo" class="tab-content active">
 <div class="stats" id="statsCusto"></div>
@@ -335,6 +510,19 @@ tr:hover{background:rgba(59,130,246,.05)}
 <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Faturamento Mensal Detalhado por Equipe</div><table id="tableFaturamento"></table></div>
 <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Resumo de ROI por Equipe (7 meses)</div><table id="tableROI"></table></div>
 
+</div>
+
+<div id="tab-decisao" class="tab-content">
+<div class="stats" id="statsDecisao"></div>
+<div class="alert-box" id="alertDecisao" style="background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.2)"></div>
+<div class="chart-container"><div class="chart-title">Custo Mensal vs Volume de Instalações — Quando Internalizar?</div><div class="chart-wrapper-lg"><canvas id="chartDecisaoCurva"></canvas></div></div>
+<div class="grid-2">
+<div class="chart-container"><div class="chart-title">Custo por Cenário no Volume Atual (323 OS/mês)</div><div class="chart-wrapper-sm"><canvas id="chartDecisaoCenarios"></canvas></div></div>
+<div class="chart-container"><div class="chart-title">Capacidade da Equipe — Manutenção vs Instalação</div><div class="chart-wrapper-sm"><canvas id="chartDecisaoCapacidade"></canvas></div></div>
+</div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Matriz de Decisão — Cenários por Número de Técnicos</div><table id="tableDecisaoCenarios"></table></div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Pontos de Decisão (Break-Even) — Quando Contratar</div><table id="tableBreakEvenDecisao"></table></div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Projeção Mensal — Custo com 4 vs 6 Técnicos (7 meses)</div><table id="tableProjecao"></table></div>
 </div>
 
 <div class="footer">Dados: IXC Web (API) + Planilha de Combustível (Bd_TickeckLOG) · Custo fixo: R$ 4.475,44/mês · Combustível: dados reais por abastecimento · Afastamento Jose Fernando (04/06): INSS · Setores 76 e 84 excluídos · Atualizado em 31/08/2026</div>
@@ -536,6 +724,180 @@ htmlSim+='</tbody>';
 document.getElementById('tableSimulacao').innerHTML=htmlSim;
 
 // === FIM VISÃO ESTRATÉGICA ===
+
+// === ABA DECISÃO ===
+var custoCLT=4475;
+var custoTerc=50;
+var capTech=150;
+var manutDemanda=575;
+var techsAtuais=4;
+var volumeAtual=323;
+
+// Stat cards
+var custoAtual=techsAtuais*custoCLT+volumeAtual*custoTerc;
+var custoOtimo=6*custoCLT+Math.max(0,volumeAtual-2*capTech)*custoTerc;
+var economia=custoAtual-custoOtimo;
+document.getElementById('statsDecisao').innerHTML=
+'<div class="stat"><div class="stat-label">Custo Atual (4 techs)</div><div class="stat-value">R$ '+custoAtual.toLocaleString('pt-BR')+'</div><div class="stat-sub">'+techsAtuais+' internal + '+volumeAtual+' OS terc/mês</div></div>'
++'<div class="stat"><div class="stat-label">Custo Ótimo (6 techs)</div><div class="stat-value" style="color:var(--green)">R$ '+custoOtimo.toLocaleString('pt-BR')+'</div><div class="stat-sub">2 techs novos focados em instalação</div></div>'
++'<div class="stat"><div class="stat-label">Economia Mensal</div><div class="stat-value" style="color:var(--green)">R$ '+economia.toLocaleString('pt-BR')+'</div><div class="stat-sub">R$ '+(economia*7).toLocaleString('pt-BR')+' em 7 meses</div></div>'
++'<div class="stat"><div class="stat-label">Break-Even por Tech</div><div class="stat-value">'+Math.round(custoCLT/custoTerc)+' OS/mês</div><div class="stat-sub">Volume para justificar 1 contratação</div></div>';
+
+// Alert box
+var alertD='<div class="alert-title" style="color:var(--green)">✅ Recomendação de Decisão</div>';
+alertD+='<div class="alert-item">📊 Volume atual de <strong>323 instalações/mês</strong> está entre os break-even points de 239 (6 techs) e 389 (7 techs)</div>';
+alertD+='<div class="alert-item">🎯 <strong>Cenário ótimo: 6 técnicos</strong> (2 novos focados em instalação) → economia de <strong>R$ '+economia.toLocaleString('pt-BR')+'/mês</strong> ('+(economia/custoAtual*100).toFixed(1)+'% de redução)</div>';
+alertD+='<div class="alert-item">💰 Cada técnico novo faz ~150 OS/mês. Custa R$ '+custoCLT+'/mês e substitui R$ '+(150*custoTerc).toLocaleString('pt-BR')+'/mês em terceirização → <strong>net savings R$ '+(150*custoTerc-custoCLT).toLocaleString('pt-BR')+'/mês por tech</strong></div>';
+alertD+='<div class="alert-item">⚠️ Pontos de atenção: (1) novos techs precisam de treinamento em instalação FTTH, (2) período de transição ~30 dias, (3) terceirizado mantém flexibilidade para picos</div>';
+alertD+='<div class="alert-item">🔄 Próximo ponto de decisão: se volume passar de <strong>389 OS/mês</strong>, contratar 3º técnico extra (7 total)</div>';
+document.getElementById('alertDecisao').innerHTML=alertD;
+
+// Chart: Cost vs Volume curve
+var volumes=[];
+for(var v=0;v<=500;v+=10){volumes.push(v);}
+var datasets=[];
+var cores=['#3b82f6','#f59e0b','#10b981','#8b5cf6'];
+for(var n=4;n<=7;n++){
+  var data=[];
+  for(var i=0;i<volumes.length;i++){
+    var v=volumes[i];
+    var extra=n-4;
+    var terc=Math.max(0,v-extra*capTech);
+    data.push(n*custoCLT+terc*custoTerc);
+  }
+  datasets.push({label:n+' técnicos ('+(n-4)+' extra)',data:data,borderColor:cores[n-4],backgroundColor:'transparent',tension:0,borderWidth:2,pointRadius:0});
+}
+// Add current volume marker line
+datasets.push({label:'Volume Atual (323)',data:volumes.map(function(){return null;}),borderColor:'#ef4444',backgroundColor:'transparent',showLine:false,pointRadius:0});
+var ctx1=document.getElementById('chartDecisaoCurva');
+// Custom plugin for vertical line and break-even annotations
+var verticalLinePlugin={
+  id:'verticalLine',
+  afterDraw:function(chart){
+    var ctx=chart.ctx;
+    var x=chart.scales.x.getPixelForValue(323);
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x,chart.chartArea.top);
+    ctx.lineTo(x,chart.chartArea.bottom);
+    ctx.strokeStyle='#ef4444';
+    ctx.lineWidth=2;
+    ctx.setLineDash([5,5]);
+    ctx.stroke();
+    ctx.fillStyle='#ef4444';
+    ctx.font='bold 11px sans-serif';
+    ctx.fillText('ATUAL: 323 OS/mês',x+5,chart.chartArea.top+15);
+    // Break-even lines
+    var be=[89,239,389];
+    be.forEach(function(bv,idx){
+      var bx=chart.scales.x.getPixelForValue(bv);
+      ctx.beginPath();
+      ctx.moveTo(bx,chart.chartArea.top+30);
+      ctx.lineTo(bx,chart.chartArea.bottom);
+      ctx.strokeStyle='rgba(245,158,11,.5)';
+      ctx.lineWidth:1;
+      ctx.setLineDash([3,3]);
+      ctx.stroke();
+      ctx.fillStyle='#f59e0b';
+      ctx.font='10px sans-serif';
+      ctx.fillText('BE: '+bv,bx+3,chart.chartArea.top+30+idx*15+15);
+    });
+    ctx.restore();
+  }
+};
+new Chart(ctx1,{type:'line',data:{labels:volumes,datasets:datasets},
+options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',
+tooltip:{callbacks:{title:function(c){return c[0].label+' OS/mês';},label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR');}}}}},
+scales:{x:{type:'linear',title:{display:true,text:'Instalações por mês (OS)'},grid:{color:colors.border}},
+y:{title:{display:true,text:'Custo mensal (R$)'},grid:{color:colors.border},
+ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'K';}}}}}},plugins:[verticalLinePlugin]});
+
+// Chart: Scenario comparison at current volume
+var cenarios=['4 techs\n(atual)','5 techs','6 techs\n(ótimo)','7 techs','8 techs'];
+var custosCenario=[];
+var internalOS=[];
+var tercOS=[];
+for(var n=4;n<=8;n++){
+  var extra=n-4;
+  var inst_int=Math.min(extra*capTech,volumeAtual);
+  var inst_terc=Math.max(0,volumeAtual-extra*capTech);
+  var custo=n*custoCLT+inst_terc*custoTerc;
+  custosCenario.push(custo);
+  internalOS.push(inst_int);
+  tercOS.push(inst_terc);
+}
+new Chart(document.getElementById('chartDecisaoCenarios'),{type:'bar',data:{labels:cenarios,datasets:[
+{label:'Custo Total (R$/mês)',data:custosCenario,backgroundColor:custosCenario.map(function(v,i){return i===2?'#10b981':(v<custosCenario[0]?'#3b82f6':'#f59e0b');}),borderRadius:4}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},
+tooltip:{callbacks:{label:function(c){return 'R$ '+c.raw.toLocaleString('pt-BR')+'/mês';}}}},
+scales:{y:{grid:{color:colors.border},title:{display:true,text:'R$ / mês'}}}}});
+
+// Chart: Capacity allocation
+new Chart(document.getElementById('chartDecisaoCapacidade'),{type:'bar',data:{labels:['Atual (4)','Ótimo (6)'],datasets:[
+{label:'Manutenção (4 techs)',data:[manutDemanda,manutDemanda],backgroundColor:'#3b82f6',borderRadius:4,stack:'a'},
+{label:'Instalação (internos)',data:[0,300],backgroundColor:'#10b981',borderRadius:4,stack:'a'},
+{label:'Instalação (terceirizados)',data:[323,23],backgroundColor:'#f59e0b',borderRadius:4,stack:'a'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',
+tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+c.raw+' OS/mês';}}}},
+scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},title:{display:true,text:'OS / mês'}}}}});
+
+// Table: Scenario comparison
+var htmlC='<thead><tr><th>Cenário</th><th>Techs</th><th>Techs Extra</th><th>Inst. Interno</th><th>Inst. Terc.</th><th>Custo CLT</th><th>Custo Terc.</th><th>Custo Total</th><th>vs Atual</th><th>% Terc.</th></tr></thead><tbody>';
+for(var n=4;n<=8;n++){
+  var extra=n-4;
+  var inst_int=Math.min(extra*capTech,volumeAtual);
+  var inst_terc=Math.max(0,volumeAtual-extra*capTech);
+  var custo_clt=n*custoCLT;
+  var custo_terc=inst_terc*custoTerc;
+  var total=custo_clt+custo_terc;
+  var diff=total-custoAtual;
+  var pct_terc=(inst_terc/volumeAtual*100).toFixed(1);
+  var isOptimal=(n===6);
+  var rowStyle=isOptimal?'style="background:rgba(16,185,129,.1);font-weight:700"':'';
+  var diffColor=diff<0?'var(--green)':'var(--red)';
+  var diffStr=diff<0?'-R$ '+Math.abs(diff).toLocaleString('pt-BR'):'+R$ '+diff.toLocaleString('pt-BR');
+  htmlC+='<tr '+rowStyle+'><td>'+(isOptimal?'⭐ ÓTIMO':'Cenário')+'</td><td>'+n+'</td><td>'+(extra>0?'+'+extra:'—')+'</td><td>'+inst_int+'</td><td>'+inst_terc+'</td><td>R$ '+custo_clt.toLocaleString('pt-BR')+'</td><td>R$ '+custo_terc.toLocaleString('pt-BR')+'</td><td><strong>R$ '+total.toLocaleString('pt-BR')+'</strong></td><td style="color:'+diffColor+'">'+diffStr+'</td><td>'+pct_terc+'%</td></tr>';
+}
+htmlC+='</tbody>';
+document.getElementById('tableDecisaoCenarios').innerHTML=htmlC;
+
+// Table: Break-even points
+var htmlBE='<thead><tr><th>Decisão</th><th>Volume Break-Even</th><th>Quando</th><th>Custo Antes</th><th>Custo Depois</th><th>Economia/mês</th></tr></thead><tbody>';
+var bePoints=[
+  {k:1,n:5,vol:89,desc:'Contratar 1º técnico extra (5 total)'},
+  {k:2,n:6,vol:239,desc:'Contratar 2º técnico extra (6 total)'},
+  {k:3,n:7,vol:389,desc:'Contratar 3º técnico extra (7 total)'},
+  {k:4,n:8,vol:539,desc:'Contratar 4º técnico extra (8 total)'}
+];
+bePoints.forEach(function(bp){
+  var antes=(bp.n-1)*custoCLT+bp.vol*custoTerc;
+  var depois=bp.n*custoCLT+Math.max(0,bp.vol-(bp.k)*capTech)*custoTerc;
+  var econ=antes-depois;
+  var isCurrent=(bp.vol<=volumeAtual&&bp.k===2)||(bp.vol<=volumeAtual&&bp.k<3);
+  var whenStr=bp.vol<=volumeAtual?'<span style="color:var(--green)">JÁ PASSOU (atual: '+volumeAtual+')</span>':'Volume > '+bp.vol+' OS/mês';
+  htmlBE+='<tr '+(bp.n===6?'style="background:rgba(16,185,129,.1);font-weight:700"':'')+'><td>'+bp.desc+'</td><td><strong>'+bp.vol+' OS/mês</strong></td><td>'+whenStr+'</td><td>R$ '+antes.toLocaleString('pt-BR')+'</td><td>R$ '+depois.toLocaleString('pt-BR')+'</td><td style="color:'+(econ>0?'var(--green)':'var(--red)')+'">R$ '+econ.toLocaleString('pt-BR')+'</td></tr>';
+});
+htmlBE+='</tbody>';
+document.getElementById('tableBreakEvenDecisao').innerHTML=htmlBE;
+
+// Table: Monthly projection 4 vs 6 techs
+var instTrend=[218,292,312,323,343,359,323];
+var htmlP='<thead><tr><th>Mês</th><th>Instalações</th><th>Custo 4 techs</th><th>Custo 6 techs</th><th>Economia</th><th>Cumulado</th></tr></thead><tbody>';
+var cumEcon=0;
+meses.forEach(function(m,i){
+  var v=instTrend[i];
+  var c4=4*custoCLT+v*custoTerc;
+  var c6=6*custoCLT+Math.max(0,v-2*capTech)*custoTerc;
+  var econ=c4-c6;
+  cumEcon+=econ;
+  htmlP+='<tr><td><strong>'+m+'</strong></td><td>'+v+' OS</td><td>R$ '+c4.toLocaleString('pt-BR')+'</td><td style="color:var(--green)">R$ '+c6.toLocaleString('pt-BR')+'</td><td style="color:var(--green)">R$ '+econ.toLocaleString('pt-BR')+'</td><td style="font-weight:700;color:var(--green)">R$ '+cumEcon.toLocaleString('pt-BR')+'</td></tr>';
+});
+htmlP+='<tr style="border-top:2px solid var(--border);font-weight:700"><td>TOTAL</td><td>'+instTrend.reduce(function(s,v){return s+v;},0)+' OS</td><td>R$ '+(4*custoCLT*7+instTrend.reduce(function(s,v){return s+v;},0)*custoTerc).toLocaleString('pt-BR')+'</td><td>R$ '+(6*custoCLT*7+Math.max(0,instTrend.reduce(function(s,v){return s+v;},0)-2*capTech*7)*custoTerc).toLocaleString('pt-BR')+'</td><td style="color:var(--green)">R$ '+cumEcon.toLocaleString('pt-BR')+'</td><td>—</td></tr>';
+htmlP+='</tbody>';
+document.getElementById('tableProjecao').innerHTML=htmlP;
+
+// === FIM DECISÃO ===
+
 
 // === FATURAMENTO ===
 var ARPU=91.23;
