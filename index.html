@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Custo MC — Arroba Banda Larga (Jan-Jul 2026)</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root{--bg:#0f172a;--card:#1e293b;--border:#334155;--text:#f1f5f9;--muted:#94a3b8;--primary:#3b82f6;--green:#10b981;--red:#ef4444;--amber:#f59e0b}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding:16px;max-width:1200px;margin:0 auto}
+  h1{font-size:1.5rem;margin-bottom:4px}
+  .subtitle{color:var(--muted);font-size:.875rem;margin-bottom:24px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px}
+  .stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+  .stat-label{color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+  .stat-value{font-size:1.75rem;font-weight:700}
+  .stat-sub{color:var(--muted);font-size:.75rem;margin-top:4px}
+  .chart-container{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:24px}
+  .chart-title{font-size:1rem;font-weight:600;margin-bottom:16px}
+  .chart-wrapper{position:relative;height:300px}
+  .chart-wrapper-sm{position:relative;height:220px}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:768px){.grid-2{grid-template-columns:1fr}}
+  table{width:100%;border-collapse:collapse;font-size:.8125rem}
+  th{text-align:right;padding:10px 8px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);text-transform:uppercase;font-size:.6875rem;letter-spacing:.03em}
+  th:first-child,td:first-child{text-align:left}
+  td{padding:10px 8px;border-bottom:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums}
+  tr:hover{background:rgba(59,130,246,.05)}
+  .badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:.6875rem;font-weight:600}
+  .badge-active{background:rgba(16,185,129,.15);color:var(--green)}
+  .badge-away{background:rgba(245,158,11,.15);color:var(--amber)}
+  .obs{color:var(--muted);font-size:.6875rem;font-style:italic;margin-top:8px}
+  .footer{color:var(--muted);font-size:.6875rem;text-align:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+  <h1>Custo Real — Manutenção Cliente</h1>
+  <p class="subtitle">Arroba Banda Larga · Janeiro a Julho 2026 · 5 Técnicos · Sem bônus · Afastamento coberto pelo INSS</p>
+  <div class="stats" id="stats"></div>
+  <div class="chart-container"><div class="chart-title">Custo Mensal da Equipe — Fixo vs Combustível</div><div class="chart-wrapper"><canvas id="chartCost"></canvas></div></div>
+  <div class="grid-2">
+    <div class="chart-container"><div class="chart-title">OS por Mês</div><div class="chart-wrapper-sm"><canvas id="chartOS"></canvas></div></div>
+    <div class="chart-container"><div class="chart-title">Custo por OS — Evolução Mensal</div><div class="chart-wrapper-sm"><canvas id="chartCPOS"></canvas></div></div>
+  </div>
+  <div class="chart-container"><div class="chart-title">Custo Total por Técnico (Jan-Jul)</div><div class="chart-wrapper-sm"><canvas id="chartTechCost"></canvas></div></div>
+  <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Detalhamento por Técnico — Mês a Mês</div><table id="tableTech"><thead><tr><th>Técnico</th><th>Mês</th><th>OS</th><th>Custo Fixo</th><th>Combustível</th><th>Custo Total</th><th>Custo/OS</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+  <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Resumo por Técnico (7 meses)</div><table id="tableSummary"><thead><tr><th>Técnico</th><th>Meses Ativo</th><th>OS Total</th><th>Média OS/mês</th><th>Custo Fixo</th><th>Combustível</th><th>Custo Total</th><th>Custo/OS</th></tr></thead><tbody></tbody></table></div>
+  <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Resumo Mensal da Equipe</div><table id="tableMonthly"><thead><tr><th>Mês</th><th>OS Total</th><th>Custo Fixo</th><th>Combustível</th><th>Custo Total</th><th>Custo/OS</th><th>Técnicos Ativos</th></tr></thead><tbody></tbody></table></div>
+  <div class="footer">Dados: IXC Web (API) · Combustível: planilha de abastecimento · Custo fixo: R$ 4.475,44/mês (salário+encargos+veículo)<br>Afastamento Jose Fernando (Jun-Jul): coberto pelo INSS · Setores 76 e 84 excluídos · Atualizado em 31/08/2026</div>
+
+<script>
+const FIXO = 4475.44;
+const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul'];
+const tecnicos = [
+  {nome:'Charles',cor:'#3b82f6',meses:7,os:[127,123,113,116,110,115,100],totalOS:804,fuelTotal:6069.17},
+  {nome:'Jose Fernando',cor:'#f59e0b',meses:5,os:[130,147,160,164,168,0,0],totalOS:769,fuelTotal:4703.80,afastado:[5,6],obs:'Afastado desde 04/06/2026 — custo coberto pelo INSS'},
+  {nome:'Carlos Arthur',cor:'#10b981',meses:1,os:[0,0,0,0,0,0,108],totalOS:108,fuelTotal:88.59},
+  {nome:'Marcos Paulo',cor:'#8b5cf6',meses:5,os:[0,0,161,149,165,149,184],totalOS:808,fuelTotal:4769.01},
+  {nome:'Pedro Henrique',cor:'#ec4899',meses:3,os:[0,0,0,0,168,160,206],totalOS:534,fuelTotal:2833.60}
+];
+const colors = {primary:'#3b82f6',green:'#10b981',amber:'#f59e0b',border:'#334155'};
+const techColors = ['#3b82f6','#f59e0b','#10b981','#8b5cf6','#ec4899'];
+
+// Calc per tech monthly
+const techMonthly = tecnicos.map(t => {
+  const monthly = meses.map((mes,i) => {
+    const os = t.os[i];
+    const isAfastado = t.afastado && t.afastado.includes(i);
+    if(os > 0) {
+      const fuel = t.fuelTotal * (os/t.totalOS);
+      const total = FIXO + fuel;
+      return {mes,os,fixo:FIXO,fuel,total,cpos:total/os,status:'ativo'};
+    } else if(isAfastado) {
+      return {mes,os:0,fixo:0,fuel:0,total:0,cpos:0,status:'afastado'};
+    }
+    return {mes,os:0,fixo:0,fuel:0,total:0,cpos:0,status:'inativo'};
+  });
+  const fixoTotal = t.meses * FIXO;
+  const custoTotal = fixoTotal + t.fuelTotal;
+  return {...t,monthly,fixoTotal,fuelTotal:t.fuelTotal,custoTotal,cpos:custoTotal/t.totalOS};
+});
+
+// Monthly totals
+const monthlyTotals = meses.map((mes,i) => {
+  let os=0,fixo=0,fuel=0,ativos=0;
+  techMonthly.forEach(t => {
+    const m = t.monthly[i];
+    if(m.os > 0) { os+=m.os; fixo+=m.fixo; fuel+=m.fuel; ativos++; }
+  });
+  const total = fixo+fuel;
+  return {mes,os,fixo,fuel,total,cpos:os>0?total/os:0,ativos};
+});
+
+// Grand totals
+const grandOS = tecnicos.reduce((s,t)=>s+t.totalOS,0);
+const grandFixo = techMonthly.reduce((s,t)=>s+t.fixoTotal,0);
+const grandFuel = techMonthly.reduce((s,t)=>s+t.fuelTotal,0);
+const grandTotal = grandFixo+grandFuel;
+const grandCPOS = grandTotal/grandOS;
+
+// Stats
+document.getElementById('stats').innerHTML = `
+  <div class="stat"><div class="stat-label">Custo Total (7 meses)</div><div class="stat-value">R$ ${grandTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div class="stat-sub">Fixo: R$ ${grandFixo.toLocaleString('pt-BR',{minimumFractionDigits:0})} + Combustível: R$ ${grandFuel.toLocaleString('pt-BR',{minimumFractionDigits:0})}</div></div>
+  <div class="stat"><div class="stat-label">Total de OS</div><div class="stat-value">${grandOS.toLocaleString('pt-BR')}</div><div class="stat-sub">Excluindo setores 76 e 84</div></div>
+  <div class="stat"><div class="stat-label">Custo por OS</div><div class="stat-value">R$ ${grandCPOS.toFixed(2)}</div><div class="stat-sub">Média geral da equipe</div></div>
+  <div class="stat"><div class="stat-label">Custo Mensal Médio</div><div class="stat-value">R$ ${(grandTotal/7).toLocaleString('pt-BR',{minimumFractionDigits:0})}</div><div class="stat-sub">Inclui meses com equipe reduzida</div></div>
+`;
+
+// Chart defaults
+Chart.defaults.color = '#94a3b8';
+Chart.defaults.font.family = '-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif';
+Chart.defaults.font.size = 11;
+
+new Chart(document.getElementById('chartCost'),{type:'bar',data:{labels:monthlyTotals.map(m=>m.mes),datasets:[
+  {label:'Custo Fixo',data:monthlyTotals.map(m=>m.fixo),backgroundColor:colors.primary,borderRadius:4,stack:'a'},
+  {label:'Combustível',data:monthlyTotals.map(m=>m.fuel),backgroundColor:colors.green,borderRadius:4,stack:'a'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:c=>c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2})}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:v=>'R$ '+(v/1000).toFixed(0)+'k'}}}}});
+
+new Chart(document.getElementById('chartOS'),{type:'line',data:{labels:monthlyTotals.map(m=>m.mes),datasets:[{label:'OS/mês',data:monthlyTotals.map(m=>m.os),borderColor:colors.primary,backgroundColor:'rgba(59,130,246,0.1)',fill:true,tension:.3,pointRadius:5,pointBackgroundColor:colors.primary}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:colors.border}}}}});
+
+new Chart(document.getElementById('chartCPOS'),{type:'line',data:{labels:monthlyTotals.map(m=>m.mes),datasets:[{label:'Custo/OS',data:monthlyTotals.map(m=>m.cpos),borderColor:colors.amber,backgroundColor:'rgba(245,158,11,0.1)',fill:true,tension:.3,pointRadius:5,pointBackgroundColor:colors.amber}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:colors.border},ticks:{callback:v=>'R$ '+v.toFixed(0)}}}}});
+
+new Chart(document.getElementById('chartTechCost'),{type:'bar',data:{labels:techMonthly.map(t=>t.nome),datasets:[
+  {label:'Custo Fixo',data:techMonthly.map(t=>t.fixoTotal),backgroundColor:colors.primary,borderRadius:4,stack:'a'},
+  {label:'Combustível',data:techMonthly.map(t=>t.fuelTotal),backgroundColor:colors.green,borderRadius:4,stack:'a'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:c=>c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2})}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:v=>'R$ '+(v/1000).toFixed(0)+'k'}}}}});
+
+// Tables
+const tbody1 = document.querySelector('#tableTech tbody');
+techData = techMonthly;
+techData.forEach(t => {
+  t.monthly.forEach(m => {
+    if(m.status === 'inativo') return;
+    const badge = m.status === 'ativo' ? '<span class="badge badge-active">Ativo</span>' : '<span class="badge badge-away">Afastado (INSS)</span>';
+    tbody1.innerHTML += '<tr><td>'+t.nome+'</td><td>'+m.mes+'</td><td>'+(m.os||'—')+'</td><td>'+(m.fixo?'R$ '+m.fixo.toFixed(2):'—')+'</td><td>'+(m.fuel?'R$ '+m.fuel.toFixed(2):'—')+'</td><td>'+(m.total?'R$ '+m.total.toFixed(2):'—')+'</td><td>'+(m.cpos?'R$ '+m.cpos.toFixed(2):'—')+'</td><td>'+badge+'</td></tr>';
+  });
+});
+
+const tbody2 = document.querySelector('#tableSummary tbody');
+techMonthly.forEach((t,i) => {
+  const media = (t.totalOS/t.meses).toFixed(1);
+  tbody2.innerHTML += '<tr><td style="color:'+techColors[i]+';font-weight:600">'+t.nome+'</td><td>'+t.meses+'</td><td>'+t.totalOS+'</td><td>'+media+'</td><td>R$ '+t.fixoTotal.toFixed(2)+'</td><td>R$ '+t.fuelTotal.toFixed(2)+'</td><td>R$ '+t.custoTotal.toFixed(2)+'</td><td style="font-weight:600">R$ '+t.cpos.toFixed(2)+'</td></tr>';
+  if(t.obs) tbody2.innerHTML += '<tr><td colspan="8" class="obs">'+t.obs+'</td></tr>';
+});
+tbody2.innerHTML += '<tr style="border-top:2px solid '+colors.border+';font-weight:700"><td>TOTAL</td><td></td><td>'+grandOS+'</td><td></td><td>R$ '+grandFixo.toFixed(2)+'</td><td>R$ '+grandFuel.toFixed(2)+'</td><td>R$ '+grandTotal.toFixed(2)+'</td><td>R$ '+grandCPOS.toFixed(2)+'</td></tr>';
+
+const tbody3 = document.querySelector('#tableMonthly tbody');
+monthlyTotals.forEach(m => {
+  tbody3.innerHTML += '<tr><td style="font-weight:600">'+m.mes+'</td><td>'+m.os+'</td><td>R$ '+m.fixo.toFixed(2)+'</td><td>R$ '+m.fuel.toFixed(2)+'</td><td>R$ '+m.total.toFixed(2)+'</td><td style="font-weight:600">R$ '+m.cpos.toFixed(2)+'</td><td>'+m.ativos+'</td></tr>';
+});
+</script>
+</body>
+</html>
