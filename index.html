@@ -60,6 +60,7 @@ tr:hover{background:rgba(59,130,246,.05)}
 <button class="tab" onclick="showTab('analitico',this)">Custo Analítico</button>
 <button class="tab" onclick="showTab('estrategica',this)">Visão Estratégica</button>
 <button class="tab" onclick="showTab('decisao',this)">Decisão</button>
+<button class="tab" onclick="showTab('reincidencia',this)">Reincidência</button>
 </div>
 <div id="tab-custo" class="tab-content active">
 <div class="stats" id="statsCusto"></div>
@@ -154,6 +155,17 @@ tr:hover{background:rgba(59,130,246,.05)}
 <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Cenários de Crescimento — Demanda × Equipe × Custo</div><table id="tableCrescimento"></table></div>
 <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Custo Detalhado por Tamanho de Equipe</div><table id="tableCustoEquipe"></table></div>
 
+
+<div id="tab-reincidencia" class="tab-content">
+<div class="stats" id="statsReincidencia"></div>
+<div class="alert-box" id="alertReincidencia" style="background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.2)"></div>
+<div class="chart-container"><div class="chart-title">Taxa de Reincidência Mensal por Técnico (%)</div><div class="chart-wrapper-lg"><canvas id="chartReincidenciaTaxa"></canvas></div></div>
+<div class="grid-2">
+<div class="chart-container"><div class="chart-title">Custo de Reincidência Mensal por Técnico (R$)</div><div class="chart-wrapper"><canvas id="chartReincidenciaCusto"></canvas></div></div>
+<div class="chart-container"><div class="chart-title">Total OS vs Reincidências por Técnico</div><div class="chart-wrapper"><canvas id="chartReincidenciaComparativo"></canvas></div></div>
+</div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Detalhamento Mensal — Reincidência por Técnico</div><table id="tableReincidencia"></table></div>
+</div>
 
 <div class="footer">Dados: IXC Web (API) + Planilha de Combustível (Bd_TickeckLOG) · Custo fixo: R$ 4.475,44/mês · Combustível: dados reais por abastecimento · Afastamento Jose Fernando (04/06): INSS · Setores 76 e 84 excluídos · Atualizado em 31/08/2026</div>
 <script>
@@ -622,6 +634,104 @@ htmlD+='</tbody>';
 document.getElementById('tableCustoEquipe').innerHTML=htmlD;
 
 // === FIM PREVISIBILIDADE ===
+
+// === ABA REINCIDÊNCIA ===
+var reincData = {"Charles": {"2026-01": {"total": 120, "reincidencia": 16, "taxa": 13.3, "custo": 646.72}, "2026-02": {"total": 112, "reincidencia": 13, "taxa": 11.6, "custo": 525.46}, "2026-03": {"total": 105, "reincidencia": 19, "taxa": 18.1, "custo": 767.98}, "2026-04": {"total": 81, "reincidencia": 10, "taxa": 12.3, "custo": 404.2}, "2026-05": {"total": 102, "reincidencia": 18, "taxa": 17.6, "custo": 727.56}, "2026-06": {"total": 136, "reincidencia": 20, "taxa": 14.7, "custo": 808.4}, "2026-07": {"total": 145, "reincidencia": 24, "taxa": 16.6, "custo": 970.08}, "2026-08": {"total": 4, "reincidencia": 0, "taxa": 0.0, "custo": 0.0}}, "Jose Fernando": {"2026-01": {"total": 49, "reincidencia": 2, "taxa": 4.1, "custo": 80.84}, "2026-02": {"total": 146, "reincidencia": 21, "taxa": 14.4, "custo": 848.82}, "2026-03": {"total": 168, "reincidencia": 20, "taxa": 11.9, "custo": 808.4}, "2026-04": {"total": 155, "reincidencia": 18, "taxa": 11.6, "custo": 727.56}, "2026-05": {"total": 174, "reincidencia": 24, "taxa": 13.8, "custo": 970.08}, "2026-06": {"total": 31, "reincidencia": 6, "taxa": 19.4, "custo": 242.52}}, "Marcos Paulo": {"2026-02": {"total": 58, "reincidencia": 6, "taxa": 10.3, "custo": 242.52}, "2026-03": {"total": 171, "reincidencia": 42, "taxa": 24.6, "custo": 1697.64}, "2026-04": {"total": 144, "reincidencia": 23, "taxa": 16.0, "custo": 929.66}, "2026-05": {"total": 161, "reincidencia": 39, "taxa": 24.2, "custo": 1576.38}, "2026-06": {"total": 156, "reincidencia": 30, "taxa": 19.2, "custo": 1212.6}, "2026-07": {"total": 181, "reincidencia": 32, "taxa": 17.7, "custo": 1293.44}, "2026-08": {"total": 133, "reincidencia": 24, "taxa": 18.0, "custo": 970.08}}, "Carlos Arthur": {"2026-02": {"total": 111, "reincidencia": 51, "taxa": 45.9, "custo": 2061.42}, "2026-03": {"total": 357, "reincidencia": 180, "taxa": 50.4, "custo": 7275.6}, "2026-04": {"total": 341, "reincidencia": 158, "taxa": 46.3, "custo": 6386.36}, "2026-05": {"total": 207, "reincidencia": 101, "taxa": 48.8, "custo": 4082.42}, "2026-06": {"total": 110, "reincidencia": 53, "taxa": 48.2, "custo": 2142.26}, "2026-07": {"total": 109, "reincidencia": 11, "taxa": 10.1, "custo": 444.62}, "2026-08": {"total": 136, "reincidencia": 17, "taxa": 12.5, "custo": 687.14}}, "Pedro Henrique": {"2026-03": {"total": 39, "reincidencia": 2, "taxa": 5.1, "custo": 80.84}, "2026-04": {"total": 130, "reincidencia": 20, "taxa": 15.4, "custo": 808.4}, "2026-05": {"total": 163, "reincidencia": 24, "taxa": 14.7, "custo": 970.08}, "2026-06": {"total": 160, "reincidencia": 19, "taxa": 11.9, "custo": 767.98}, "2026-07": {"total": 212, "reincidencia": 39, "taxa": 18.4, "custo": 1576.38}, "2026-08": {"total": 157, "reincidencia": 21, "taxa": 13.4, "custo": 848.82}}};
+var reincTechs = ["Charles", "Jose Fernando", "Marcos Paulo", "Carlos Arthur", "Pedro Henrique"];
+var reincMonths = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago"];
+var reincCores = {"Charles": "#3b82f6", "Jose Fernando": "#f59e0b", "Marcos Paulo": "#8b5cf6", "Carlos Arthur": "#10b981", "Pedro Henrique": "#ec4899"};
+
+// Stat cards
+var totalOS = 4764;
+var totalReinc = 1103;
+var totalCusto = 44583.26;
+var taxaGeral = (totalReinc/totalOS*100).toFixed(1);
+
+document.getElementById('statsReincidencia').innerHTML=
+'<div class="stat"><div class="stat-label">Total OS (Jan-Ago)</div><div class="stat-value">'+totalOS.toLocaleString('pt-BR')+'</div><div class="stat-sub">Todos os técnicos MC</div></div>'
++'<div class="stat"><div class="stat-label">Reincidências</div><div class="stat-value" style="color:var(--red)">'+totalReinc.toLocaleString('pt-BR')+'</div><div class="stat-sub">'+taxaGeral+'% do total de OS</div></div>'
++'<div class="stat"><div class="stat-label">Custo Reincidência</div><div class="stat-value" style="color:var(--red)">R$ '+totalCusto.toLocaleString('pt-BR')+'</div><div class="stat-sub">A R$ 40,42/OS · 7 dias</div></div>'
++'<div class="stat"><div class="stat-label">Pior Técnico</div><div class="stat-value" style="color:var(--red)">Carlos Arthur</div><div class="stat-sub">41.6% reincidência</div></div>'
++'<div class="stat"><div class="stat-label">Melhor Técnico</div><div class="stat-value" style="color:var(--green)">Jose Fernando</div><div class="stat-sub">12.6% reincidência</div></div>';
+
+// Alert box
+var worstMsg = '⚠️ <strong>Carlos Arthur</strong> tem a maior taxa de reincidência (41.6%). Cada reincidência = OS desnecessária = custo de R$ 40,42.';
+var costMsg = '💰 Custo total de reincidência: <strong>R$ 44,583.26</strong> em 8 meses. Reduzir a taxa de 23.2% para 10% economizaria R$ 25,327.17.';
+var noteMsg = '📋 Definição: reincidência = mesma empresa/cliente abriu nova OS com o mesmo técnico em até 7 dias. Janela: 7 dias. Custo: R$ 40,42/OS (custo médio da operação MC). Setores 76 e 84 excluídos.';
+document.getElementById('alertReincidencia').innerHTML=
+'<div class="alert-title" style="color:var(--red)">📊 Análise de Reincidência — Qualidade da Execução</div>'
++'<div class="alert-item">'+worstMsg+'</div>'
++'<div class="alert-item">'+costMsg+'</div>'
++'<div class="alert-item">'+noteMsg+'</div>';
+
+// Chart: Reincidence rate by tech by month (line chart)
+var taxaDatasets=reincTechs.map(function(t){
+  var data=reincMonths.map(function(m,i){
+    var key='2026-0'+(i+1);
+    return (reincData[t]&&reincData[t][key])?reincData[t][key].taxa:0;
+  });
+  return {label:t,data:data,borderColor:reincCores[t],backgroundColor:reincCores[t]+'20',tension:.3,borderWidth:2,pointRadius:3,pointBackgroundColor:reincCores[t]};
+});
+new Chart(document.getElementById('chartReincidenciaTaxa'),{type:'line',data:{labels:reincMonths,datasets:taxaDatasets},
+options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',
+tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+c.raw+'%';}}}}},
+scales:{y:{grid:{color:colors.border},title:{display:true,text:'% Reincidência'},ticks:{callback:function(v){return v+'%';}}},x:{grid:{display:false}}}}});
+
+// Chart: Reincidence cost by tech by month (stacked bar)
+var custoDatasets=reincTechs.map(function(t){
+  var data=reincMonths.map(function(m,i){
+    var key='2026-0'+(i+1);
+    return (reincData[t]&&reincData[t][key])?reincData[t][key].custo:0;
+  });
+  return {label:t,data:data,backgroundColor:reincCores[t],borderRadius:3,stack:'a'};
+});
+new Chart(document.getElementById('chartReincidenciaCusto'),{type:'bar',data:{labels:reincMonths,datasets:custoDatasets},
+options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',
+tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR');}}}}},
+scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},title:{display:true,text:'R$ / mês'},
+ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(1)+'K';}}}}}});
+
+// Chart: Total OS vs Reincidence comparison (grouped bar)
+var compLabels=reincTechs;
+var totalDataComp=reincTechs.map(function(t){
+  var s=0;
+  for(var key in reincData[t]){s+=reincData[t][key].total;}
+  return s;
+});
+var reincDataComp=reincTechs.map(function(t){
+  var s=0;
+  for(var key in reincData[t]){s+=reincData[t][key].reincidencia;}
+  return s;
+});
+new Chart(document.getElementById('chartReincidenciaComparativo'),{type:'bar',data:{labels:compLabels,datasets:[
+{label:'Total OS',data:totalDataComp,backgroundColor:'#3b82f6',borderRadius:4,stack:'a'},
+{label:'Reincidências',data:reincDataComp,backgroundColor:'#ef4444',borderRadius:4,stack:'b'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},
+scales:{y:{grid:{color:colors.border},title:{display:true,text:'OS'}},x:{grid:{display:false}}}}});
+
+// Table: Detailed monthly breakdown
+var htmlR='<thead><tr><th>Técnico</th><th>Mês</th><th>Total OS</th><th>Reincidências</th><th>Taxa (%)</th><th>Custo (R$)</th></tr></thead><tbody>';
+reincTechs.forEach(function(t){
+  for(var key in reincData[t]){
+    var r=reincData[t][key];
+    var mesNomes={'2026-01':'Jan','2026-02':'Fev','2026-03':'Mar','2026-04':'Abr','2026-05':'Mai','2026-06':'Jun','2026-07':'Jul','2026-08':'Ago'};
+    var taxaColor=r.taxa>20?'var(--red)':(r.taxa>15?'var(--amber)':'var(--green)');
+    htmlR+='<tr><td style="color:'+reincCores[t]+'"><strong>'+t+'</strong></td><td>'+mesNomes[key]+'</td><td>'+r.total+'</td><td style="color:var(--red)">'+r.reincidencia+'</td><td style="color:'+taxaColor+';font-weight:700">'+r.taxa.toFixed(1)+'%</td><td>R$ '+r.custo.toLocaleString('pt-BR')+'</td></tr>';
+  }
+  // Subtotal per tech
+  var st=0,sr=0,sc=0;
+  for(var key in reincData[t]){st+=reincData[t][key].total;sr+=reincData[t][key].reincidencia;sc+=reincData[t][key].custo;}
+  var sTaxa=(sr/st*100).toFixed(1);
+  var sColor=sTaxa>20?'var(--red)':(sTaxa>15?'var(--amber)':'var(--green)');
+  htmlR+='<tr style="border-top:2px solid var(--border);font-weight:700"><td>'+t+' (TOTAL)</td><td>—</td><td>'+st+'</td><td style="color:var(--red)">'+sr+'</td><td style="color:'+sColor+'">'+sTaxa+'%</td><td>R$ '+sc.toLocaleString('pt-BR')+'</td></tr>';
+});
+// Grand total
+htmlR+='<tr style="border-top:2px solid var(--green);font-weight:700;background:rgba(16,185,129,.05)"><td>TOTAL GERAL</td><td>—</td><td>'+totalOS+'</td><td style="color:var(--red)">'+totalReinc+'</td><td style="color:'+(taxaGeral>15?'var(--red)':'var(--green)')+'">'+taxaGeral+'%</td><td>R$ '+totalCusto.toLocaleString('pt-BR')+'</td></tr>';
+htmlR+='</tbody>';
+document.getElementById('tableReincidencia').innerHTML=htmlR;
+
+// === FIM REINCIDÊNCIA ===
+
 
 
 
@@ -1098,6 +1208,104 @@ htmlD+='</tbody>';
 document.getElementById('tableCustoEquipe').innerHTML=htmlD;
 
 // === FIM PREVISIBILIDADE ===
+
+// === ABA REINCIDÊNCIA ===
+var reincData = {"Charles": {"2026-01": {"total": 120, "reincidencia": 16, "taxa": 13.3, "custo": 646.72}, "2026-02": {"total": 112, "reincidencia": 13, "taxa": 11.6, "custo": 525.46}, "2026-03": {"total": 105, "reincidencia": 19, "taxa": 18.1, "custo": 767.98}, "2026-04": {"total": 81, "reincidencia": 10, "taxa": 12.3, "custo": 404.2}, "2026-05": {"total": 102, "reincidencia": 18, "taxa": 17.6, "custo": 727.56}, "2026-06": {"total": 136, "reincidencia": 20, "taxa": 14.7, "custo": 808.4}, "2026-07": {"total": 145, "reincidencia": 24, "taxa": 16.6, "custo": 970.08}, "2026-08": {"total": 4, "reincidencia": 0, "taxa": 0.0, "custo": 0.0}}, "Jose Fernando": {"2026-01": {"total": 49, "reincidencia": 2, "taxa": 4.1, "custo": 80.84}, "2026-02": {"total": 146, "reincidencia": 21, "taxa": 14.4, "custo": 848.82}, "2026-03": {"total": 168, "reincidencia": 20, "taxa": 11.9, "custo": 808.4}, "2026-04": {"total": 155, "reincidencia": 18, "taxa": 11.6, "custo": 727.56}, "2026-05": {"total": 174, "reincidencia": 24, "taxa": 13.8, "custo": 970.08}, "2026-06": {"total": 31, "reincidencia": 6, "taxa": 19.4, "custo": 242.52}}, "Marcos Paulo": {"2026-02": {"total": 58, "reincidencia": 6, "taxa": 10.3, "custo": 242.52}, "2026-03": {"total": 171, "reincidencia": 42, "taxa": 24.6, "custo": 1697.64}, "2026-04": {"total": 144, "reincidencia": 23, "taxa": 16.0, "custo": 929.66}, "2026-05": {"total": 161, "reincidencia": 39, "taxa": 24.2, "custo": 1576.38}, "2026-06": {"total": 156, "reincidencia": 30, "taxa": 19.2, "custo": 1212.6}, "2026-07": {"total": 181, "reincidencia": 32, "taxa": 17.7, "custo": 1293.44}, "2026-08": {"total": 133, "reincidencia": 24, "taxa": 18.0, "custo": 970.08}}, "Carlos Arthur": {"2026-02": {"total": 111, "reincidencia": 51, "taxa": 45.9, "custo": 2061.42}, "2026-03": {"total": 357, "reincidencia": 180, "taxa": 50.4, "custo": 7275.6}, "2026-04": {"total": 341, "reincidencia": 158, "taxa": 46.3, "custo": 6386.36}, "2026-05": {"total": 207, "reincidencia": 101, "taxa": 48.8, "custo": 4082.42}, "2026-06": {"total": 110, "reincidencia": 53, "taxa": 48.2, "custo": 2142.26}, "2026-07": {"total": 109, "reincidencia": 11, "taxa": 10.1, "custo": 444.62}, "2026-08": {"total": 136, "reincidencia": 17, "taxa": 12.5, "custo": 687.14}}, "Pedro Henrique": {"2026-03": {"total": 39, "reincidencia": 2, "taxa": 5.1, "custo": 80.84}, "2026-04": {"total": 130, "reincidencia": 20, "taxa": 15.4, "custo": 808.4}, "2026-05": {"total": 163, "reincidencia": 24, "taxa": 14.7, "custo": 970.08}, "2026-06": {"total": 160, "reincidencia": 19, "taxa": 11.9, "custo": 767.98}, "2026-07": {"total": 212, "reincidencia": 39, "taxa": 18.4, "custo": 1576.38}, "2026-08": {"total": 157, "reincidencia": 21, "taxa": 13.4, "custo": 848.82}}};
+var reincTechs = ["Charles", "Jose Fernando", "Marcos Paulo", "Carlos Arthur", "Pedro Henrique"];
+var reincMonths = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago"];
+var reincCores = {"Charles": "#3b82f6", "Jose Fernando": "#f59e0b", "Marcos Paulo": "#8b5cf6", "Carlos Arthur": "#10b981", "Pedro Henrique": "#ec4899"};
+
+// Stat cards
+var totalOS = 4764;
+var totalReinc = 1103;
+var totalCusto = 44583.26;
+var taxaGeral = (totalReinc/totalOS*100).toFixed(1);
+
+document.getElementById('statsReincidencia').innerHTML=
+'<div class="stat"><div class="stat-label">Total OS (Jan-Ago)</div><div class="stat-value">'+totalOS.toLocaleString('pt-BR')+'</div><div class="stat-sub">Todos os técnicos MC</div></div>'
++'<div class="stat"><div class="stat-label">Reincidências</div><div class="stat-value" style="color:var(--red)">'+totalReinc.toLocaleString('pt-BR')+'</div><div class="stat-sub">'+taxaGeral+'% do total de OS</div></div>'
++'<div class="stat"><div class="stat-label">Custo Reincidência</div><div class="stat-value" style="color:var(--red)">R$ '+totalCusto.toLocaleString('pt-BR')+'</div><div class="stat-sub">A R$ 40,42/OS · 7 dias</div></div>'
++'<div class="stat"><div class="stat-label">Pior Técnico</div><div class="stat-value" style="color:var(--red)">Carlos Arthur</div><div class="stat-sub">41.6% reincidência</div></div>'
++'<div class="stat"><div class="stat-label">Melhor Técnico</div><div class="stat-value" style="color:var(--green)">Jose Fernando</div><div class="stat-sub">12.6% reincidência</div></div>';
+
+// Alert box
+var worstMsg = '⚠️ <strong>Carlos Arthur</strong> tem a maior taxa de reincidência (41.6%). Cada reincidência = OS desnecessária = custo de R$ 40,42.';
+var costMsg = '💰 Custo total de reincidência: <strong>R$ 44,583.26</strong> em 8 meses. Reduzir a taxa de 23.2% para 10% economizaria R$ 25,327.17.';
+var noteMsg = '📋 Definição: reincidência = mesma empresa/cliente abriu nova OS com o mesmo técnico em até 7 dias. Janela: 7 dias. Custo: R$ 40,42/OS (custo médio da operação MC). Setores 76 e 84 excluídos.';
+document.getElementById('alertReincidencia').innerHTML=
+'<div class="alert-title" style="color:var(--red)">📊 Análise de Reincidência — Qualidade da Execução</div>'
++'<div class="alert-item">'+worstMsg+'</div>'
++'<div class="alert-item">'+costMsg+'</div>'
++'<div class="alert-item">'+noteMsg+'</div>';
+
+// Chart: Reincidence rate by tech by month (line chart)
+var taxaDatasets=reincTechs.map(function(t){
+  var data=reincMonths.map(function(m,i){
+    var key='2026-0'+(i+1);
+    return (reincData[t]&&reincData[t][key])?reincData[t][key].taxa:0;
+  });
+  return {label:t,data:data,borderColor:reincCores[t],backgroundColor:reincCores[t]+'20',tension:.3,borderWidth:2,pointRadius:3,pointBackgroundColor:reincCores[t]};
+});
+new Chart(document.getElementById('chartReincidenciaTaxa'),{type:'line',data:{labels:reincMonths,datasets:taxaDatasets},
+options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',
+tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+c.raw+'%';}}}}},
+scales:{y:{grid:{color:colors.border},title:{display:true,text:'% Reincidência'},ticks:{callback:function(v){return v+'%';}}},x:{grid:{display:false}}}}});
+
+// Chart: Reincidence cost by tech by month (stacked bar)
+var custoDatasets=reincTechs.map(function(t){
+  var data=reincMonths.map(function(m,i){
+    var key='2026-0'+(i+1);
+    return (reincData[t]&&reincData[t][key])?reincData[t][key].custo:0;
+  });
+  return {label:t,data:data,backgroundColor:reincCores[t],borderRadius:3,stack:'a'};
+});
+new Chart(document.getElementById('chartReincidenciaCusto'),{type:'bar',data:{labels:reincMonths,datasets:custoDatasets},
+options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',
+tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR');}}}}},
+scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},title:{display:true,text:'R$ / mês'},
+ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(1)+'K';}}}}}});
+
+// Chart: Total OS vs Reincidence comparison (grouped bar)
+var compLabels=reincTechs;
+var totalDataComp=reincTechs.map(function(t){
+  var s=0;
+  for(var key in reincData[t]){s+=reincData[t][key].total;}
+  return s;
+});
+var reincDataComp=reincTechs.map(function(t){
+  var s=0;
+  for(var key in reincData[t]){s+=reincData[t][key].reincidencia;}
+  return s;
+});
+new Chart(document.getElementById('chartReincidenciaComparativo'),{type:'bar',data:{labels:compLabels,datasets:[
+{label:'Total OS',data:totalDataComp,backgroundColor:'#3b82f6',borderRadius:4,stack:'a'},
+{label:'Reincidências',data:reincDataComp,backgroundColor:'#ef4444',borderRadius:4,stack:'b'}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},
+scales:{y:{grid:{color:colors.border},title:{display:true,text:'OS'}},x:{grid:{display:false}}}}});
+
+// Table: Detailed monthly breakdown
+var htmlR='<thead><tr><th>Técnico</th><th>Mês</th><th>Total OS</th><th>Reincidências</th><th>Taxa (%)</th><th>Custo (R$)</th></tr></thead><tbody>';
+reincTechs.forEach(function(t){
+  for(var key in reincData[t]){
+    var r=reincData[t][key];
+    var mesNomes={'2026-01':'Jan','2026-02':'Fev','2026-03':'Mar','2026-04':'Abr','2026-05':'Mai','2026-06':'Jun','2026-07':'Jul','2026-08':'Ago'};
+    var taxaColor=r.taxa>20?'var(--red)':(r.taxa>15?'var(--amber)':'var(--green)');
+    htmlR+='<tr><td style="color:'+reincCores[t]+'"><strong>'+t+'</strong></td><td>'+mesNomes[key]+'</td><td>'+r.total+'</td><td style="color:var(--red)">'+r.reincidencia+'</td><td style="color:'+taxaColor+';font-weight:700">'+r.taxa.toFixed(1)+'%</td><td>R$ '+r.custo.toLocaleString('pt-BR')+'</td></tr>';
+  }
+  // Subtotal per tech
+  var st=0,sr=0,sc=0;
+  for(var key in reincData[t]){st+=reincData[t][key].total;sr+=reincData[t][key].reincidencia;sc+=reincData[t][key].custo;}
+  var sTaxa=(sr/st*100).toFixed(1);
+  var sColor=sTaxa>20?'var(--red)':(sTaxa>15?'var(--amber)':'var(--green)');
+  htmlR+='<tr style="border-top:2px solid var(--border);font-weight:700"><td>'+t+' (TOTAL)</td><td>—</td><td>'+st+'</td><td style="color:var(--red)">'+sr+'</td><td style="color:'+sColor+'">'+sTaxa+'%</td><td>R$ '+sc.toLocaleString('pt-BR')+'</td></tr>';
+});
+// Grand total
+htmlR+='<tr style="border-top:2px solid var(--green);font-weight:700;background:rgba(16,185,129,.05)"><td>TOTAL GERAL</td><td>—</td><td>'+totalOS+'</td><td style="color:var(--red)">'+totalReinc+'</td><td style="color:'+(taxaGeral>15?'var(--red)':'var(--green)')+'">'+taxaGeral+'%</td><td>R$ '+totalCusto.toLocaleString('pt-BR')+'</td></tr>';
+htmlR+='</tbody>';
+document.getElementById('tableReincidencia').innerHTML=htmlR;
+
+// === FIM REINCIDÊNCIA ===
+
 
 
 
