@@ -52,7 +52,7 @@ tr:hover{background:rgba(59,130,246,.05)}
 </head>
 <body>
 <h1>Visão Gestor — Manutenção Cliente</h1>
-<p class="subtitle">Arroba Banda Larga · Janeiro a Julho 2026 · 5 Técnicos · Custo proporcional por dias trabalhados · Apenas Setor 23 (Manutenção Cliente) · Combustível: dados reais da planilha</p>
+<p class="subtitle">Arroba Banda Larga · Janeiro a Agosto 2026 · 5 Técnicos · Custo proporcional por dias trabalhados · Apenas Setor 23 (Manutenção Cliente) · Combustível: dados reais da planilha</p>
 <div class="tabs">
 <button class="tab active" onclick="showTab('custo',this)">Custo</button>
 <button class="tab" onclick="showTab('setores',this)">Setores</button>
@@ -71,7 +71,7 @@ tr:hover{background:rgba(59,130,246,.05)}
 </div>
 <div class="chart-container"><div class="chart-title">Custo Total por Técnico</div><div class="chart-wrapper-sm"><canvas id="chartTechCost"></canvas></div></div>
 <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Detalhamento por Técnico — Mês a Mês</div><table id="tableTech"></table></div>
-<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Resumo por Técnico (7 meses)</div><table id="tableSummary"></table></div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Resumo por Técnico (8 meses)</div><table id="tableSummary"></table></div>
 <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Resumo Mensal da Equipe</div><table id="tableMonthly"></table></div>
 </div>
 <div id="tab-setores" class="tab-content">
@@ -130,7 +130,7 @@ tr:hover{background:rgba(59,130,246,.05)}
 <div class="chart-container"><div class="chart-title">Faturamento vs Custo — Internos (Manutenção)</div><div class="chart-wrapper-sm"><canvas id="chartROIInt"></canvas></div></div>
 </div>
 <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Faturamento Mensal Detalhado por Equipe</div><table id="tableFaturamento"></table></div>
-<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Resumo de ROI por Equipe (7 meses)</div><table id="tableROI"></table></div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Resumo de ROI por Equipe (8 meses)</div><table id="tableROI"></table></div>
 
 </div>
 
@@ -144,7 +144,7 @@ tr:hover{background:rgba(59,130,246,.05)}
 </div>
 <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Matriz de Decisão — Cenários por Número de Técnicos</div><table id="tableDecisaoCenarios"></table></div>
 <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Pontos de Decisão (Break-Even) — Quando Contratar</div><table id="tableBreakEvenDecisao"></table></div>
-<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Projeção Mensal — Custo com 4 vs 6 Técnicos (7 meses)</div><table id="tableProjecao"></table></div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Projeção Mensal — Custo com 4 vs 6 Técnicos (8 meses)</div><table id="tableProjecao"></table></div>
 <div class="chart-container" style="border-top:2px solid var(--green);padding-top:20px;margin-top:8px"><div class="chart-title" style="color:var(--green);font-size:1.1rem">📋 Previsibilidade — Equipe Própia Cobre Toda a Demanda</div><p style="color:var(--muted);font-size:.75rem;margin-bottom:14px">Modelo preditivo com base em produtividade real · Custo por técnico: R$ 4.475,44 fixo + R$ 852 combustível = R$ 5.327,44/mês</p></div>
 <div class="stats" id="statsPrevisao"></div>
 <div class="grid-2">
@@ -206,7 +206,7 @@ Chart.defaults.font.size=11;
 function showTab(name,btn){document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.getElementById('tab-'+name).classList.add('active');if(btn)btn.classList.add('active');}
 var colors={primary:'#3b82f6',green:'#10b981',amber:'#f59e0b',border:'#334155',red:'#ef4444'};
 // TAB1
-document.getElementById('statsCusto').innerHTML='<div class="stat"><div class="stat-label">Custo Total (7 meses)</div><div class="stat-value">R$ '+grandTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})+'</div><div class="stat-sub">Fixo: R$ '+grandFixo.toLocaleString('pt-BR',{minimumFractionDigits:0})+' + Combustível: R$ '+grandFuel.toLocaleString('pt-BR',{minimumFractionDigits:0})+'</div></div><div class="stat"><div class="stat-label">Total de OS</div><div class="stat-value">'+grandOS.toLocaleString('pt-BR')+'</div><div class="stat-sub">Excluindo setores 76 e 84</div></div><div class="stat"><div class="stat-label">Custo por OS</div><div class="stat-value">R$ '+grandCPOS.toFixed(2)+'</div><div class="stat-sub">Média geral da equipe</div></div><div class="stat"><div class="stat-label">Custo Mensal Médio</div><div class="stat-value">R$ '+(grandTotal/7).toLocaleString('pt-BR',{minimumFractionDigits:0})+'</div><div class="stat-sub">Inclui meses com equipe reduzida</div></div>';
+document.getElementById('statsCusto').innerHTML='<div class="stat"><div class="stat-label">Custo Total (8 meses)</div><div class="stat-value">R$ '+grandTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})+'</div><div class="stat-sub">Fixo: R$ '+grandFixo.toLocaleString('pt-BR',{minimumFractionDigits:0})+' + Combustível: R$ '+grandFuel.toLocaleString('pt-BR',{minimumFractionDigits:0})+'</div></div><div class="stat"><div class="stat-label">Total de OS</div><div class="stat-value">'+grandOS.toLocaleString('pt-BR')+'</div><div class="stat-sub">Excluindo setores 76 e 84</div></div><div class="stat"><div class="stat-label">Custo por OS</div><div class="stat-value">R$ '+grandCPOS.toFixed(2)+'</div><div class="stat-sub">Média geral da equipe</div></div><div class="stat"><div class="stat-label">Custo Mensal Médio</div><div class="stat-value">R$ '+(grandTotal/7).toLocaleString('pt-BR',{minimumFractionDigits:0})+'</div><div class="stat-sub">Inclui meses com equipe reduzida</div></div>';
 new Chart(document.getElementById('chartCost'),{type:'bar',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[{label:'Custo Fixo',data:monthlyTotals.map(function(m){return m.fixo;}),backgroundColor:colors.primary,borderRadius:4,stack:'a'},{label:'Combustível',data:monthlyTotals.map(function(m){return m.fuel;}),backgroundColor:colors.green,borderRadius:4,stack:'a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'k';}}}}}});
 new Chart(document.getElementById('chartOS'),{type:'line',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[{label:'OS/mês',data:monthlyTotals.map(function(m){return m.os;}),borderColor:colors.primary,backgroundColor:'rgba(59,130,246,0.1)',fill:true,tension:.3,pointRadius:5,pointBackgroundColor:colors.primary}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:colors.border}}}}});
 new Chart(document.getElementById('chartCPOS'),{type:'line',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[{label:'Custo/OS',data:monthlyTotals.map(function(m){return m.cpos;}),borderColor:colors.amber,backgroundColor:'rgba(245,158,11,0.1)',fill:true,tension:.3,pointRadius:5,pointBackgroundColor:colors.amber}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+v.toFixed(0);}}}}}});
@@ -287,14 +287,14 @@ var breakEven=Math.round(custoCLT/50);
 
 // Stat cards
 document.getElementById('statsEstrategica').innerHTML=
-'<div class="stat"><div class="stat-label">Total Instalações (7 meses)</div><div class="stat-value">'+grandTotal.toLocaleString('pt-BR')+'</div><div class="stat-sub">Setor 1 · Jan-Jul 2026</div></div>'
+'<div class="stat"><div class="stat-label">Total Instalações (8 meses)</div><div class="stat-value">'+grandTotal.toLocaleString('pt-BR')+'</div><div class="stat-sub">Setor 1 · Jan-Jul 2026</div></div>'
 +'<div class="stat"><div class="stat-label">Custo Terceirizados</div><div class="stat-value">R$ '+tercCusto.toLocaleString('pt-BR')+'</div><div class="stat-sub">'+tercTotalOS+' OS × R$ 50</div></div>'
 +'<div class="stat"><div class="stat-label">Participação Terceirizados</div><div class="stat-value">'+(tercTotalOS/grandTotal*100).toFixed(1)+'%</div><div class="stat-sub">Internos: '+(intTotalOS/grandTotal*100).toFixed(1)+'% ('+intTotalOS+' OS)</div></div>'
 +'<div class="stat"><div class="stat-label">Break-Even (CLT vs Terc.)</div><div class="stat-value">'+breakEven+' OS/mês</div><div class="stat-sub">Custo CLT: R$ '+custoCLT+'/mês</div></div>';
 
 // Alert box
 var alertHtml='<div class="alert-title" style="color:var(--amber)">⚠️ Insights Estratégicos</div>';
-alertHtml+='<div class="alert-item">📊 Terceirizados fazem <strong>'+(tercTotalOS/grandTotal*100).toFixed(1)+'%</strong> das instalações ('+tercTotalOS+' de '+grandTotal+' OS) — custo de <strong>R$ '+tercCusto.toLocaleString('pt-BR')+'</strong> em 7 meses</div>';
+alertHtml+='<div class="alert-item">📊 Terceirizados fazem <strong>'+(tercTotalOS/grandTotal*100).toFixed(1)+'%</strong> das instalações ('+tercTotalOS+' de '+grandTotal+' OS) — custo de <strong>R$ '+tercCusto.toLocaleString('pt-BR')+'</strong> em 8 meses</div>';
 alertHtml+='<div class="alert-item">🟢 <strong>Weyderson</strong> (média '+112.1+' OS/mês) está acima do break-even ('+breakEven+' OS/mês) — CLT seria <strong>R$ 1.132/mês mais barato</strong></div>';
 alertHtml+='<div class="alert-item">🔴 <strong>Jose Edson, Givaldo e Salvador</strong> estão abaixo do break-even — terceirizado é mais barato no volume atual</div>';
 alertHtml+='<div class="alert-item">💰 Custo médio mensal com terceirizados: <strong>R$ '+(tercCusto/7).toLocaleString('pt-BR', {maximumFractionDigits:0})+'</strong> · Custo médio/OS instalado: <strong>R$ '+(tercCusto/tercTotalOS).toFixed(2)+'</strong></div>';
@@ -340,7 +340,7 @@ htmlI+='</tbody>';
 document.getElementById('tableEstratInt').innerHTML=htmlI;
 
 // Table: Break-even analysis
-var htmlBE='<thead><tr><th>Técnico</th><th>Média OS/mês</th><th>Custo Terc./mês</th><th>Custo CLT/mês</th><th>Diferença/mês</th><th>Diferença/7 meses</th><th>Recomendação</th></tr></thead><tbody>';
+var htmlBE='<thead><tr><th>Técnico</th><th>Média OS/mês</th><th>Custo Terc./mês</th><th>Custo CLT/mês</th><th>Diferença/mês</th><th>Diferença/8 meses</th><th>Recomendação</th></tr></thead><tbody>';
 tercData.forEach(function(t){
 var custoTerc=t.media*50;
 var diff=custoTerc-custoCLT;
@@ -363,10 +363,10 @@ var cenarios=[
 new Chart(document.getElementById('chartSimulacao'),{type:'bar',data:{labels:cenarios.map(function(c){return c.nome;}),datasets:[
 {label:'Custo Terceirizado',data:cenarios.map(function(c){return c.custoTerc;}),backgroundColor:'#f59e0b',borderRadius:4},
 {label:'Custo CLT (Fixo)',data:cenarios.map(function(c){return c.custoCLT;}),backgroundColor:'#3b82f6',borderRadius:4}
-]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},title:{display:true,text:'R$ (7 meses)'}}}}});
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},title:{display:true,text:'R$ (8 meses)'}}}}});
 
 // Table: Simulation details
-var htmlSim='<thead><tr><th>Cenário</th><th>Descrição</th><th>Custo Terc.</th><th>Custo CLT</th><th>Total (7 meses)</th><th>vs Atual</th></tr></thead><tbody>';
+var htmlSim='<thead><tr><th>Cenário</th><th>Descrição</th><th>Custo Terc.</th><th>Custo CLT</th><th>Total (8 meses)</th><th>vs Atual</th></tr></thead><tbody>';
 var atualTotal=cenarios[0].total;
 cenarios.forEach(function(c){
 var diff=c.total-atualTotal;
@@ -395,7 +395,7 @@ var economia=custoAtual-custoOtimo;
 document.getElementById('statsDecisao').innerHTML=
 '<div class="stat"><div class="stat-label">Custo Atual (4 techs)</div><div class="stat-value">R$ '+custoAtual.toLocaleString('pt-BR')+'</div><div class="stat-sub">'+techsAtuais+' internal + '+volumeAtual+' OS terc/mês</div></div>'
 +'<div class="stat"><div class="stat-label">Custo Ótimo (6 techs)</div><div class="stat-value" style="color:var(--green)">R$ '+custoOtimo.toLocaleString('pt-BR')+'</div><div class="stat-sub">2 techs novos focados em instalação</div></div>'
-+'<div class="stat"><div class="stat-label">Economia Mensal</div><div class="stat-value" style="color:var(--green)">R$ '+economia.toLocaleString('pt-BR')+'</div><div class="stat-sub">R$ '+(economia*7).toLocaleString('pt-BR')+' em 7 meses</div></div>'
++'<div class="stat"><div class="stat-label">Economia Mensal</div><div class="stat-value" style="color:var(--green)">R$ '+economia.toLocaleString('pt-BR')+'</div><div class="stat-sub">R$ '+(economia*8).toLocaleString('pt-BR')+' em 8 meses</div></div>'
 +'<div class="stat"><div class="stat-label">Break-Even por Tech</div><div class="stat-value">'+Math.round(custoCLT/custoTerc)+' OS/mês</div><div class="stat-sub">Volume para justificar 1 contratação</div></div>';
 
 // Alert box
