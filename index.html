@@ -1007,10 +1007,11 @@ new Chart(document.getElementById('chartProjMes'),{type:'bar',data:{labels:_mk.m
  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{color:'#94a3b8'}}},scales:{x:{grid:{display:false},ticks:{font:{size:9}}},y:{beginAtZero:true,grid:{color:colors.border}}}}});
 
 var _al='<div class="alert-title">⚠️ Pontos de Atenção — Carteira de Projetos</div>';
+var _jaAlerta={};
 _projAtivos.forEach(function(p){var s=statusProjeto(p);
- if(s.label==='Atrasado'&&s.atraso>180)_al+='<div class="alert-item">🔴 <strong>'+p.t+'</strong> — '+s.atraso+' dias de atraso · '+s.done+'/'+s.total+' etapas · último update '+p.up+'</div>';});
+ if(s.label==='Atrasado'&&s.atraso>180){_jaAlerta[p.t]=1;_al+='<div class="alert-item">🔴 <strong>'+p.t+'</strong> — '+s.atraso+' dias de atraso · '+s.done+'/'+s.total+' etapas · último update '+p.up+'</div>';}});
 _projAtivos.forEach(function(p){var s=statusProjeto(p);
- if(s.total>0&&s.done===0)_al+='<div class="alert-item">🟠 <strong>'+p.t+'</strong> — 0 de '+s.total+' etapas concluídas · início previsto '+(p.ps||'—')+'</div>';});
+ if(s.total>0&&s.done===0&&!_jaAlerta[p.t])_al+='<div class="alert-item">🟠 <strong>'+p.t+'</strong> — 0 de '+s.total+' etapas concluídas · início previsto '+(p.ps||'—')+'</div>';});
 _projAtivos.forEach(function(p){var r=(p.resp||[]).filter(function(x){return x&&x!=='Arroba Banda Larga';});
  if(!r.length)_al+='<div class="alert-item">🟡 <strong>'+p.t+'</strong> — sem responsável definido</div>';});
 document.getElementById('alertProjetos').innerHTML=_al;
