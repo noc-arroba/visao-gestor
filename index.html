@@ -403,9 +403,9 @@ document.getElementById('tableSimulacao').innerHTML=htmlSim;
 var custoCLT=4475;
 var custoTerc=50;
 var capTech=150;
-var manutDemanda=intOS[intOS.length-1];
+var manutDemanda=Object.keys(osMonthly).reduce(function(s,k){return s+osMonthly[k][osMonthly[k].length-1];},0);
 var techsAtuais=4;
-var volumeAtual=instTrend[instTrend.length-1];
+var volumeAtual=tercData.reduce(function(s,t){return s+t.monthly[t.monthly.length-1];},0);
 
 // Stat cards
 var custoAtual=techsAtuais*custoCLT+volumeAtual*custoTerc;
@@ -582,8 +582,8 @@ var custoTercOS=50;
 var prodMedia=150;
 var prodCons=130;
 var prodOtim=170;
-var manutDemanda=intOS[intOS.length-1];
-var instDemanda=instTrend[instTrend.length-1];
+var manutDemanda=Object.keys(osMonthly).reduce(function(s,k){return s+osMonthly[k][osMonthly[k].length-1];},0);
+var instDemanda=tercData.reduce(function(s,t){return s+t.monthly[t.monthly.length-1];},0);
 var totalDemanda=manutDemanda+instDemanda;
 var custoAtual=4*custoTotalTech+instDemanda*custoTercOS;
 
