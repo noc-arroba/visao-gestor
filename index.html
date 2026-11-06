@@ -202,6 +202,7 @@ tr:hover{background:rgba(59,130,246,.05)}
 
 
 <div id="tab-projetos" class="tab-content">
+<div style="display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-bottom:12px;flex-wrap:wrap"><button id="btnAtualizarProjetos" onclick="atualizarProjetos()" style="padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-weight:600;font-size:.8rem;cursor:pointer">🔄 Atualizar do InCicle</button><span id="projSync" style="font-size:.72rem;color:var(--muted)"></span></div>
 <div class="chart-container" id="boxMinhasEtapas"></div>
 <div id="filtroProjetos" style="display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)"><span>Escopo:</span><button class="tech-btn active" onclick="setEscopoProjetos('meus',this)">Minha carteira</button><button class="tech-btn" onclick="setEscopoProjetos('todos',this)">Tudo que estou vinculado</button><span id="filtroNota"></span></div><div class="stats" id="statsProjetos"></div>
 <div class="grid-2">
@@ -1172,6 +1173,50 @@ function renderConcluidos(){
   document.getElementById('tableConcEtapas').innerHTML=t;
 }
 renderConcluidos();
+
+// === ATUALIZAÇÃO SOB DEMANDA (API InCicle via backend function) ===
+var INCICLE_ENDPOINT='https://zelia-125f354d.base44.app/functions/incicleProjetos';
+var PROJ_GERADO_EM='2026-11-06T12:20:00-03:00';
+function _fmtSync(iso){
+  var d=new Date(iso); if(isNaN(d.getTime())) return '—';
+  var p=function(n){return String(n).padStart(2,'0');};
+  return p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear()+' '+p(d.getHours())+':'+p(d.getMinutes());
+}
+function _syncLabel(txt,cor){
+  var el=document.getElementById('projSync'); if(!el) return;
+  el.textContent=txt; el.style.color=cor||'var(--muted)';
+}
+function _aplicarPayload(d){
+  if(!d || !Array.isArray(d.PROJETOS) || !d.PROJETOS.length) throw new Error('resposta sem projetos');
+  PROJETOS=d.PROJETOS;
+  MINHAS_ETAPAS=d.MINHAS_ETAPAS||[];
+  CONCLUIDOS=d.CONCLUIDOS||{projetos:[],etapas:[]};
+  PROJ_GERADO_EM=d.gerado_em||new Date().toISOString();
+  var hoje=new Date(); HOJE_PROJ=new Date(hoje.getFullYear(),hoje.getMonth(),hoje.getDate());
+  renderMinhasEtapas(); renderProjetos(); renderConcluidos();
+  return (d.total_projetos||PROJETOS.length)+' projetos · '+(d.total_etapas||'')+' etapas';
+}
+function atualizarProjetos(){
+  var btn=document.getElementById('btnAtualizarProjetos');
+  if(btn){ btn.disabled=true; btn.style.opacity=.65; btn.textContent='⏳ Atualizando...'; }
+  _syncLabel('Consultando o InCicle (pode levar até 30s)...','var(--amber)');
+  var t0=Date.now();
+  fetch(INCICLE_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({forcar:true})})
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(function(d){
+      if(d.erro) throw new Error(d.erro);
+      var resumo=_aplicarPayload(d);
+      var seg=Math.round((Date.now()-t0)/1000);
+      _syncLabel('✅ Atualizado agora ('+seg+'s) · '+resumo+(d.aviso?' · atenção: '+d.aviso:''),'var(--green)');
+    })
+    .catch(function(e){
+      _syncLabel('⚠️ Não atualizou: '+e.message+' · mantendo os dados de '+_fmtSync(PROJ_GERADO_EM),'var(--red)');
+    })
+    .then(function(){
+      if(btn){ btn.disabled=false; btn.style.opacity=1; btn.textContent='🔄 Atualizar do InCicle'; }
+    });
+}
+(function(){ _syncLabel('Dados embutidos na publicação · '+_fmtSync(PROJ_GERADO_EM)); })();
 </script>
 </body>
 </html>
