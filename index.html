@@ -202,6 +202,7 @@ tr:hover{background:rgba(59,130,246,.05)}
 
 
 <div id="tab-projetos" class="tab-content">
+<div class="chart-container" id="boxMinhasEtapas"></div>
 <div id="filtroProjetos" style="display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)"><span>Escopo:</span><button class="tech-btn active" onclick="setEscopoProjetos('meus',this)">Minha carteira</button><button class="tech-btn" onclick="setEscopoProjetos('todos',this)">Tudo que estou vinculado</button><span id="filtroNota"></span></div><div class="stats" id="statsProjetos"></div>
 <div class="grid-2">
 <div class="chart-container"><div class="chart-title">Progresso dos Projetos — % de atividades concluídas</div><div class="chart-wrapper-lg"><canvas id="chartProjProgresso"></canvas></div></div>
@@ -954,6 +955,30 @@ function carregarRedeNeutra(){
       document.getElementById('statsRedeNeutra').innerHTML='<div class="stat"><div class="stat-label">Erro ao carregar Rede Neutra</div><div class="stat-value">--</div><div class="stat-sub">'+e.message+'</div></div>';
     });
 }
+
+// === MINHAS ETAPAS (InCicle) ===
+var MINHAS_ETAPAS = [{"p":"CM 15 - Comercial | Monetização B2B | Prateleira Corporativa + Planos de Venda","e":"Implantação do Produto Câmeras IP","n":10,"dl":"2026-04-10","at":210,"j":[]},{"p":"RH7 - Padronização de departamentos","e":"Contrução de base de estrutura do NOC","n":12,"dl":"2026-05-27","at":163,"j":[]},{"p":"Wellerson","e":"Reuniao com lideres","n":7,"dl":"2026-06-16","at":143,"j":[]},{"p":"Wellerson","e":"Reuniao com lideres","n":9,"dl":"2026-06-23","at":136,"j":[]},{"p":"CM 31 - Marketing | Parcerias |  Academias e Condomínios de Alto Padrão","e":"ATIVAÇÃO E LANÇAMENTO DOS PONTOS","n":6,"dl":"2026-07-04","at":125,"j":["Marcos Vinicios Nunes Rangel","Raiza Martins"]},{"p":"49 - CS - ECOSSISTEMA - APP ARROBA","e":"LEVANTAMENTO TÉCNICO","n":3,"dl":null,"at":null,"j":[]},{"p":"RH9 - Implantação Gestor Pro","e":"Estruturação da Hierarquia no sistema","n":5,"dl":null,"at":null,"j":["Eduarda Alves","Mariana Correa Barreto","Raiza Martins","Rebeca Silva Rocha alves"]}];
+function renderMinhasEtapas(){
+  var box=document.getElementById('boxMinhasEtapas'); if(!box) return;
+  var venc=MINHAS_ETAPAS.filter(function(e){return e.at!==null&&e.at>0;}).length;
+  var sPrazo=MINHAS_ETAPAS.filter(function(e){return e.at===null;}).length;
+  var h='<div class="chart-title">🎯 Minhas Etapas em Aberto — '+MINHAS_ETAPAS.length+'</div>'
+   +'<p style="color:var(--muted);font-size:.75rem;margin-bottom:12px">Atribuídas a você no InCicle · <strong style="color:var(--red)">'+venc+' vencidas</strong> · '+sPrazo+' sem prazo definido. Nenhuma tem prioridade ou dependência registrada no sistema, então nada alerta quando trava.</p>';
+  h+='<div style="overflow-x:auto"><table style="font-size:12.5px"><thead><tr><th style="text-align:left">Etapa</th><th style="text-align:left">Projeto</th><th>Entrega</th><th>Atraso</th><th style="text-align:left">Com quem</th></tr></thead><tbody>';
+  MINHAS_ETAPAS.forEach(function(e){
+    var cor = e.at===null?'var(--muted)':(e.at>90?'var(--red)':(e.at>0?'var(--amber)':'var(--green)'));
+    var lbl = e.at===null?'sem prazo':(e.at>0?e.at+' d':'em dia');
+    h+='<tr><td style="text-align:left"><strong>'+e.e+'</strong></td>'
+     + '<td style="text-align:left;color:var(--muted)">'+e.p+'</td>'
+     + '<td>'+(e.dl||'—')+'</td>'
+     + '<td style="color:'+cor+';font-weight:600">'+lbl+'</td>'
+     + '<td style="text-align:left;color:var(--muted)">'+((e.j&&e.j.length)?e.j.join(', '):'só você')+'</td></tr>';
+  });
+  h+='</tbody></table></div>';
+  box.innerHTML=h;
+}
+renderMinhasEtapas();
+
 carregarRedeNeutra();
 setInterval(carregarRedeNeutra, 300000);
 
