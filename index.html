@@ -202,7 +202,6 @@ tr:hover{background:rgba(59,130,246,.05)}
 
 
 <div id="tab-projetos" class="tab-content">
-<div style="display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-bottom:12px;flex-wrap:wrap"><button id="btnAtualizarProjetos" onclick="atualizarProjetos()" style="padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-weight:600;font-size:.8rem;cursor:pointer">🔄 Atualizar do InCicle</button><span id="projSync" style="font-size:.72rem;color:var(--muted)"></span></div>
 <div class="chart-container" id="boxMinhasEtapas"></div>
 <div id="filtroProjetos" style="display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)"><span>Escopo:</span><button class="tech-btn active" onclick="setEscopoProjetos('meus',this)">Minha carteira</button><button class="tech-btn" onclick="setEscopoProjetos('todos',this)">Tudo que estou vinculado</button><span id="filtroNota"></span></div><div class="stats" id="statsProjetos"></div>
 <div class="grid-2">
@@ -247,6 +246,7 @@ Chart.defaults.font.family='-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,san
 Chart.defaults.font.size=11;
 function showTab(name,btn){document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.getElementById('tab-'+name).classList.add('active');if(btn)btn.classList.add('active');}
 var colors={primary:'#3b82f6',green:'#10b981',amber:'#f59e0b',border:'#334155',red:'#ef4444'};
+var BUILD='2026-11-06T17:22';  // atualizado a cada publicacao
 // TAB1
 document.getElementById('statsCusto').innerHTML='<div class="stat"><div class="stat-label">Custo Total (8 meses)</div><div class="stat-value">R$ '+grandTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})+'</div><div class="stat-sub">Fixo: R$ '+grandFixo.toLocaleString('pt-BR',{minimumFractionDigits:0})+' + Combustível: R$ '+grandFuel.toLocaleString('pt-BR',{minimumFractionDigits:0})+'</div></div><div class="stat"><div class="stat-label">Total de OS</div><div class="stat-value">'+grandOS.toLocaleString('pt-BR')+'</div><div class="stat-sub">Excluindo setores 76 e 84</div></div><div class="stat"><div class="stat-label">Custo por OS</div><div class="stat-value">R$ '+grandCPOS.toFixed(2)+'</div><div class="stat-sub">Média geral da equipe</div></div><div class="stat"><div class="stat-label">Custo Mensal Médio</div><div class="stat-value">R$ '+(grandTotal/7).toLocaleString('pt-BR',{minimumFractionDigits:0})+'</div><div class="stat-sub">Inclui meses com equipe reduzida</div></div>';
 new Chart(document.getElementById('chartCost'),{type:'bar',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[{label:'Custo Fixo',data:monthlyTotals.map(function(m){return m.fixo;}),backgroundColor:colors.primary,borderRadius:4,stack:'a'},{label:'Combustível',data:monthlyTotals.map(function(m){return m.fuel;}),backgroundColor:colors.green,borderRadius:4,stack:'a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'k';}}}}}});
@@ -885,7 +885,7 @@ document.getElementById('tableROI').innerHTML=htmlROI;
 
 var faturasKW=[];
 function carregarFaturamentoKW(){
-  fetch('https://visao-gestor.noc-a16.workers.dev/api/kw-faturamento')
+  return fetch('https://visao-gestor.noc-a16.workers.dev/api/kw-faturamento')
     .then(function(r){return r.json();})
     .then(function(d){
       if(d.error){document.getElementById('statsFaturaKW').innerHTML='<div class="stat"><div class="stat-label">Erro</div><div class="stat-value">--</div><div class="stat-sub">'+d.error+'</div></div>';return;}
@@ -923,7 +923,7 @@ carregarFaturamentoKW();
 setInterval(carregarFaturamentoKW, 300000);
 var kwChartVlan=null, kwChartOlt=null;
 function carregarRedeNeutra(){
-  fetch('https://visao-gestor.noc-a16.workers.dev/api/kw-faturamento')
+  return fetch('https://visao-gestor.noc-a16.workers.dev/api/kw-faturamento')
     .then(function(r){return r.json();})
     .then(function(d){
       if(d&&d.success&&d.atual){d=d.atual;}
@@ -1174,17 +1174,54 @@ function renderConcluidos(){
 }
 renderConcluidos();
 
-// === ATUALIZAÇÃO SOB DEMANDA (API InCicle via backend function) ===
+// === ATUALIZAÇÃO POR ABA ===
 var INCICLE_ENDPOINT='https://zelia-125f354d.base44.app/functions/incicleProjetos';
 var PROJ_GERADO_EM='2026-11-06T12:20:00-03:00';
-function _fmtSync(iso){
-  var d=new Date(iso); if(isNaN(d.getTime())) return '—';
-  var p=function(n){return String(n).padStart(2,'0');};
-  return p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear()+' '+p(d.getHours())+':'+p(d.getMinutes());
+var ABAS={
+  custo:{rotulo:'Custo',fonte:'Planilha de custos + IXC',viva:false},
+  setores:{rotulo:'Setores',fonte:'Planilha de custos + IXC',viva:false},
+  combustivel:{rotulo:'Combustível',fonte:'Planilha Bd_TickeckLOG',viva:false},
+  analitico:{rotulo:'Custo Analítico',fonte:'Planilha de custos + IXC',viva:false},
+  estrategica:{rotulo:'Visão Estratégica',fonte:'Planilha de custos + IXC',viva:false},
+  decisao:{rotulo:'Decisão',fonte:'Planilha de custos + IXC',viva:false},
+  reincidencia:{rotulo:'Reincidência',fonte:'IXC',viva:false},
+  redeneutra:{rotulo:'Rede Neutra',fonte:'IXC (carteira VLAN KW)',viva:true},
+  projetos:{rotulo:'Projetos',fonte:'InCicle',viva:true}
+};
+function _p2(n){return String(n).padStart(2,'0');}
+function _fmtTs(iso){
+  var d = (iso instanceof Date) ? iso : new Date(iso);
+  if(isNaN(d.getTime())) return '—';
+  return _p2(d.getDate())+'/'+_p2(d.getMonth()+1)+'/'+d.getFullYear()+' '+_p2(d.getHours())+':'+_p2(d.getMinutes());
 }
-function _syncLabel(txt,cor){
-  var el=document.getElementById('projSync'); if(!el) return;
+function _setSync(aba,txt,cor){
+  var el=document.getElementById('sync-'+aba); if(!el) return;
   el.textContent=txt; el.style.color=cor||'var(--muted)';
+}
+function _travar(aba,ligado,texto){
+  var b=document.getElementById('btn-'+aba); if(!b) return;
+  b.disabled=!!ligado; b.style.opacity=ligado?0.65:1;
+  b.textContent = ligado ? '⏳ Atualizando...' : '🔄 Atualizar';
+}
+function _montarBarras(){
+  var abas=Object.keys(ABAS);
+  abas.forEach(function(aba){
+    var box=document.getElementById('tab-'+aba); if(!box) return;
+    var bar=document.createElement('div');
+    bar.className='refresh-bar';
+    bar.style.cssText='display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-bottom:12px;flex-wrap:wrap';
+    var btn=document.createElement('button');
+    btn.id='btn-'+aba;
+    btn.textContent='🔄 Atualizar';
+    btn.style.cssText='padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-weight:600;font-size:.8rem;cursor:pointer';
+    btn.onclick=function(){atualizarAba(aba);};
+    var st=document.createElement('span');
+    st.id='sync-'+aba;
+    st.style.cssText='font-size:.72rem;color:var(--muted)';
+    bar.appendChild(btn); bar.appendChild(st);
+    box.insertBefore(bar, box.firstChild);
+    _setSync(aba, ABAS[aba].viva ? ('fonte: '+ABAS[aba].fonte) : ('dados embutidos na publicação · '+_fmtTs(BUILD)));
+  });
 }
 function _aplicarPayload(d){
   if(!d || !Array.isArray(d.PROJETOS) || !d.PROJETOS.length) throw new Error('resposta sem projetos');
@@ -1196,27 +1233,60 @@ function _aplicarPayload(d){
   renderMinhasEtapas(); renderProjetos(); renderConcluidos();
   return (d.total_projetos||PROJETOS.length)+' projetos · '+(d.total_etapas||'')+' etapas';
 }
-function atualizarProjetos(){
-  var btn=document.getElementById('btnAtualizarProjetos');
-  if(btn){ btn.disabled=true; btn.style.opacity=.65; btn.textContent='⏳ Atualizando...'; }
-  _syncLabel('Consultando o InCicle (pode levar até 30s)...','var(--amber)');
+function _atualizarInCicle(aba){
+  _travar(aba,true); _setSync(aba,'Consultando o InCicle (até 30s)...','var(--amber)');
   var t0=Date.now();
-  fetch(INCICLE_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({forcar:true})})
+  return fetch(INCICLE_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({forcar:true})})
     .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
     .then(function(d){
       if(d.erro) throw new Error(d.erro);
       var resumo=_aplicarPayload(d);
-      var seg=Math.round((Date.now()-t0)/1000);
-      _syncLabel('✅ Atualizado agora ('+seg+'s) · '+resumo+(d.aviso?' · atenção: '+d.aviso:''),'var(--green)');
+      _setSync(aba,'✅ Atualizado agora ('+Math.round((Date.now()-t0)/1000)+'s) · '+resumo+(d.aviso?' · atenção: '+d.aviso:''),'var(--green)');
     })
     .catch(function(e){
-      _syncLabel('⚠️ Não atualizou: '+e.message+' · mantendo os dados de '+_fmtSync(PROJ_GERADO_EM),'var(--red)');
+      _setSync(aba,'⚠️ Não atualizou: '+e.message+' · mantendo dados de '+_fmtTs(PROJ_GERADO_EM),'var(--red)');
     })
-    .then(function(){
-      if(btn){ btn.disabled=false; btn.style.opacity=1; btn.textContent='🔄 Atualizar do InCicle'; }
-    });
+    .then(function(){ _travar(aba,false); });
 }
-(function(){ _syncLabel('Dados embutidos na publicação · '+_fmtSync(PROJ_GERADO_EM)); })();
+function _sincronizarPublicacao(aba){
+  _travar(aba,true); _setSync(aba,'Verificando versão publicada...','var(--amber)');
+  var url=location.pathname+'?_cb='+Date.now();
+  return fetch(url,{cache:'no-store'})
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.text(); })
+    .then(function(txt){
+      var m=txt.match(/var BUILD='([^']+)'/);
+      var novo=m?m[1]:null;
+      if(novo && novo!==BUILD){
+        _setSync(aba,'✅ Nova versão publicada ('+_fmtTs(novo)+') · recarregando...','var(--green)');
+        setTimeout(function(){location.href=location.pathname+'?v='+Date.now();},700);
+      } else {
+        _setSync(aba,'✅ Já está na versão publicada mais recente · '+_fmtTs(BUILD),'var(--green)');
+      }
+    })
+    .catch(function(e){
+      _setSync(aba,'⚠️ Não consegui verificar: '+e.message,'var(--red)');
+    })
+    .then(function(){ _travar(aba,false); });
+}
+function atualizarAba(aba){
+  if(aba==='projetos') return _atualizarInCicle(aba);
+  if(aba==='redeneutra'){
+    _travar(aba,true);
+    _setSync(aba,'Consultando a API do IXC (~20s)...','var(--amber)');
+    var p1=carregarRedeNeutra(), p2=carregarFaturamentoKW();
+    return Promise.all([p1,p2]).then(function(){
+      var st=document.getElementById('statsRedeNeutra');
+      var ok = st && !/Erro ao carregar/i.test(st.textContent||'');
+      _setSync(aba, ok ? ('✅ Rede Neutra recarregada · '+_fmtTs(new Date()))
+                       : '⚠️ Fonte indisponível: a rota /api/kw-faturamento do Worker está fora do ar (404). Sem ela, esta aba não tem de onde puxar dado novo.',
+                ok?'var(--green)':'var(--red)');
+    }).catch(function(e){
+      _setSync(aba,'⚠️ Falha ao consultar: '+e.message,'var(--red)');
+    }).then(function(){ _travar(aba,false); });
+  }
+  return _sincronizarPublicacao(aba);
+}
+_montarBarras();
 </script>
 </body>
 </html>
