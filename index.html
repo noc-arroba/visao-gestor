@@ -1159,8 +1159,9 @@ function renderConcluidos(){
   var t='<thead><tr><th style="text-align:left">Etapa</th><th style="text-align:left">Projeto</th><th>Prevista</th><th>Concluída</th><th>Δ</th></tr></thead><tbody>';
   ult.forEach(function(e){
     var delta = e.d===null ? '<span style="color:var(--muted)">—</span>' :
-      (e.d<=0?'<span style="color:var(--green);font-weight:600">'+Math.abs(e.d)+' d antes</span>'
-             :'<span style="color:var(--red);font-weight:600">'+e.d+' d depois</span>');
+      (e.d===0?'<span style="color:var(--green);font-weight:600">no dia</span>'
+        :(e.d<0?'<span style="color:var(--green);font-weight:600">'+Math.abs(e.d)+' d antes</span>'
+             :'<span style="color:var(--red);font-weight:600">'+e.d+' d depois</span>'));
     t+='<tr><td style="text-align:left">'+e.e+(e.m?' <span style="color:var(--amber);font-size:.65rem">(sua)</span>':'')+'</td>'
      +'<td style="text-align:left;color:var(--muted);font-size:.7rem">'+e.p+'</td>'
      +'<td>'+(e.dl||'—')+'</td><td>'+(e.dr||'—')+'</td><td>'+delta+'</td></tr>';
