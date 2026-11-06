@@ -1058,9 +1058,6 @@ function renderProjetos(){
     if(s.label==='Atrasado'&&s.atraso>90){ja[p.t]=1;al+='<div class="alert-item">🔴 <strong>'+p.t+'</strong> — '+s.atraso+' dias de atraso · '+s.done+'/'+s.total+' etapas · último update '+(p.up||'—')+'</div>';}});
   ordenados.forEach(function(p){var s=statusProjeto(p);
     if(s.total>0&&s.done===0&&!ja[p.t])al+='<div class="alert-item">🟠 <strong>'+p.t+'</strong> — 0 de '+s.total+' etapas concluídas</div>';});
-  ordenados.forEach(function(p){
-    var minhasAbertas=(p.a||[]).filter(function(a){return !a.c && a.mine;}).length;
-    if(minhasAbertas>0) al+='<div class="alert-item">👤 <strong>'+p.t+'</strong> — '+minhasAbertas+' etapa(s) atribuída(s) a você em aberto</div>';});
   document.getElementById('alertProjetos').innerHTML=al;
 
   var th='<thead><tr><th>Projeto</th><th>Seu vínculo</th><th>Status</th><th>Etapas</th><th>Minhas</th><th>Progresso</th><th>Fim previsto</th><th>Atraso</th><th>Últ. atualização</th></tr></thead><tbody>';
