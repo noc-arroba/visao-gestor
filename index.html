@@ -212,6 +212,13 @@ tr:hover{background:rgba(59,130,246,.05)}
 <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Visão Geral dos Projetos</div><table id="tableProjetos"></table></div>
 <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Atividades em Atraso — as 20 mais críticas</div><table id="tableProjAtrasadas"></table></div>
 <div class="chart-container" style="overflow-x:auto"><div class="chart-title">Carga por Responsável — etapas abertas por projeto</div><table id="tableProjResp"></table></div>
+<h3 style="margin:26px 0 12px;font-size:1.05rem;color:var(--text)">✅ Projetos Concluídos e Velocidade de Entrega</h3>
+<div class="stats" id="statsConcluidos"></div>
+<div class="chart-container" id="boxConcProjetos" style="overflow-x:auto"></div>
+<div class="grid-2">
+<div class="chart-container"><div class="chart-title">Etapas concluídas por mês — no prazo x com atraso</div><div class="chart-wrapper"><canvas id="chartConcMes"></canvas></div></div>
+<div class="chart-container" style="overflow-x:auto"><div class="chart-title">Últimas etapas concluídas</div><table id="tableConcEtapas"></table></div>
+</div>
 </div>
 
 <div class="footer">Dados: IXC Web (API) + Planilha de Combustível (Bd_TickeckLOG) · Custo fixo: R$ 4.475,44/mês · Combustível: dados reais por abastecimento · Afastamentos: Jose Fernando (04/06, INSS) e Charles (02/08-01/09, voltou 02/09) · Setores 76 e 84 excluídos · Atualizado em 16/09/2026 — dados até 31/08/2026</div>
@@ -979,6 +986,8 @@ function renderMinhasEtapas(){
 }
 renderMinhasEtapas();
 
+
+
 carregarRedeNeutra();
 setInterval(carregarRedeNeutra, 300000);
 
@@ -1098,6 +1107,68 @@ function renderProjetos(){
   tr+='</tbody>';document.getElementById('tableProjResp').innerHTML=tr;
 }
 renderProjetos();
+
+// === CONCLUÍDOS (InCicle) ===
+var CONCLUIDOS = {"projetos":[{"t":"Jessica","n":15,"pe":"2026-12-31","ae":null,"up":"2026-06-08","criou":true,"resp":["Jéssica Ribeiro da Silva Tavares","Wellerson Fidelis Ribeiro"]},{"t":"MANUTENÇAO DE VEICULOS CARRO DE EMANUEL","n":3,"pe":"2025-12-31","ae":null,"up":"2025-12-15","criou":false,"resp":["Arroba Banda Larga","Hermano","Mariana Correa Barreto","Wellerson Fidelis Ribeiro"]}],"etapas":[{"p":"49 - CS - ECOSSISTEMA - APP ARROBA","e":"TESTES DAS FUNCIONALIDADES","dl":"2026-08-28","dr":"2026-10-08","d":41,"tp":"Ecossitema do Arroba","m":false},{"p":"CM 15 - Comercial | Monetização B2B | Prateleira Corporativa + Planos de Venda","e":"RESULTADO DO PROJETO – ROI","dl":"2026-09-30","dr":"2026-09-30","d":0,"tp":"🎯 Posicionar o ArrobaCorp como referência em soluções corps","m":false},{"p":"CM 15 - Comercial | Monetização B2B | Prateleira Corporativa + Planos de Venda","e":"RESULTADO DO PROJETO – OPERACIONAL","dl":"2026-09-30","dr":"2026-09-30","d":0,"tp":"🎯 Posicionar o ArrobaCorp como referência em soluções corps","m":false},{"p":"49 - CS - ECOSSISTEMA - APP ARROBA","e":"APRESENTAÇÃO PARA O TIME ARROBA","dl":"2026-09-29","dr":"2026-09-29","d":0,"tp":"Ecossitema do Arroba","m":false},{"p":"49 - CS - ECOSSISTEMA - APP ARROBA","e":"CAMPANHAS DE DIVULGAÇÃO","dl":"2026-09-19","dr":"2026-09-19","d":0,"tp":"Ecossitema do Arroba","m":false},{"p":"RH11 - Contratações","e":"Recepção de Ururaí","dl":"2026-08-19","dr":"2026-08-19","d":0,"tp":"Comercial","m":false},{"p":"49 - CS - ECOSSISTEMA - APP ARROBA","e":"APRESENTAÇÃO DO APP PELO DESENVOLVEDOR","dl":"2026-08-05","dr":"2026-08-05","d":0,"tp":"Ecossitema do Arroba","m":false},{"p":"Solicitações de outros Setores","e":"Atualizar o site interno de comunicação do CSC","dl":"2026-07-09","dr":"2026-07-09","d":0,"tp":"Pedidos - Solicitações","m":false},{"p":"RH11 - Contratações","e":"Cabista","dl":"2026-06-30","dr":"2026-06-30","d":0,"tp":"NOC","m":false},{"p":"RH11 - Contratações","e":"Recrutamento e Seleção","dl":"2026-06-30","dr":"2026-06-30","d":0,"tp":"RH","m":false},{"p":"CM 15 - Comercial | Monetização B2B | Prateleira Corporativa + Planos de Venda","e":"Implantação do Produto Internet para Eventos","dl":"2026-06-15","dr":"2026-06-15","d":0,"tp":"🎯 Posicionar o ArrobaCorp como referência em soluções corps","m":true},{"p":"Wellerson","e":"Reuniao com lideres","dl":"2026-06-09","dr":"2026-06-09","d":0,"tp":"Rotinas","m":true},{"p":"Wellerson","e":"Reunião com Taticos NOC","dl":"2026-06-08","dr":"2026-06-08","d":0,"tp":"Rotinas","m":true},{"p":"01 - FINANCEIRO ADM - DOIS Novos Veiculos para Frota da Ativação","e":"ETAPA 8 - ATIVAÇÃO OPERACIONAL - INSTALAÇÃO DE RASTREADOR","dl":"2026-03-02","dr":"2026-06-03","d":93,"tp":"META","m":true},{"p":"Solicitações de outros Setores","e":"Validar se esta sendo aberta o.s de segundo ponto","dl":"2026-06-03","dr":"2026-06-03","d":0,"tp":"Solicitações de outros setores","m":false},{"p":"RH9 - Implantação Gestor Pro","e":"Identificação de necessidade de dados base para implantação.","dl":"2026-06-02","dr":"2026-06-02","d":0,"tp":"Criação de sistema base.","m":false},{"p":"01 - FINANCEIRO ADM - DOIS Novos Veiculos para Frota da Ativação","e":"ETAPA 10 - ATIVAÇÃO OPERACIONAL - INSTALAÇÃO DE ITENS","dl":"2026-03-04","dr":"2026-06-01","d":89,"tp":"META","m":false},{"p":"49 - CS - ECOSSISTEMA - APP ARROBA","e":"LEVANTAMENTO INTEGRAÇÃO","dl":"2026-05-25","dr":"2026-05-25","d":0,"tp":"Ecossitema do Arroba","m":false},{"p":"Solicitações de outros Setores","e":"Atualizar os clientes sem data de vencimento devido o app","dl":"2026-05-20","dr":"2026-05-20","d":0,"tp":"Pedidos - Solicitações","m":false},{"p":"Solicitações de outros Setores","e":"Testes de data de vencimento sendo alterada no app","dl":"2026-05-19","dr":"2026-05-19","d":0,"tp":"Pedidos - Solicitações","m":false},{"p":"49 - CS - ECOSSISTEMA - APP ARROBA","e":"APRESENTAÇÃO AO SETOR DE DESENVOLVIMENTO PARA HOMOLOGAÇÕES","dl":"2026-05-15","dr":"2026-05-15","d":0,"tp":"Ecossitema do Arroba","m":false},{"p":"Solicitações de outros Setores","e":"Enviar E-mails","dl":"2026-05-13","dr":"2026-05-13","d":0,"tp":"Solicitações de outros setores","m":false},{"p":"49 - CS - ECOSSISTEMA - APP ARROBA","e":"APROVAÇÃO DE PEDIDO","dl":"2026-04-30","dr":"2026-04-30","d":0,"tp":"Ecossitema do Arroba","m":false},{"p":"RH7 - Padronização de departamentos","e":"Revisão da documentação de todos os processos do RH.","dl":"2026-04-10","dr":"2026-04-10","d":0,"tp":"Departamento de RH","m":false},{"p":"CM 15 - Comercial | Monetização B2B | Prateleira Corporativa + Planos de Venda","e":"Atualização da Prateleira Corporativa no Site Arroba Corp","dl":"2026-04-06","dr":"2026-04-06","d":0,"tp":"🎯 Posicionar o ArrobaCorp como referência em soluções corps","m":false},{"p":"CM 15 - Comercial | Monetização B2B | Prateleira Corporativa + Planos de Venda","e":"Estruturação Jurídica do CORP","dl":"2026-03-28","dr":"2026-03-28","d":0,"tp":"🎯 Posicionar o ArrobaCorp como referência em soluções corps","m":false},{"p":"CM 15 - Comercial | Monetização B2B | Prateleira Corporativa + Planos de Venda","e":"Aprovação de Projeto","dl":"2026-03-27","dr":"2026-03-27","d":0,"tp":"🎯 Posicionar o ArrobaCorp como referência em soluções corps","m":false},{"p":"RH7 - Padronização de departamentos","e":"Contrução de base de estrutura de RH","dl":"2026-03-24","dr":"2026-03-24","d":0,"tp":"Departamento de RH","m":false},{"p":"CM 15 - Comercial | Monetização B2B | Prateleira Corporativa + Planos de Venda","e":"Treinamento Geral (Capacitação Total do Time Arroba)","dl":"2026-03-12","dr":"2026-03-12","d":0,"tp":"🎯 Posicionar o ArrobaCorp como referência em soluções corps","m":false},{"p":"CM 15 - Comercial | Monetização B2B | Prateleira Corporativa + Planos de Venda","e":"Criar os Planos de Vendas no IXC","dl":"2026-03-10","dr":"2026-03-10","d":0,"tp":"🎯 Posicionar o ArrobaCorp como referência em soluções corps","m":false},{"p":"01 - FINANCEIRO ADM - DOIS Novos Veiculos para Frota da Ativação","e":"ETAPA 6 - REGULARIZAÇÃO LEGAL","dl":"2026-02-25","dr":"2026-03-04","d":7,"tp":"META","m":false},{"p":"01 - FINANCEIRO ADM - DOIS Novos Veiculos para Frota da Ativação","e":"ETAPA 9 - PROTOCOLO DE ESTOQUE/ PATRIMONIO","dl":"2026-03-03","dr":"2026-03-03","d":0,"tp":"META","m":false},{"p":"01 - FINANCEIRO ADM - DOIS Novos Veiculos para Frota da Ativação","e":"ETAPA 7 - ATIVAÇÃO OPERACIONAL - ADESIVAÇÃO","dl":"2026-03-02","dr":"2026-03-02","d":0,"tp":"META","m":false},{"p":"01 - FINANCEIRO ADM - DOIS Novos Veiculos para Frota da Ativação","e":"ETAPA 5 - PAGAMENTO","dl":"2026-02-25","dr":"2026-02-20","d":-5,"tp":"META","m":false},{"p":"01 - FINANCEIRO ADM - DOIS Novos Veiculos para Frota da Ativação","e":"ETAPA 4 - FATURAMENTO","dl":"2026-02-23","dr":"2026-02-19","d":-4,"tp":"META","m":false},{"p":"CM 15 - Comercial | Monetização B2B | Prateleira Corporativa + Planos de Venda","e":"Estruturação Estratégica da Prateleira Corporativa","dl":"2026-01-28","dr":"2026-01-28","d":0,"tp":"🎯 Posicionar o ArrobaCorp como referência em soluções corps","m":true},{"p":"01 - FINANCEIRO ADM - DOIS Novos Veiculos para Frota da Ativação","e":"ETAPA 3 - ASSINATURA DO CONTRATO PELO SOCIO RESPONSAVEL","dl":"2026-01-23","dr":"2026-01-23","d":0,"tp":"META","m":false},{"p":"Wellerson","e":"Rede neutra parcerios","dl":"2026-06-30","dr":null,"d":null,"tp":"Crescimento de rede","m":true},{"p":"01 - FINANCEIRO ADM - DOIS Novos Veiculos para Frota da Ativação","e":"etapa 1 - Aprovação do Projeto","dl":"2026-01-23","dr":null,"d":null,"tp":"META","m":false},{"p":"01 - FINANCEIRO ADM - DOIS Novos Veiculos para Frota da Ativação","e":"ETAPA 2 - ENVIO DOS DADOS PARA ELABORAÇÃO DO DOCUMENTO","dl":"2026-01-23","dr":null,"d":null,"tp":"META","m":false},{"p":"Jessica","e":"Dia 17/11","dl":"2025-11-17","dr":null,"d":null,"tp":"Novembro/25","m":false},{"p":"Jessica","e":"Dia 18/11","dl":"2025-11-18","dr":null,"d":null,"tp":"Novembro/25","m":false},{"p":"Jessica","e":"Dia 19/11","dl":"2025-11-19","dr":null,"d":null,"tp":"Novembro/25","m":false},{"p":"Jessica","e":"Dia 21/11","dl":"2025-11-21","dr":null,"d":null,"tp":"Novembro/25","m":false},{"p":"Jessica","e":"Dia 22/11","dl":"2025-11-22","dr":null,"d":null,"tp":"Novembro/25","m":false},{"p":"Jessica","e":"Dia 24/11","dl":"2025-11-24","dr":null,"d":null,"tp":"Novembro/25","m":false},{"p":"Jessica","e":"Dia 25/11","dl":"2025-11-25","dr":null,"d":null,"tp":"Novembro/25","m":false},{"p":"Jessica","e":"Dia 26/11","dl":"2025-11-26","dr":null,"d":null,"tp":"Novembro/25","m":false},{"p":"Jessica","e":"Dia 27/11","dl":"2025-11-27","dr":null,"d":null,"tp":"Novembro/25","m":false},{"p":"Jessica","e":"Dia 28/11","dl":"2025-11-28","dr":null,"d":null,"tp":"Novembro/25","m":false},{"p":"Jessica","e":"Dia 29/11","dl":"2025-11-29","dr":null,"d":null,"tp":"Novembro/25","m":false},{"p":"Jessica","e":"Dia 01/12","dl":"2025-12-01","dr":null,"d":null,"tp":"Dezembro/25","m":false},{"p":"Jessica","e":"Dia 02/12","dl":"2025-12-02","dr":null,"d":null,"tp":"Dezembro/25","m":false},{"p":"Jessica","e":"Dia 03/12","dl":"2025-12-03","dr":null,"d":null,"tp":"Dezembro/25","m":false},{"p":"Jessica","e":"Dia 05/12","dl":"2025-12-05","dr":null,"d":null,"tp":"Dezembro/25","m":false},{"p":"MANUTENÇAO DE VEICULOS CARRO DE EMANUEL","e":"FAZER ORCAMENTO","dl":"2025-11-19","dr":null,"d":null,"tp":"ORCAMENTO  CONSERTO TAMPA TRAZEIRA ONIX","m":false},{"p":"MANUTENÇAO DE VEICULOS CARRO DE EMANUEL","e":"LEVAR O CARRO PARA CONSERTO","dl":"2025-12-31","dr":null,"d":null,"tp":"ORCAMENTO  CONSERTO TAMPA TRAZEIRA ONIX","m":false},{"p":"MANUTENÇAO DE VEICULOS CARRO DE EMANUEL","e":"PEDIDO DE APROVÇAO DO GESTOR","dl":"2025-12-31","dr":null,"d":null,"tp":"ORCAMENTO  CONSERTO TAMPA TRAZEIRA ONIX","m":true},{"p":"MANUTENÇAO DE VEICULOS CARRO DE LEANDRO","e":"FAZER O ORÇAMENTO OFICINA","dl":"2025-11-19","dr":null,"d":null,"tp":"FAZER ORÇAMENTO","m":false},{"p":"RH11 - Contratações","e":"Vendas","dl":null,"dr":null,"d":null,"tp":"Comercial","m":false},{"p":"RH11 - Contratações","e":"Marketing","dl":null,"dr":null,"d":null,"tp":"Comercial","m":false},{"p":"RH11 - Contratações","e":"Recepção Travessão","dl":null,"dr":null,"d":null,"tp":"Comercial","m":false},{"p":"RH11 - Contratações","e":"Instalação/manutenção","dl":null,"dr":null,"d":null,"tp":"NOC","m":false},{"p":"RH11 - Contratações","e":"Estagiário","dl":"2026-06-30","dr":null,"d":null,"tp":"CS","m":false},{"p":"RH11 - Contratações","e":"Estagiário","dl":null,"dr":null,"d":null,"tp":"Cobrança","m":false},{"p":"RH11 - Contratações","e":"Reversão de cancelamento","dl":null,"dr":null,"d":null,"tp":"Cobrança","m":false},{"p":"RH11 - Contratações","e":"Expedição","dl":null,"dr":null,"d":null,"tp":"Estoque","m":false},{"p":"Solicitações de outros Setores","e":"tarefa","dl":null,"dr":null,"d":null,"tp":"Solicitações de outros setores","m":false}]};
+function renderConcluidos(){
+  var box=document.getElementById('boxConcProjetos'); if(!box) return;
+  var projs=CONCLUIDOS.projetos, ets=CONCLUIDOS.etapas;
+  var comData=ets.filter(function(e){return e.d!==null;});
+  var noPrazo=comData.filter(function(e){return e.d<=0;}).length;
+  var atraso=comData.length-noPrazo;
+  var semData=ets.length-comData.length;
+  var ader=comData.length?Math.round(noPrazo/comData.length*100):0;
+  var semEncerrar=projs.filter(function(c){return !c.ae;}).length;
+  document.getElementById('statsConcluidos').innerHTML=
+   '<div class="stat"><div class="stat-label">Projetos Concluídos</div><div class="stat-value" style="color:var(--green)">'+projs.length+'</div><div class="stat-sub">de '+PROJETOS.length+' entradas no InCicle</div></div>'
+  +'<div class="stat"><div class="stat-label">Etapas Concluídas</div><div class="stat-value">'+ets.length+'</div><div class="stat-sub">'+noPrazo+' no prazo · '+atraso+' com atraso</div></div>'
+  +'<div class="stat"><div class="stat-label">Aderência ao Prazo</div><div class="stat-value" style="color:'+(ader>=80?'var(--green)':(ader>=60?'var(--amber)':'var(--red)'))+'">'+ader+'%</div><div class="stat-sub">das '+comData.length+' etapas com data comparável</div></div>'
+  +'<div class="stat"><div class="stat-label">Sem Data de Conclusão</div><div class="stat-value" style="color:var(--amber)">'+semData+'</div><div class="stat-sub">'+Math.round(semData/Math.max(ets.length,1)*100)+'% das etapas concluídas · '+semEncerrar+' projeto(s) sem encerramento formal</div></div>';
+
+  var h='<div class="chart-title">Projetos Entregues — '+projs.length+'</div>'
+   +'<p style="color:var(--muted);font-size:.75rem;margin-bottom:12px">Nenhum projeto tem <em>data real de encerramento</em> preenchida no InCicle, então o prazo de entrega do projeto não pode ser medido — só o das etapas.</p>'
+   +'<table style="font-size:12.5px"><thead><tr><th style="text-align:left">Projeto</th><th>Etapas</th><th>Fim previsto</th><th>Encerrado no sistema</th><th>Últ. atualização</th><th style="text-align:left">Quem tocou</th></tr></thead><tbody>';
+  projs.forEach(function(c){
+    h+='<tr><td style="text-align:left"><strong>'+c.t+'</strong>'+(c.criou?' <span style="color:var(--green);font-size:.65rem">(criado por você)</span>':'')+'</td>'
+     +'<td style="color:var(--green);font-weight:600">'+c.n+'/'+c.n+'</td>'
+     +'<td>'+(c.pe||'—')+'</td>'
+     +'<td style="color:'+(c.ae?'var(--green)':'var(--red)')+'">'+(c.ae||'não')+'</td>'
+     +'<td>'+(c.up||'—')+'</td>'
+     +'<td style="text-align:left;color:var(--muted);font-size:.7rem">'+((c.resp&&c.resp.length)?c.resp.join(', '):'—')+'</td></tr>';
+  });
+  h+='</tbody></table>';
+  box.innerHTML=h;
+
+  var meses={};
+  ets.forEach(function(e){
+    var ref=e.dr||e.dl; if(!ref) return;
+    var m=ref.slice(0,7); meses[m]=meses[m]||{ok:0,late:0};
+    if(e.d===null){return;} else if(e.d<=0) meses[m].ok++; else meses[m].late++;
+  });
+  var mk=Object.keys(meses).sort();
+  var mn=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  if(_chProj.conc) _chProj.conc.destroy();
+  _chProj.conc=new Chart(document.getElementById('chartConcMes'),{type:'bar',data:{
+    labels:mk.map(function(m){var x=m.split('-');return mn[+x[1]-1]+'/'+x[0].slice(2);}),
+    datasets:[{label:'No prazo',data:mk.map(function(m){return meses[m].ok;}),backgroundColor:colors.green,borderRadius:3},
+              {label:'Com atraso',data:mk.map(function(m){return meses[m].late;}),backgroundColor:colors.red,borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{color:'#94a3b8'}}},
+    scales:{x:{stacked:true,grid:{display:false},ticks:{font:{size:9}}},y:{stacked:true,beginAtZero:true,grid:{color:colors.border}}}}});
+
+  var ult=ets.slice(0,18);
+  var t='<thead><tr><th style="text-align:left">Etapa</th><th style="text-align:left">Projeto</th><th>Prevista</th><th>Concluída</th><th>Δ</th></tr></thead><tbody>';
+  ult.forEach(function(e){
+    var delta = e.d===null ? '<span style="color:var(--muted)">—</span>' :
+      (e.d<=0?'<span style="color:var(--green);font-weight:600">'+Math.abs(e.d)+' d antes</span>'
+             :'<span style="color:var(--red);font-weight:600">'+e.d+' d depois</span>');
+    t+='<tr><td style="text-align:left">'+e.e+(e.m?' <span style="color:var(--amber);font-size:.65rem">(sua)</span>':'')+'</td>'
+     +'<td style="text-align:left;color:var(--muted);font-size:.7rem">'+e.p+'</td>'
+     +'<td>'+(e.dl||'—')+'</td><td>'+(e.dr||'—')+'</td><td>'+delta+'</td></tr>';
+  });
+  t+='</tbody>';
+  document.getElementById('tableConcEtapas').innerHTML=t;
+}
+renderConcluidos();
 </script>
 </body>
 </html>
