@@ -590,7 +590,7 @@ var custoAtual=4*custoTotalTech+instDemanda*custoTercOS;
 // Stat cards
 document.getElementById('statsPrevisao').innerHTML=
 '<div class="stat"><div class="stat-label">Demanda Total</div><div class="stat-value">'+totalDemanda+' OS/mês</div><div class="stat-sub">'+manutDemanda+' manut + '+instDemanda+' instalação</div></div>'
-+'<div class="stat"><div class="stat-label">Custo por Técnico</div><div class="stat-value">R$ '+(custoTotalTech).toLocaleString('pt-BR')+'</div><div class="stat-sub">R$ '+(salarioEncargos).toLocaleString('pt-BR')+' fixo + R$ '+custoCombustivel+' comb.</div></div>'
++'<div class="stat"><div class="stat-label">Custo por Técnico</div><div class="stat-value">R$ '+(custoTotalTech).toLocaleString('pt-BR')+'</div><div class="stat-sub">R$ '+custoFixoTech.toLocaleString('pt-BR')+' fixo + R$ '+custoCombustivel+' comb.</div></div>'
 +'<div class="stat"><div class="stat-label">Equipe Necessária</div><div class="stat-value" style="color:var(--green)">'+Math.ceil(totalDemanda/prodMedia)+' técnicos</div><div class="stat-sub">'+totalDemanda+' ÷ '+prodMedia+' OS/mês = '+Math.ceil(totalDemanda/prodMedia)+' techs</div></div>'
 +'<div class="stat"><div class="stat-label">Custo Projetado</div><div class="stat-value" style="color:var(--green)">R$ '+(Math.ceil(totalDemanda/prodMedia)*custoTotalTech).toLocaleString('pt-BR')+'</div><div class="stat-sub">vs atual R$ '+custoAtual.toLocaleString('pt-BR')+' → -R$ '+(custoAtual-Math.ceil(totalDemanda/prodMedia)*custoTotalTech).toLocaleString('pt-BR')+'/mês</div></div>';
 
@@ -720,8 +720,8 @@ new Chart(document.getElementById('chartReincidenciaComparativo'),{type:'bar',da
 
 // Tabela resumo
 var htmlR='<thead><tr><th>Técnico</th><th>Período</th><th>Total OS</th><th>Reincid.</th><th>Taxa</th><th>Custo</th></tr></thead><tbody>';
-reincTechs.forEach(function(t){var tt=0,tr=0,tc=0;var meses=Object.keys(reincData[t]).sort();meses.forEach(function(m){tt+=reincData[t][m].total;tr+=reincData[t][m].reincidencia;tc+=reincData[t][m].custo;});var taxa=tt>0?(tr/tt*100).toFixed(1):0;var p=meses[0]||'—',u=meses[meses.length-1]||'—';var per=meses.length>1?p.slice(5)+'-'+u.slice(5):p.slice(5);htmlR+='<tr><td style="color:'+reincCores[t]+';font-weight:600">'+t+'</td><td>'+per+'</td><td>'+tt+'</td><td style="color:var(--red)">'+tr+'</td><td style="color:'+(taxa>15?'var(--red)':'var(--green)')+'">'+taxa+'%</td><td>R$ '+tc.toLocaleString('pt-BR')+'</td></tr>';});
-htmlR+='<tr style="border-top:2px solid var(--green);font-weight:700;background:rgba(16,185,129,.05)"><td>TOTAL GERAL</td><td>—</td><td>'+totalOS+'</td><td style="color:var(--red)">'+totalReinc+'</td><td style="color:'+(taxaGeral>15?'var(--red)':'var(--green)')+'">'+taxaGeral+'%</td><td>R$ '+totalCusto.toLocaleString('pt-BR')+'</td></tr>';
+reincTechs.forEach(function(t){var tt=0,tr=0,tc=0;var meses=Object.keys(reincData[t]).sort();meses.forEach(function(m){tt+=reincData[t][m].total;tr+=reincData[t][m].reincidencia;tc+=reincData[t][m].custo;});var taxa=tt>0?(tr/tt*100).toFixed(1):0;var p=meses[0]||'—',u=meses[meses.length-1]||'—';var per=meses.length>1?p.slice(5)+'-'+u.slice(5):p.slice(5);htmlR+='<tr><td style="color:'+reincCores[t]+';font-weight:600">'+t+'</td><td>'+per+'</td><td>'+tt+'</td><td style="color:var(--red)">'+tr+'</td><td style="color:'+(taxa>15?'var(--red)':'var(--green)')+'">'+taxa+'%</td><td>R$ '+tc.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td></tr>';});
+htmlR+='<tr style="border-top:2px solid var(--green);font-weight:700;background:rgba(16,185,129,.05)"><td>TOTAL GERAL</td><td>—</td><td>'+totalOS+'</td><td style="color:var(--red)">'+totalReinc+'</td><td style="color:'+(taxaGeral>15?'var(--red)':'var(--green)')+'">'+taxaGeral+'%</td><td>R$ '+totalCusto.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'</td></tr>';
 htmlR+='</tbody>';
 document.getElementById('tableReincidencia').innerHTML=htmlR;
 
