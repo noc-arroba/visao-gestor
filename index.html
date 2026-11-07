@@ -214,6 +214,43 @@ tr:hover{background:rgba(59,130,246,.05)}
 <div class="jn-l" style="margin-top:14px"><b>Modelo sugerido:</b> R$ 45 por dia de plantão em dia útil e R$ 65 em fim de semana ou feriado. Numa escala de 15 dias isso dá R$ 755, praticamente os R$ 750 que a gente já vinha conversando, mas com critério em vez de número redondo. Por cima disso, a hora extra real de cada chamado, a entrada deslocada quando passar das 23h e a opção de banco de horas escrito para trocar extra por folga.</div>
 </div>
 
+
+<div class="chart-container">
+<div class="chart-title">Quanto custa repor: a conta que precisa chegar na mesa do diretor</div>
+<p class="jn-l" style="margin-bottom:14px">Reter não é argumento de clima, é decisão de custo. Uma saída não custa um salário, custa quatro blocos somados. E o maior deles não é a rescisão: é a rampa de produtividade, que é justamente o que ninguém mede.</p>
+<table><thead><tr><th style="text-align:left">Bloco</th><th style="text-align:left">O que entra</th><th style="text-align:left">Quem responde</th></tr></thead>
+<tbody><tr><td style="text-align:left"><b>1. Custo de saída</b><div style="color:var(--muted);font-size:.68rem;margin-top:2px">Rescisão</div></td><td style="text-align:left">Aviso prévio, férias com 1/3, 13º proporcional e multa de 40% do FGTS. Para quem sai com 12 meses, gira em torno de R$ 9 mil.</td><td style="text-align:left">Contador + RH</td></tr><tr><td style="text-align:left"><b>2. Custo de entrada</b><div style="color:var(--muted);font-size:.68rem;margin-top:2px">Recrutamento e admissão</div></td><td style="text-align:left">Anúncio, triagem, entrevista do gestor, exame admissional, documentação, EPI e uniforme. R$ 1 mil a R$ 1,5 mil, sem contar o seu tempo.</td><td style="text-align:left">RH</td></tr><tr><td style="text-align:left"><b>3. Custo invisível e o maior</b><div style="color:var(--muted);font-size:.68rem;margin-top:2px">Rampa de produtividade</div></td><td style="text-align:left">Seis meses até a autonomia plena. Nesse período a empresa paga o salário inteiro e recebe metade da entrega, o que custa mais que a rescisão.</td><td style="text-align:left">Wellerson + RH</td></tr><tr><td style="text-align:left"><b>4. Custo que vaza para o cliente</b><div style="color:var(--muted);font-size:.68rem;margin-top:2px">SLA, retrabalho e sobrecarga</div></td><td style="text-align:left">Rompimento resolvido mais devagar, retrabalho por fusão mal feita, e o time antigo absorvendo OS para cobrir o buraco.</td><td style="text-align:left">Operação</td></tr></tbody></table>
+<div class="jn-l" style="margin-top:14px"><b>A ponte com o SLA:</b> quem tem dois anos de casa resolve rompimento mais rápido, erra menos na fusão e não precisa de supervisão. Isso significa que o tempo de casa é o que sustenta o SLA que a empresa promete ao cliente. Repor não devolve esse tempo, ele recomeça a contagem em zero.</div>
+</div>
+
+<div class="chart-container">
+<div class="chart-title">Calculadora do custo de reposição</div>
+<p class="jn-l" style="margin-bottom:12px">Premissas ajustáveis. O custo mensal da posição já inclui salário, encargos e benefícios.</p>
+<div class="calc">
+<div class="calc-grid">
+  <div class="calc-f"><label>Salário base (R$)</label><input id="crSal" type="number" value="2410" step="10" oninput="calcRepo()"></div>
+  <div class="calc-f"><label>Custo mensal total (R$)</label><input id="crMes" type="number" value="3941" step="10" oninput="calcRepo()"></div>
+  <div class="calc-f"><label>Meses trabalhados na saída</label><input id="crMt" type="number" value="12" step="1" oninput="calcRepo()"></div>
+  <div class="calc-f"><label>Meses até autonomia</label><input id="crRam" type="number" value="6" step="1" oninput="calcRepo()"></div>
+  <div class="calc-f"><label>Produtividade na rampa (%)</label><input id="crProd" type="number" value="55" step="5" oninput="calcRepo()"></div>
+  <div class="calc-f"><label>Recrutamento e admissão (R$)</label><input id="crAdm" type="number" value="1200" step="100" oninput="calcRepo()"></div>
+  <div class="calc-f"><label>Indiretos: SLA e retrabalho (R$)</label><input id="crInd" type="number" value="2000" step="100" oninput="calcRepo()"></div>
+</div>
+<div class="calc-out" id="crOut"></div>
+</div>
+<div class="jn-l" style="margin-top:14px"><b>Como ler o resultado:</b> o número final é o que a empresa paga para trocar uma pessoa treinada por uma pessoa nova. Não é o salário do mês, é o investimento de reposição. É este valor que precisa aparecer na conversa com o diretor, porque é ele que compete com o custo do plano de retenção.</div>
+</div>
+
+<div class="chart-container">
+<div class="chart-title">Reter contra repor: onde a conta vira a favor</div>
+<table><thead><tr><th style="text-align:left">Cenário</th><th>Custo no ano</th><th style="text-align:left">Leitura</th></tr></thead><tbody>
+<tr><td style="text-align:left">Repor 3 pessoas por ano</td><td><b>3 x custo de reposição</b></td><td style="text-align:left">É o cenário atual do setor, com três saídas concentradas no primeiro ano</td></tr>
+<tr><td style="text-align:left">Plano de retenção completo</td><td>R$ 24 mil de sobreaviso + prêmio de permanência</td><td style="text-align:left">Reajuste do sobreaviso é o único custo certo e imediato; níveis e prêmio só pesam quando alguém é promovido</td></tr>
+<tr><td style="text-align:left">Ponto de equilíbrio</td><td><b>1 a 2 saídas evitadas</b></td><td style="text-align:left">A partir da segunda pessoa que fica, o plano já se pagou</td></tr>
+</tbody></table>
+<div class="jn-l" style="margin-top:14px"><b>O argumento que fecha:</b> não é pedir aumento de custo, é trocar um custo variável e imprevisível, que é a rotatividade, por um custo fixo e conhecido, que é a política de retenção. Para o diretor, previsibilidade vale tanto quanto o valor.</div>
+</div>
+
 <div class="alert-box" style="background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.25)"><div class="alert-title">⚠ Combustível sem lançamento em Set e Out</div><div class="alert-item">A planilha Bd_TickeckLOG tem registros até 31/08/2026. Setembro e outubro estão com combustível R$ 0,00 porque não houve nenhum abastecimento lançado, então o custo desses meses e o custo/OS estão subestimados até o lançamento ser feito.</div></div>
 <div class="stats" id="statsCusto"></div>
 <div class="chart-container"><div class="chart-title">Custo Mensal — Fixo vs Combustível</div><div class="chart-wrapper"><canvas id="chartCost"></canvas></div></div>
@@ -464,7 +501,7 @@ Chart.defaults.font.family='-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,san
 Chart.defaults.font.size=11;
 function showTab(name,btn){document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.getElementById('tab-'+name).classList.add('active');if(btn)btn.classList.add('active');}
 var colors={primary:'#3b82f6',green:'#10b981',amber:'#f59e0b',border:'#334155',red:'#ef4444'};
-var BUILD='2026-11-07T14:05';  // atualizado a cada publicacao
+var BUILD='2026-11-07T14:40';  // atualizado a cada publicacao
 // TAB1
 document.getElementById('statsCusto').innerHTML='<div class="stat"><div class="stat-label">Custo Total (10 meses)</div><div class="stat-value">R$ '+grandTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})+'</div><div class="stat-sub">Fixo: R$ '+grandFixo.toLocaleString('pt-BR',{minimumFractionDigits:0})+' + Combustível: R$ '+grandFuel.toLocaleString('pt-BR',{minimumFractionDigits:0})+'</div></div><div class="stat"><div class="stat-label">Total de OS</div><div class="stat-value">'+grandOS.toLocaleString('pt-BR')+'</div><div class="stat-sub">Excluindo setores 76 e 84</div></div><div class="stat"><div class="stat-label">Custo por OS</div><div class="stat-value">R$ '+grandCPOS.toFixed(2)+'</div><div class="stat-sub">Média geral da equipe</div></div><div class="stat"><div class="stat-label">Custo Mensal Médio</div><div class="stat-value">R$ '+(grandTotal/mesesC.length).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div><div class="stat-sub">Inclui meses com equipe reduzida</div></div>';
 new Chart(document.getElementById('chartCost'),{type:'bar',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[{label:'Custo Fixo',data:monthlyTotals.map(function(m){return m.fixo;}),backgroundColor:colors.primary,borderRadius:4,stack:'a'},{label:'Combustível',data:monthlyTotals.map(function(m){return m.fuel;}),backgroundColor:colors.green,borderRadius:4,stack:'a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'k';}}}}}});
@@ -1524,8 +1561,25 @@ function calcSob(){
    '<div class="calc-c"><div class="calc-l">Modelo proposto (fixo)</div><div class="calc-v">'+_brl(prop,0)+'</div><div class="calc-h">45 por dia útil e 65 no fim de semana</div></div>'+
    '<div class="calc-c"><div class="calc-l">Diferença por pessoa</div><div class="calc-v">'+_brl(prop-250,0)+'</div><div class="calc-h">por escala, antes dos chamados</div></div>';
 }
+
+function calcRepo(){
+  var out=document.getElementById('crOut'); if(!out) return;
+  var sal=_n('crSal',2410), mes=_n('crMes',3941), mt=_n('crMt',12), ram=_n('crRam',6), prod=_n('crProd',55)/100, adm=_n('crAdm',1200), ind=_n('crInd',2000);
+  var rescisao = sal*(1 + 4/3 + 1) + 0.08*sal*mt*0.40;
+  var rampa = mes*ram*(1-prod);
+  var total = rescisao + adm + rampa + ind;
+  var porAno = total*3;
+  out.innerHTML=
+   '<div class="calc-c"><div class="calc-l">Custo de saída</div><div class="calc-v">'+_brl(rescisao,0)+'</div><div class="calc-h">aviso, férias, 13º e multa do FGTS</div></div>'+
+   '<div class="calc-c"><div class="calc-l">Recrutamento e admissão</div><div class="calc-v">'+_brl(adm,0)+'</div><div class="calc-h">anúncio, exames, EPI e uniforme</div></div>'+
+   '<div class="calc-c"><div class="calc-l">Rampa de produtividade</div><div class="calc-v">'+_brl(rampa,0)+'</div><div class="calc-h">'+ram+' meses entregando '+Math.round(prod*100)+'%</div></div>'+
+   '<div class="calc-c"><div class="calc-l">Indiretos</div><div class="calc-v">'+_brl(ind,0)+'</div><div class="calc-h">SLA, retrabalho e sobrecarga do time</div></div>'+
+   '<div class="calc-c" style="border-color:var(--primary)"><div class="calc-l">Custo de uma reposição</div><div class="calc-v" style="color:var(--primary)">'+_brl(total,0)+'</div><div class="calc-h">'+ (total/sal).toFixed(1).replace('.',',')+' salários</div></div>'+
+   '<div class="calc-c"><div class="calc-l">Três reposições no ano</div><div class="calc-v">'+_brl(porAno,0)+'</div><div class="calc-h">é o que a rotatividade tira do setor</div></div>';
+}
 _montarBarras();
 calcSob();
+calcRepo();
 </script>
 </body>
 </html>
