@@ -231,9 +231,9 @@ tr:hover{background:rgba(59,130,246,.05)}
 <tr><td style="text-align:left">Aviso prévio</td><td>1 salário descontado, se não cumprir</td><td>1 salário pago, indenizado</td></tr>
 <tr><td style="text-align:left">Multa de 40% do FGTS</td><td><b style="color:var(--red)">Não</b></td><td>Sim</td></tr>
 <tr><td style="text-align:left">Saque do FGTS e seguro-desemprego</td><td><b style="color:var(--red)">Não</b></td><td>Sim</td></tr>
-<tr><td style="text-align:left">Total com 12 meses e salário de R$ 2.410</td><td><b>R$ 5.623</b> com desconto do aviso, R$ 8.033 sem desconto</td><td><b>R$ 8.959</b></td></tr>
+<tr><td style="text-align:left">Total com 12 meses e salário de R$ 2.410, sem contar o saldo de salário</td><td><b>R$ 3.213</b> com desconto do aviso, R$ 5.623 sem desconto</td><td><b>R$ 8.959</b></td></tr>
 </tbody></table>
-<div class="jn-l" style="margin-top:14px"><b>O que isso muda na conclusão:</b> a rescisão do pedido de demissão fica uns 37% mais barata, mas o custo total de reposição cai pouco, porque o maior bloco nunca foi a rescisão, foi a rampa de produtividade. Sai de cerca de R$ 22,8 mil para cerca de R$ 19,5 mil. A leitura para o diretor continua a mesma: o caro não é pagar a saída, é pagar de novo os seis meses de formação.</div>
+<div class="jn-l" style="margin-top:14px"><b>O que isso muda na conclusão:</b> a rescisão do pedido de demissão fica uns 37% mais barata, mas o custo total de reposição cai pouco, porque o maior bloco nunca foi a rescisão, foi a rampa de produtividade. Sai de cerca de R$ 22,8 mil para cerca de R$ 17 mil. Para efeito de comparação, o saldo de salário ficou fora das duas contas, porque é pagamento por trabalho já prestado e acontece igual nos dois casos. A leitura para o diretor continua a mesma: o caro não é pagar a saída, é pagar de novo os seis meses de formação.</div>
 <div class="jn-l"><b>E explica um comportamento que você já observou:</b> o colaborador desanimado que fica esperando ser mandado embora está fazendo conta. Dispensa libera FGTS, multa de 40% e seguro-desemprego; pedir demissão não libera nada disso. Ou seja, segurar quem já desistiu empurra a empresa justamente para a saída mais cara, e ainda por cima com produtividade baixa. É a razão financeira por trás da régua do desânimo que a gente colocou no plano.</div>
 <div class="jn-l"><b>Um ponto de atenção para o RH:</b> o desconto do aviso não cumprido é previsto no art. 487, §2º da CLT, mas costuma gerar atrito. Vale decidir em política se a empresa desconta, e para quem, antes de o próximo caso acontecer.</div>
 
@@ -520,7 +520,7 @@ Chart.defaults.font.family='-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,san
 Chart.defaults.font.size=11;
 function showTab(name,btn){document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.getElementById('tab-'+name).classList.add('active');if(btn)btn.classList.add('active');}
 var colors={primary:'#3b82f6',green:'#10b981',amber:'#f59e0b',border:'#334155',red:'#ef4444'};
-var BUILD='2026-11-07T15:45';  // atualizado a cada publicacao
+var BUILD='2026-11-07T16:05';  // atualizado a cada publicacao
 // TAB1
 document.getElementById('statsCusto').innerHTML='<div class="stat"><div class="stat-label">Custo Total (10 meses)</div><div class="stat-value">R$ '+grandTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})+'</div><div class="stat-sub">Fixo: R$ '+grandFixo.toLocaleString('pt-BR',{minimumFractionDigits:0})+' + Combustível: R$ '+grandFuel.toLocaleString('pt-BR',{minimumFractionDigits:0})+'</div></div><div class="stat"><div class="stat-label">Total de OS</div><div class="stat-value">'+grandOS.toLocaleString('pt-BR')+'</div><div class="stat-sub">Excluindo setores 76 e 84</div></div><div class="stat"><div class="stat-label">Custo por OS</div><div class="stat-value">R$ '+grandCPOS.toFixed(2)+'</div><div class="stat-sub">Média geral da equipe</div></div><div class="stat"><div class="stat-label">Custo Mensal Médio</div><div class="stat-value">R$ '+(grandTotal/mesesC.length).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div><div class="stat-sub">Inclui meses com equipe reduzida</div></div>';
 new Chart(document.getElementById('chartCost'),{type:'bar',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[{label:'Custo Fixo',data:monthlyTotals.map(function(m){return m.fixo;}),backgroundColor:colors.primary,borderRadius:4,stack:'a'},{label:'Combustível',data:monthlyTotals.map(function(m){return m.fuel;}),backgroundColor:colors.green,borderRadius:4,stack:'a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'k';}}}}}});
@@ -1586,7 +1586,7 @@ function calcRepo(){
   var sal=_n('crSal',2410), mes=_n('crMes',3941), mt=_n('crMt',12), ram=_n('crRam',6), prod=_n('crProd',55)/100, adm=_n('crAdm',1200), ind=_n('crInd',2000);
   var tipo=((document.getElementById('crTipo')||{}).value)||'pedido';
   var descAviso=(((document.getElementById('crAviso')||{}).value)||'1')==='1';
-  var saldo=sal;
+  var saldo=0; // saldo de salario nao entra: e pagamento por trabalho ja prestado
   var feriasVenc = mt>=12 ? sal*4/3*Math.floor(mt/12) : 0;
   var feriasProp = sal*4/3*((Math.min(mt,12)%12)/12);
   var decimo = sal*Math.min(mt,12)/12;
