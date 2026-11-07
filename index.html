@@ -199,6 +199,25 @@ tr:hover{background:rgba(59,130,246,.05)}
 <div class="jn-l"><b>O detalhe que costuma escapar:</b> se ele termina às 1h e entra às 8h, são 7 h de descanso, e a lei exige 11 h entre jornadas. As horas suprimidas são pagas como extra. A saída é simples e barata: acionamento que passa das 23h desloca a entrada do dia seguinte.</div>
 </div>
 
+
+<div class="chart-container">
+<div class="chart-title">Folga compensatória: onde ela resolve e onde ela vira passivo</div>
+<p class="jn-l" style="margin-bottom:14px">Dar folga não é problema. Problema é dar folga combinada na conversa e sem registro. A troca de hora extra por descanso é legal e é a saída mais barata, mas depende de três coisas: acordo escrito, prazo para compensar e controle de horas confiável.</p>
+<div class="mot"><div class="mot-tag"><span class="pill pill-blue">Hora de sobreaviso (ficar disponível)</span></div><div><b>Pagar em dinheiro.</b> É verba de natureza salarial, não é jornada a compensar. Folga não quita o 1/3.</div></div><div class="mot"><div class="mot-tag"><span class="pill pill-amber">Hora efetivamente trabalhada no acionamento</span></div><div><b>Pode virar folga, com acordo escrito e prazo.</b> O banco de horas permite trocar extra por descanso, mas exige registro formal e limite de prazo.</div></div><div class="mot"><div class="mot-tag"><span class="pill pill-blue">Acionamento que passa das 23h e entrada às 8h</span></div><div><b>Deslocar a entrada do dia seguinte.</b> As 11 horas de descanso entre jornadas são obrigação. Folga depois não corrige a violação.</div></div><div class="mot"><div class="mot-tag"><span class="pill pill-blue">Acionamento repetido toda semana</span></div><div><b>Pagar como extra e revisar a escala.</b> Quando é habitual, deixa de ser exceção e passa a integrar a remuneração, com reflexos em férias, 13º e FGTS.</div></div><div class="mot"><div class="mot-tag"><span class="pill pill-amber">Setor sem controle de ponto confiável</span></div><div><b>Implantar registro antes de continuar dando folga.</b> Sem registro, a empresa não prova que a folga existiu, e a conta do processo fica aberta para o lado do colaborador.</div></div>
+<div class="frentes" style="margin-top:16px">
+<div class="frente"><div class="frente-h">Como formalizar</div><div class="frente-t">Banco de horas com regra escrita</div>
+<div class="frente-i">Acordo individual por escrito, com prazo de compensação de até 6 meses. Acordo ou convenção coletiva permite chegar a 1 ano.</div>
+<div class="frente-i">A folga tem que ser lançada como compensação de horas, com data e quantidade, não como favor.</div>
+<div class="frente-i">Se o prazo vencer sem compensar, a diferença é paga na folha seguinte.</div>
+<div class="frente-f">Sem o acordo escrito, a compensação é questionável: a Justiça costuma mandar pagar ao menos o adicional de 50%, e a hora cheia quando a folga não vem.</div></div>
+<div class="frente"><div class="frente-h">Regra sugerida</div><div class="frente-t">Três linhas que resolvem 90% dos casos</div>
+<div class="frente-i">Acionamento de até 2 horas: folga de 4 horas no mesmo turno ou no dia seguinte.</div>
+<div class="frente-i">Acionamento depois das 23h: entrada deslocada no dia seguinte, com mínimo de 11 horas de descanso, mais folga de 2 horas.</div>
+<div class="frente-i">Mais de 2 acionamentos na mesma semana: paga como extra e entra na revisão da escala.</div>
+<div class="frente-f">A regra precisa existir antes do próximo rompimento, não depois. Escrita, e assinada por quem entra na escala.</div></div>
+</div>
+</div>
+
 <div class="chart-container">
 <div class="chart-title">Simulador: quanto custa o sobreaviso do jeito que ele acontece hoje</div>
 <p class="jn-l" style="margin-bottom:12px">Mude os campos para ver a conta com os números reais da sua operação.</p>
@@ -520,7 +539,7 @@ Chart.defaults.font.family='-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,san
 Chart.defaults.font.size=11;
 function showTab(name,btn){document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.getElementById('tab-'+name).classList.add('active');if(btn)btn.classList.add('active');}
 var colors={primary:'#3b82f6',green:'#10b981',amber:'#f59e0b',border:'#334155',red:'#ef4444'};
-var BUILD='2026-11-07T16:05';  // atualizado a cada publicacao
+var BUILD='2026-11-07T16:35';  // atualizado a cada publicacao
 // TAB1
 document.getElementById('statsCusto').innerHTML='<div class="stat"><div class="stat-label">Custo Total (10 meses)</div><div class="stat-value">R$ '+grandTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})+'</div><div class="stat-sub">Fixo: R$ '+grandFixo.toLocaleString('pt-BR',{minimumFractionDigits:0})+' + Combustível: R$ '+grandFuel.toLocaleString('pt-BR',{minimumFractionDigits:0})+'</div></div><div class="stat"><div class="stat-label">Total de OS</div><div class="stat-value">'+grandOS.toLocaleString('pt-BR')+'</div><div class="stat-sub">Excluindo setores 76 e 84</div></div><div class="stat"><div class="stat-label">Custo por OS</div><div class="stat-value">R$ '+grandCPOS.toFixed(2)+'</div><div class="stat-sub">Média geral da equipe</div></div><div class="stat"><div class="stat-label">Custo Mensal Médio</div><div class="stat-value">R$ '+(grandTotal/mesesC.length).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div><div class="stat-sub">Inclui meses com equipe reduzida</div></div>';
 new Chart(document.getElementById('chartCost'),{type:'bar',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[{label:'Custo Fixo',data:monthlyTotals.map(function(m){return m.fixo;}),backgroundColor:colors.primary,borderRadius:4,stack:'a'},{label:'Combustível',data:monthlyTotals.map(function(m){return m.fuel;}),backgroundColor:colors.green,borderRadius:4,stack:'a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'k';}}}}}});
