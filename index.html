@@ -85,7 +85,8 @@ tr:hover{background:rgba(59,130,246,.05)}
 .calc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
 .calc-f label{display:block;font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px}
 .calc-f input{width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.85rem}
-.calc-f input:focus{outline:none;border-color:var(--primary)}
+.calc-f input:focus,.calc-f select:focus{outline:none;border-color:var(--primary)}
+.calc-f select{width:100%;padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.8rem}
 .calc-out{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
 .calc-c{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:12px}
 .calc-l{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;line-height:1.4}
@@ -219,7 +220,23 @@ tr:hover{background:rgba(59,130,246,.05)}
 <div class="chart-title">Quanto custa repor: a conta que precisa chegar na mesa do diretor</div>
 <p class="jn-l" style="margin-bottom:14px">Reter não é argumento de clima, é decisão de custo. Uma saída não custa um salário, custa quatro blocos somados. E o maior deles não é a rescisão: é a rampa de produtividade, que é justamente o que ninguém mede.</p>
 <table><thead><tr><th style="text-align:left">Bloco</th><th style="text-align:left">O que entra</th><th style="text-align:left">Quem responde</th></tr></thead>
-<tbody><tr><td style="text-align:left"><b>1. Custo de saída</b><div style="color:var(--muted);font-size:.68rem;margin-top:2px">Rescisão</div></td><td style="text-align:left">Aviso prévio, férias com 1/3, 13º proporcional e multa de 40% do FGTS. Para quem sai com 12 meses, gira em torno de R$ 9 mil.</td><td style="text-align:left">Contador + RH</td></tr><tr><td style="text-align:left"><b>2. Custo de entrada</b><div style="color:var(--muted);font-size:.68rem;margin-top:2px">Recrutamento e admissão</div></td><td style="text-align:left">Anúncio, triagem, entrevista do gestor, exame admissional, documentação, EPI e uniforme. R$ 1 mil a R$ 1,5 mil, sem contar o seu tempo.</td><td style="text-align:left">RH</td></tr><tr><td style="text-align:left"><b>3. Custo invisível e o maior</b><div style="color:var(--muted);font-size:.68rem;margin-top:2px">Rampa de produtividade</div></td><td style="text-align:left">Seis meses até a autonomia plena. Nesse período a empresa paga o salário inteiro e recebe metade da entrega, o que custa mais que a rescisão.</td><td style="text-align:left">Wellerson + RH</td></tr><tr><td style="text-align:left"><b>4. Custo que vaza para o cliente</b><div style="color:var(--muted);font-size:.68rem;margin-top:2px">SLA, retrabalho e sobrecarga</div></td><td style="text-align:left">Rompimento resolvido mais devagar, retrabalho por fusão mal feita, e o time antigo absorvendo OS para cobrir o buraco.</td><td style="text-align:left">Operação</td></tr></tbody></table>
+<tbody><tr><td style="text-align:left"><b>1. Custo de saída</b><div style="color:var(--muted);font-size:.68rem;margin-top:2px">Rescisão</div></td><td style="text-align:left">Na maioria dos casos é pedido de demissão, e aí a conta é outra: férias com 1/3, 13º proporcional e saldo, sem multa de 40% do FGTS. Para quem sai com 12 meses, fica entre R$ 5,6 mil e R$ 8 mil.</td><td style="text-align:left">Contador + RH</td></tr><tr><td style="text-align:left"><b>2. Custo de entrada</b><div style="color:var(--muted);font-size:.68rem;margin-top:2px">Recrutamento e admissão</div></td><td style="text-align:left">Anúncio, triagem, entrevista do gestor, exame admissional, documentação, EPI e uniforme. R$ 1 mil a R$ 1,5 mil, sem contar o seu tempo.</td><td style="text-align:left">RH</td></tr><tr><td style="text-align:left"><b>3. Custo invisível e o maior</b><div style="color:var(--muted);font-size:.68rem;margin-top:2px">Rampa de produtividade</div></td><td style="text-align:left">Seis meses até a autonomia plena. Nesse período a empresa paga o salário inteiro e recebe metade da entrega, o que custa mais que a rescisão.</td><td style="text-align:left">Wellerson + RH</td></tr><tr><td style="text-align:left"><b>4. Custo que vaza para o cliente</b><div style="color:var(--muted);font-size:.68rem;margin-top:2px">SLA, retrabalho e sobrecarga</div></td><td style="text-align:left">Rompimento resolvido mais devagar, retrabalho por fusão mal feita, e o time antigo absorvendo OS para cobrir o buraco.</td><td style="text-align:left">Operação</td></tr></tbody></table>
+
+<div class="chart-title" style="margin-top:22px">A rescisão muda conforme quem toma a decisão</div>
+<p class="jn-l" style="margin-bottom:14px">Este é o ajuste importante no cálculo que eu te apresentei antes: eu tinha usado a conta de dispensa sem justa causa. Como na prática o colaborador pede demissão por carta de próprio punho, a maior parte das verbas deixa de existir.</p>
+<table><thead><tr><th style="text-align:left">Verba</th><th>Pedido de demissão</th><th>Dispensa sem justa causa</th></tr></thead><tbody>
+<tr><td style="text-align:left">Saldo de salário</td><td>Sim</td><td>Sim</td></tr>
+<tr><td style="text-align:left">Férias vencidas e proporcionais, com 1/3</td><td>Sim</td><td>Sim</td></tr>
+<tr><td style="text-align:left">13º proporcional</td><td>Sim</td><td>Sim</td></tr>
+<tr><td style="text-align:left">Aviso prévio</td><td>1 salário descontado, se não cumprir</td><td>1 salário pago, indenizado</td></tr>
+<tr><td style="text-align:left">Multa de 40% do FGTS</td><td><b style="color:var(--red)">Não</b></td><td>Sim</td></tr>
+<tr><td style="text-align:left">Saque do FGTS e seguro-desemprego</td><td><b style="color:var(--red)">Não</b></td><td>Sim</td></tr>
+<tr><td style="text-align:left">Total com 12 meses e salário de R$ 2.410</td><td><b>R$ 5.623</b> com desconto do aviso, R$ 8.033 sem desconto</td><td><b>R$ 8.959</b></td></tr>
+</tbody></table>
+<div class="jn-l" style="margin-top:14px"><b>O que isso muda na conclusão:</b> a rescisão do pedido de demissão fica uns 37% mais barata, mas o custo total de reposição cai pouco, porque o maior bloco nunca foi a rescisão, foi a rampa de produtividade. Sai de cerca de R$ 22,8 mil para cerca de R$ 19,5 mil. A leitura para o diretor continua a mesma: o caro não é pagar a saída, é pagar de novo os seis meses de formação.</div>
+<div class="jn-l"><b>E explica um comportamento que você já observou:</b> o colaborador desanimado que fica esperando ser mandado embora está fazendo conta. Dispensa libera FGTS, multa de 40% e seguro-desemprego; pedir demissão não libera nada disso. Ou seja, segurar quem já desistiu empurra a empresa justamente para a saída mais cara, e ainda por cima com produtividade baixa. É a razão financeira por trás da régua do desânimo que a gente colocou no plano.</div>
+<div class="jn-l"><b>Um ponto de atenção para o RH:</b> o desconto do aviso não cumprido é previsto no art. 487, §2º da CLT, mas costuma gerar atrito. Vale decidir em política se a empresa desconta, e para quem, antes de o próximo caso acontecer.</div>
+
 <div class="jn-l" style="margin-top:14px"><b>A ponte com o SLA:</b> quem tem dois anos de casa resolve rompimento mais rápido, erra menos na fusão e não precisa de supervisão. Isso significa que o tempo de casa é o que sustenta o SLA que a empresa promete ao cliente. Repor não devolve esse tempo, ele recomeça a contagem em zero.</div>
 </div>
 
@@ -235,6 +252,8 @@ tr:hover{background:rgba(59,130,246,.05)}
   <div class="calc-f"><label>Produtividade na rampa (%)</label><input id="crProd" type="number" value="55" step="5" oninput="calcRepo()"></div>
   <div class="calc-f"><label>Recrutamento e admissão (R$)</label><input id="crAdm" type="number" value="1200" step="100" oninput="calcRepo()"></div>
   <div class="calc-f"><label>Indiretos: SLA e retrabalho (R$)</label><input id="crInd" type="number" value="2000" step="100" oninput="calcRepo()"></div>
+  <div class="calc-f"><label>Tipo de saída</label><select id="crTipo" onchange="calcRepo()"><option value="pedido">Pedido de demissão</option><option value="dispensa">Dispensa sem justa causa</option></select></div>
+  <div class="calc-f"><label>Aviso não cumprido</label><select id="crAviso" onchange="calcRepo()"><option value="1">Descontar 1 salário</option><option value="0">Não descontar</option></select></div>
 </div>
 <div class="calc-out" id="crOut"></div>
 </div>
@@ -501,7 +520,7 @@ Chart.defaults.font.family='-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,san
 Chart.defaults.font.size=11;
 function showTab(name,btn){document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.getElementById('tab-'+name).classList.add('active');if(btn)btn.classList.add('active');}
 var colors={primary:'#3b82f6',green:'#10b981',amber:'#f59e0b',border:'#334155',red:'#ef4444'};
-var BUILD='2026-11-07T15:10';  // atualizado a cada publicacao
+var BUILD='2026-11-07T15:45';  // atualizado a cada publicacao
 // TAB1
 document.getElementById('statsCusto').innerHTML='<div class="stat"><div class="stat-label">Custo Total (10 meses)</div><div class="stat-value">R$ '+grandTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})+'</div><div class="stat-sub">Fixo: R$ '+grandFixo.toLocaleString('pt-BR',{minimumFractionDigits:0})+' + Combustível: R$ '+grandFuel.toLocaleString('pt-BR',{minimumFractionDigits:0})+'</div></div><div class="stat"><div class="stat-label">Total de OS</div><div class="stat-value">'+grandOS.toLocaleString('pt-BR')+'</div><div class="stat-sub">Excluindo setores 76 e 84</div></div><div class="stat"><div class="stat-label">Custo por OS</div><div class="stat-value">R$ '+grandCPOS.toFixed(2)+'</div><div class="stat-sub">Média geral da equipe</div></div><div class="stat"><div class="stat-label">Custo Mensal Médio</div><div class="stat-value">R$ '+(grandTotal/mesesC.length).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div><div class="stat-sub">Inclui meses com equipe reduzida</div></div>';
 new Chart(document.getElementById('chartCost'),{type:'bar',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[{label:'Custo Fixo',data:monthlyTotals.map(function(m){return m.fixo;}),backgroundColor:colors.primary,borderRadius:4,stack:'a'},{label:'Combustível',data:monthlyTotals.map(function(m){return m.fuel;}),backgroundColor:colors.green,borderRadius:4,stack:'a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'k';}}}}}});
@@ -1565,12 +1584,27 @@ function calcSob(){
 function calcRepo(){
   var out=document.getElementById('crOut'); if(!out) return;
   var sal=_n('crSal',2410), mes=_n('crMes',3941), mt=_n('crMt',12), ram=_n('crRam',6), prod=_n('crProd',55)/100, adm=_n('crAdm',1200), ind=_n('crInd',2000);
-  var rescisao = sal*(1 + 4/3 + 1) + 0.08*sal*mt*0.40;
+  var tipo=((document.getElementById('crTipo')||{}).value)||'pedido';
+  var descAviso=(((document.getElementById('crAviso')||{}).value)||'1')==='1';
+  var saldo=sal;
+  var feriasVenc = mt>=12 ? sal*4/3*Math.floor(mt/12) : 0;
+  var feriasProp = sal*4/3*((Math.min(mt,12)%12)/12);
+  var decimo = sal*Math.min(mt,12)/12;
+  var rescisao, rotulo;
+  if(tipo==='pedido'){
+    rescisao = saldo+feriasVenc+feriasProp+decimo-(descAviso?sal:0);
+    rotulo = descAviso ? 'pedido de demissão, com desconto do aviso' : 'pedido de demissão, sem desconto do aviso';
+  } else {
+    var aviso = sal*(1+0.1*Math.floor((mt-1)/12));
+    var multa = 0.08*sal*mt*0.4;
+    rescisao = saldo+feriasVenc+feriasProp+decimo+aviso+multa;
+    rotulo = 'dispensa sem justa causa, com aviso e multa do FGTS';
+  }
   var rampa = mes*ram*(1-prod);
   var total = rescisao + adm + rampa + ind;
   var porAno = total*3;
   out.innerHTML=
-   '<div class="calc-c"><div class="calc-l">Custo de saída</div><div class="calc-v">'+_brl(rescisao,0)+'</div><div class="calc-h">aviso, férias, 13º e multa do FGTS</div></div>'+
+   '<div class="calc-c"><div class="calc-l">Custo de saída</div><div class="calc-v">'+_brl(rescisao,0)+'</div><div class="calc-h">'+rotulo+'</div></div>'+
    '<div class="calc-c"><div class="calc-l">Recrutamento e admissão</div><div class="calc-v">'+_brl(adm,0)+'</div><div class="calc-h">anúncio, exames, EPI e uniforme</div></div>'+
    '<div class="calc-c"><div class="calc-l">Rampa de produtividade</div><div class="calc-v">'+_brl(rampa,0)+'</div><div class="calc-h">'+ram+' meses entregando '+Math.round(prod*100)+'%</div></div>'+
    '<div class="calc-c"><div class="calc-l">Indiretos</div><div class="calc-v">'+_brl(ind,0)+'</div><div class="calc-h">SLA, retrabalho e sobrecarga do time</div></div>'+
