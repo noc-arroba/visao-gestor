@@ -48,6 +48,30 @@ tr:hover{background:rgba(59,130,246,.05)}
 .tech-btn:hover{color:var(--text)}
 .tech-btn.active{color:var(--text);border-color:var(--primary)}
 .km-good{color:var(--green)}.km-bad{color:var(--red)}.km-warn{color:var(--amber)}
+
+/* ===== Aba Pessoas (jornada e retenção) ===== */
+.jn{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:900px){.jn{grid-template-columns:1fr}}
+.jn-card{background:rgba(59,130,246,.05);border:1px solid var(--border);border-left:3px solid var(--primary);border-radius:10px;padding:14px}
+.jn-etapa{font-size:.625rem;letter-spacing:.07em;text-transform:uppercase;color:var(--primary);font-weight:700}
+.jn-tit{font-size:.875rem;font-weight:700;margin:5px 0 9px}
+.jn-l{font-size:.78rem;color:var(--muted);margin-bottom:7px;line-height:1.45}
+.jn-l b{color:var(--text);font-weight:600}
+.mot{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);font-size:.8125rem;line-height:1.45}
+.mot:last-child{border-bottom:none}
+.mot-tag{flex:0 0 150px}
+.pill{display:inline-block;padding:3px 9px;border-radius:99px;font-size:.625rem;font-weight:700;letter-spacing:.02em;white-space:nowrap}
+.pill-red{background:rgba(239,68,68,.15);color:var(--red)}
+.pill-amber{background:rgba(245,158,11,.15);color:var(--amber)}
+.pill-purple{background:rgba(139,92,246,.15);color:var(--purple)}
+.pill-blue{background:rgba(59,130,246,.15);color:var(--primary)}
+.plano{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:900px){.plano{grid-template-columns:1fr}}
+.plano-col{background:rgba(30,41,59,.55);border:1px solid var(--border);border-radius:10px;padding:14px}
+.plano-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.plano-t{font-size:.8125rem;font-weight:700}
+.plano-i{font-size:.79rem;line-height:1.5;margin-bottom:10px;padding-left:13px;position:relative}
+.plano-i:before{content:'';position:absolute;left:0;top:6px;width:5px;height:5px;border-radius:99px;background:var(--primary)}
 </style>
 </head>
 <body>
@@ -63,6 +87,7 @@ tr:hover{background:rgba(59,130,246,.05)}
 <button class="tab" onclick="showTab('reincidencia',this)">Reincidência</button>
 <button class="tab" onclick="showTab('redeneutra',this)">Rede Neutra</button>
 <button class="tab" onclick="showTab('projetos',this)">Projetos</button>
+<button class="tab" onclick="showTab('pessoas',this)">Pessoas</button>
 </div>
 <div id="tab-custo" class="tab-content active">
 <div class="alert-box" style="background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.25)"><div class="alert-title">⚠ Combustível sem lançamento em Set e Out</div><div class="alert-item">A planilha Bd_TickeckLOG tem registros até 31/08/2026. Setembro e outubro estão com combustível R$ 0,00 porque não houve nenhum abastecimento lançado, então o custo desses meses e o custo/OS estão subestimados até o lançamento ser feito.</div></div>
@@ -223,7 +248,72 @@ tr:hover{background:rgba(59,130,246,.05)}
 </div>
 </div>
 
-<div class="footer">Dados: IXC Web (API) + Planilha de Combustível (Bd_TickeckLOG) · Custo fixo: R$ 4.475,44/mês · Combustível: dados reais por abastecimento · Afastamentos: Jose Fernando (04/06, INSS) e Charles (02/08-01/09, voltou 02/09) · Setores 76 e 84 excluídos · Atualizado em 06/11/2026 — dados reais até 31/10/2026</div>
+
+<div class="tab-content" id="tab-pessoas">
+<h2 style="font-size:1.05rem;margin-bottom:4px">Setor de Crescimento de Rede: jornada e retenção</h2>
+<p class="subtitle" style="margin-bottom:16px">Cabistas e ajudantes de técnico cabista · rede e backbone · regime de sobreaviso · base: planilha de RH do setor</p>
+
+<div class="stats">
+  <div class="stat"><div class="stat-label">Colaboradores na base</div><div class="stat-value">13</div><div class="stat-sub">Cabistas e ajudantes, todos CLT</div></div>
+  <div class="stat"><div class="stat-label">Motivos de saída registrados</div><div class="stat-value">6</div><div class="stat-sub">Casos descritos na planilha do setor</div></div>
+  <div class="stat"><div class="stat-label">Saídas por remuneração</div><div class="stat-value">3 de 6</div><div class="stat-sub">Salário abaixo, concorrente do ramo e sobreaviso</div></div>
+  <div class="stat"><div class="stat-label">Custo de uma reposição</div><div class="stat-value">R$ 18.848,18</div><div class="stat-sub">Valor de custo na A registrado em uma linha da planilha</div></div>
+</div>
+
+<div class="chart-container">
+  <div class="chart-title">Onde a jornada vaza: os motivos que a base registra</div>
+  <div class="mot"><div class="mot-tag"><span class="pill pill-blue">Experiência</span></div><div>Fim do período de experiência. O contrato acabou antes de o investimento em treinamento se pagar.</div></div><div class="mot"><div class="mot-tag"><span class="pill pill-red">Remuneração</span></div><div>Pedido de demissão por conta do valor do salário.</div></div><div class="mot"><div class="mot-tag"><span class="pill pill-red">Remuneração</span></div><div>Proposta de concorrente com R$ 700 a mais de salário e R$ 600 de sobreaviso. Sobreaviso virou item de negociação de mercado.</div></div><div class="mot"><div class="mot-tag"><span class="pill pill-amber">Mercado</span></div><div>Oportunidade em outra empresa do mesmo ramo. Cabista treinado é ativo disputado pela concorrência.</div></div><div class="mot"><div class="mot-tag"><span class="pill pill-amber">Rotina e disciplina</span></div><div>Advertência por falta não autorizada e insubordinação, seguida de pedido de desligamento. Falta de régua clara antes do caso crítico.</div></div><div class="mot"><div class="mot-tag"><span class="pill pill-purple">Segurança e dívida</span></div><div>Acidente seguido de empréstimo descontado no salário. Pediu rescisão para não ficar com valor em aberto.</div></div>
+</div>
+
+<div class="chart-container">
+  <div class="chart-title">Jornada do cabista em 6 etapas</div>
+  <div class="jn"><div class="jn-card"><div class="jn-etapa">Etapa 1 · Atração e seleção</div><div class="jn-tit">Entrar certo</div>
+<div class="jn-l"><b>Dono:</b> RH + gestor do setor</div>
+<div class="jn-l"><b>O que fazer:</b> Contratar quem aguenta trabalho externo, altura e escala de sobreaviso, com teste prático antes da proposta.</div>
+<div class="jn-l"><b>Indicador:</b> Aceite de proposta e reprovação no teste prático</div></div><div class="jn-card"><div class="jn-etapa">Etapa 2 · Experiência (0 a 90 dias)</div><div class="jn-tit">Sobreviver à entrada</div>
+<div class="jn-l"><b>Dono:</b> Líder direto + padrinho</div>
+<div class="jn-l"><b>O que fazer:</b> Checklist de campo fechado em 90 dias: fusão, OTDR, escalada, NR-35, direção defensiva.</div>
+<div class="jn-l"><b>Indicador:</b> Aprovação na experiência (meta proposta: 90% ou mais)</div></div><div class="jn-card"><div class="jn-etapa">Etapa 3 · Autonomia (3 a 12 meses)</div><div class="jn-tit">Virar cabista que resolve</div>
+<div class="jn-l"><b>Dono:</b> Supervisor técnico</div>
+<div class="jn-l"><b>O que fazer:</b> Níveis Cabista I e II com critério objetivo e passagem de faixa prevista em data.</div>
+<div class="jn-l"><b>Indicador:</b> Retenção em 12 meses (onde a base concentra as saídas)</div></div><div class="jn-card"><div class="jn-etapa">Etapa 4 · Permanência produtiva (12 a 36 meses)</div><div class="jn-tit">Não perder quem já sabe</div>
+<div class="jn-l"><b>Dono:</b> Wellerson + RH</div>
+<div class="jn-l"><b>O que fazer:</b> Faixa salarial por nível, sobreaviso com teto e folga, e reconhecimento por qualidade de execução.</div>
+<div class="jn-l"><b>Indicador:</b> Turnover voluntário e % de saídas por remuneração</div></div><div class="jn-card"><div class="jn-etapa">Etapa 5 · Especialização backbone (24 meses+)</div><div class="jn-tit">Ter para onde crescer</div>
+<div class="jn-l"><b>Dono:</b> Wellerson + engenharia de rede</div>
+<div class="jn-l"><b>O que fazer:</b> Trilha de backbone (BGP, OLT/PON, OTDR avançado) e formação de instrutor interno.</div>
+<div class="jn-l"><b>Indicador:</b> % de certificados por nível e nº de instrutores formados</div></div><div class="jn-card"><div class="jn-etapa">Etapa 6 · Saída e alumni</div><div class="jn-tit">Aprender e poder recontratar</div>
+<div class="jn-l"><b>Dono:</b> RH</div>
+<div class="jn-l"><b>O que fazer:</b> Entrevista de desligamento e motivo classificado em categoria fixa.</div>
+<div class="jn-l"><b>Indicador:</b> % de desligamentos com motivo classificado</div></div></div>
+</div>
+
+<div class="chart-container">
+  <div class="chart-title">Plano de retenção</div>
+  <div class="plano"><div class="plano-col"><div class="plano-h"><div class="plano-t">P0</div><span class="pill pill-red">0 a 30 dias</span></div>
+<div class="jn-l" style="margin-bottom:12px">Custo baixo, efeito imediato</div>
+<div class="plano-i">Classificar motivo de desligamento em 7 categorias fixas. Hoje é texto livre, então nada é medido.</div><div class="plano-i">Entrevista de desligamento com quem não é o líder direto, com 6 perguntas fechadas.</div><div class="plano-i">Revisar a regra de sobreaviso: valor da hora, teto na escala e folga depois de acionamento de madrugada.</div><div class="plano-i">Publicar faixa salarial por nível (I, II, III) e encerrar diferença sem critério.</div></div><div class="plano-col"><div class="plano-h"><div class="plano-t">P1</div><span class="pill pill-amber">30 a 90 dias</span></div>
+<div class="jn-l" style="margin-bottom:12px">Estrutura que segura</div>
+<div class="plano-i">Certificação interna com aumento por nível, atrelada a evidência de campo.</div><div class="plano-i">Padrinho obrigatório nos 90 primeiros dias de cada admissão.</div><div class="plano-i">Painel de retenção nesta aba: turnover por tempo de casa e custo de reposição por saída.</div><div class="plano-i">Segurança: NR-35, NR-10, direção defensiva e análise do acidente registrado.</div></div><div class="plano-col"><div class="plano-h"><div class="plano-t">P2</div><span class="pill pill-purple">90 a 180 dias</span></div>
+<div class="jn-l" style="margin-bottom:12px">Futuro dentro da empresa</div>
+<div class="plano-i">Trilha de especialista em backbone para reter quem quer crescer sem virar gestor.</div><div class="plano-i">Banco de alumni para recontratar cabista já treinado.</div><div class="plano-i">Regra de empréstimo e consignado com teto de desconto, para dívida não terminar em rescisão.</div></div></div>
+</div>
+
+<div class="chart-container">
+  <div class="chart-title">Indicadores para acompanhar</div>
+  <table><thead><tr><th style="text-align:left">Indicador</th><th style="text-align:left">Como medir</th><th style="text-align:left">Meta (proposta)</th></tr></thead>
+  <tbody><tr><td>Turnover voluntário</td><td style='text-align:left'>Desligamentos a pedido ÷ efetivo médio do mês</td><td style='text-align:left'>Tendência de queda por trimestre</td></tr><tr><td>Tempo médio de casa</td><td style='text-align:left'>Média de meses dos ativos do setor</td><td style='text-align:left'>Subir a cada trimestre</td></tr><tr><td>Saídas por remuneração</td><td style='text-align:left'>% dos motivos classificados como remuneração ou proposta externa</td><td style='text-align:left'>Abaixo de 20%</td></tr><tr><td>Custo de reposição</td><td style='text-align:left'>Rescisão + admissão + rampa de 90 dias por vaga reposta</td><td style='text-align:left'>Medir antes de agir</td></tr><tr><td>Aprovação na experiência</td><td style='text-align:left'>% de admitidos que passam dos 90 dias</td><td style='text-align:left'>90% ou mais</td></tr><tr><td>Sobreaviso por pessoa</td><td style='text-align:left'>Horas de sobreaviso por técnico no mês</td><td style='text-align:left'>Teto acordado em escala</td></tr><tr><td>Retenção em 12 meses</td><td style='text-align:left'>% de cada turma de admissão ainda ativa com 12 meses</td><td style='text-align:left'>Acima de 70%</td></tr></tbody></table>
+</div>
+
+<div class="alert-box" style="background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.25)">
+  <div class="alert-title" style="color:var(--amber)">Base desta aba</div>
+  <div class="alert-item">Fonte: planilha de RH do Setor de Crescimento de Rede, recebida como imagem (13 colaboradores com nome, cargo, admissão, desligamento, status, tempo de casa, salário, custo e motivo).</div>
+  <div class="alert-item">O que falta para fechar os números: o arquivo em xlsx ou csv. Só com ele dá para calcular turnover exato, tempo médio de casa, custo total de reposição e a distribuição real dos motivos.</div>
+  <div class="alert-item">Nada aqui foi estimado. Os valores exibidos são os que a própria planilha mostra e as contagens de motivos descritos.</div>
+</div>
+</div>
+
+<div class="footer">Dados: IXC Web (API) + Planilha de Combustível (Bd_TickeckLOG) · Custo fixo: R$ 4.475,44/mês · Combustível: dados reais por abastecimento · Afastamentos: Jose Fernando (04/06, INSS) e Charles (02/08-01/09, voltou 02/09) · Setores 76 e 84 excluídos · Atualizado em 07/11/2026 — dados reais até 31/10/2026</div>
 <script>
 const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago"];
 const mesesC = meses.concat(["Set","Out"]);
@@ -249,7 +339,7 @@ Chart.defaults.font.family='-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,san
 Chart.defaults.font.size=11;
 function showTab(name,btn){document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.getElementById('tab-'+name).classList.add('active');if(btn)btn.classList.add('active');}
 var colors={primary:'#3b82f6',green:'#10b981',amber:'#f59e0b',border:'#334155',red:'#ef4444'};
-var BUILD='2026-11-06T18:32';  // atualizado a cada publicacao
+var BUILD='2026-11-07T12:35';  // atualizado a cada publicacao
 // TAB1
 document.getElementById('statsCusto').innerHTML='<div class="stat"><div class="stat-label">Custo Total (10 meses)</div><div class="stat-value">R$ '+grandTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})+'</div><div class="stat-sub">Fixo: R$ '+grandFixo.toLocaleString('pt-BR',{minimumFractionDigits:0})+' + Combustível: R$ '+grandFuel.toLocaleString('pt-BR',{minimumFractionDigits:0})+'</div></div><div class="stat"><div class="stat-label">Total de OS</div><div class="stat-value">'+grandOS.toLocaleString('pt-BR')+'</div><div class="stat-sub">Excluindo setores 76 e 84</div></div><div class="stat"><div class="stat-label">Custo por OS</div><div class="stat-value">R$ '+grandCPOS.toFixed(2)+'</div><div class="stat-sub">Média geral da equipe</div></div><div class="stat"><div class="stat-label">Custo Mensal Médio</div><div class="stat-value">R$ '+(grandTotal/mesesC.length).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div><div class="stat-sub">Inclui meses com equipe reduzida</div></div>';
 new Chart(document.getElementById('chartCost'),{type:'bar',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[{label:'Custo Fixo',data:monthlyTotals.map(function(m){return m.fixo;}),backgroundColor:colors.primary,borderRadius:4,stack:'a'},{label:'Combustível',data:monthlyTotals.map(function(m){return m.fuel;}),backgroundColor:colors.green,borderRadius:4,stack:'a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'k';}}}}}});
@@ -1189,7 +1279,8 @@ var ABAS={
   decisao:{rotulo:'Decisão',fonte:'Planilha de custos + IXC',viva:false},
   reincidencia:{rotulo:'Reincidência',fonte:'IXC',viva:false},
   redeneutra:{rotulo:'Rede Neutra',fonte:'IXC (carteira VLAN KW)',viva:true},
-  projetos:{rotulo:'Projetos',fonte:'InCicle',viva:true}
+  projetos:{rotulo:'Projetos',fonte:'InCicle',viva:true},
+  pessoas:{rotulo:'Pessoas',fonte:'Planilha de RH do setor',viva:false}
 };
 function _p2(n){return String(n).padStart(2,'0');}
 function _fmtTs(iso){
