@@ -754,8 +754,40 @@ Chart.defaults.color='#94a3b8';
 Chart.defaults.font.family='-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif';
 Chart.defaults.font.size=11;
 function showTab(name,btn){document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.getElementById('tab-'+name).classList.add('active');if(btn)btn.classList.add('active');}
-var colors={primary:'#00439c',green:'#159c57',amber:'#fbb900',border:'#e3e9f2',red:'#d33a3a',yellow:'#fbb900',orange:'#ff7043'};
-var BUILD='2026-11-17T20:15';  // atualizado a cada publicacao
+var colors={primary:'#00439c',green:'#159c57',amber:'#fbb900',border:'#e3e9f2',red:'#d33a3a',yellow:'#fbb900',orange:'#ff7043'}
+Chart.register({id:'numCli',afterDatasetsDraw:function(ch){
+  try{
+    var id=ch.canvas&&ch.canvas.id; if(id!=='chartChurnMes'&&id!=='chartSafra') return;
+    var ctx=ch.ctx; ctx.save(); ctx.textAlign='center'; ctx.textBaseline='bottom';
+    if(id==='chartChurnMes'){
+      ctx.font='700 11px Quicksand,sans-serif'; ctx.fillStyle='#00306e';
+      var meta=ch.getDatasetMeta(0);
+      (ch.data.datasets[0].data||[]).forEach(function(v,i){
+        var el=meta.data[i]; if(!el||v==null) return;
+        ctx.fillText(String(v), el.x, el.y-9);
+      });
+    } else {
+      var tops={}, soma={};
+      ch.data.datasets.forEach(function(ds,i){
+        if(ch.isDatasetVisible && !ch.isDatasetVisible(i)) return;
+        var m=ch.getDatasetMeta(i);
+        m.data.forEach(function(el,j){
+          if(!el) return;
+          soma[j]=(soma[j]||0)+(Number(ds.data[j])||0);
+          if(tops[j]===undefined||el.y<tops[j]) tops[j]=el.y;
+        });
+      });
+      ctx.font='700 10px Quicksand,sans-serif'; ctx.fillStyle='#5f6f85';
+      Object.keys(tops).forEach(function(j){
+        if(!soma[j]) return;
+        var m0=ch.getDatasetMeta(0); var el=m0.data[j]; if(!el) return;
+        ctx.fillText(String(soma[j]), el.x, tops[j]-6);
+      });
+    }
+    ctx.restore();
+  }catch(e){}
+}});;
+var BUILD='2026-11-17T20:45';  // atualizado a cada publicacao
 // TAB1
 document.getElementById('statsCusto').innerHTML='<div class="stat"><div class="stat-label">Custo Total (10 meses)</div><div class="stat-value">R$ '+grandTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})+'</div><div class="stat-sub">Fixo: R$ '+grandFixo.toLocaleString('pt-BR',{minimumFractionDigits:0})+' + Combustível: R$ '+grandFuel.toLocaleString('pt-BR',{minimumFractionDigits:0})+'</div></div><div class="stat"><div class="stat-label">Total de OS</div><div class="stat-value">'+grandOS.toLocaleString('pt-BR')+'</div><div class="stat-sub">Excluindo setores 76 e 84</div></div><div class="stat"><div class="stat-label">Custo por OS</div><div class="stat-value">R$ '+grandCPOS.toFixed(2)+'</div><div class="stat-sub">Média geral da equipe</div></div><div class="stat"><div class="stat-label">Custo Mensal Médio</div><div class="stat-value">R$ '+(grandTotal/mesesC.length).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div><div class="stat-sub">Inclui meses com equipe reduzida</div></div>';
 new Chart(document.getElementById('chartCost'),{type:'bar',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[{label:'Custo Fixo',data:monthlyTotals.map(function(m){return m.fixo;}),backgroundColor:colors.primary,borderRadius:4,stack:'a'},{label:'Combustível',data:monthlyTotals.map(function(m){return m.fuel;}),backgroundColor:colors.green,borderRadius:4,stack:'a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'k';}}}}}});
