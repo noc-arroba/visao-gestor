@@ -623,6 +623,16 @@ tr:hover{background:#f5f8ff}
     <button onclick="limparFiltro()" style="padding:8px 14px;border:1px solid var(--border);background:#fff;color:var(--primary);border-radius:8px;font-family:inherit;font-size:.78rem;font-weight:700;cursor:pointer">Limpar filtro</button>
     <span id="filtroNotaClientes" style="font-size:.72rem;color:var(--muted)"></span>
   </div>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0 4px;padding-top:10px;border-top:1px dashed var(--border)">
+    <label for="filtroSaida" style="font-size:.78rem;font-weight:700;color:var(--primary)">Ano da saída</label>
+    <select id="filtroSaida" onchange="aplicarAnoSaida(this.value)" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:.82rem;color:var(--text);background:#fff">
+      <option value="2026" selected>2026</option><option value="2025">2025</option><option value="2024">2024</option>
+      <option value="2023">2023</option><option value="2022">2022</option><option value="2021">2021</option>
+      <option value="2020">2020</option><option value="2019">2019</option><option value="2018">2018</option>
+      <option value="2017">2017</option><option value="2016">2016</option>
+    </select>
+    <span style="font-size:.72rem;color:var(--muted)">ano em que o cliente saiu: os cartões de saída, os dois gráficos e as tabelas passam a mostrar aquele ano</span>
+  </div>
   <div class="stats" id="fichaAno" style="margin-top:12px"></div>
 </div>
 
@@ -631,14 +641,14 @@ tr:hover{background:#f5f8ff}
   <div class="stat"><div class="stat-label">ARPU</div><div class="stat-value">R$ 85,78</div><div class="stat-sub">média dos contratos com valor · mediana R$ 50</div></div>
   <div class="stat"><div class="stat-label">Tempo médio de casa</div><div class="stat-value">46 meses</div><div class="stat-sub">mediana de 35 meses na base ativa</div></div>
   <div class="stat"><div class="stat-label">LTV estimado</div><div class="stat-value">R$ 3.984</div><div class="stat-sub">ARPU x tempo médio de casa</div></div>
-  <div class="stat"><div class="stat-label">Saíram em 2026</div><div class="stat-value">2.001</div><div class="stat-sub">clientes · 802 cancelaram e 1.199 negativaram</div></div>
-  <div class="stat"><div class="stat-label">MRR perdido</div><div class="stat-value">R$ 172 mil</div><div class="stat-sub">cerca de R$ 2,1 milhões por ano</div></div>
+  <div class="stat"><div class="stat-label" id="cSaidasLbl">Saíram em 2026</div><div class="stat-value" id="cSaidasVal">2.001</div><div class="stat-sub" id="cSaidasSub">clientes · 802 cancelaram e 1.199 negativaram</div></div>
+  <div class="stat"><div class="stat-label">MRR perdido</div><div class="stat-value" id="cMrrVal">R$ 172 mil</div><div class="stat-sub" id="cMrrSub">cerca de R$ 2,1 milhões por ano</div></div>
   <div class="stat"><div class="stat-label">Bloqueados hoje</div><div class="stat-value">416</div><div class="stat-sub">clientes com contrato ativo e internet bloqueada</div></div>
 </div>
 
 <div class="grid-2">
   <div class="chart-container">
-    <div class="chart-title">Quem saiu em 2026, por ano de instalação</div>
+    <div class="chart-title" id="tituloSafra">Quem saiu em 2026, por ano de instalação</div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
       <button class="tech-btn active" id="fTodos" onclick="filtroSaida('todos',this)">Todas as saídas</button>
       <button class="tech-btn" id="fCanc" onclick="filtroSaida('cancel',this)">Só cancelamento</button>
@@ -647,7 +657,7 @@ tr:hover{background:#f5f8ff}
     <div class="chart-wrapper"><canvas id="chartSafra"></canvas></div>
   </div>
   <div class="chart-container">
-    <div class="chart-title">Saídas por mês em 2026 (cancelamento + negativação)</div>
+    <div class="chart-title" id="tituloMes">Saídas por mês em 2026 (cancelamento + negativação)</div>
     <div class="chart-wrapper"><canvas id="chartChurnMes"></canvas></div>
   </div>
 </div>
@@ -655,7 +665,7 @@ tr:hover{background:#f5f8ff}
 <div class="chart-container">
   <div class="chart-title">Safra por safra: sobrevivência, tempo de casa e LTV realizado</div>
   <table><thead><tr><th style="text-align:left">Safra</th><th>Clientes instalados</th><th>Ativos hoje</th><th>Sobrevivência</th><th>Cancelou</th><th>Negativou</th><th>Total saiu</th><th>% do total</th><th>Tempo médio de casa</th><th>LTV realizado</th></tr></thead>
-  <tbody><tr><td style="text-align:left"><b>2016</b></td><td>2.328</td><td>966</td><td>41,5%</td><td>11</td><td>18</td><td><b>29</b></td><td>1,4%</td><td>118,4 meses</td><td>R$ 10.158</td></tr><tr><td style="text-align:left"><b>2017</b></td><td>1.567</td><td>635</td><td>40,5%</td><td>14</td><td>13</td><td><b>27</b></td><td>1,3%</td><td>107,3 meses</td><td>R$ 9.201</td></tr><tr><td style="text-align:left"><b>2018</b></td><td>2.359</td><td>1.012</td><td>42,9%</td><td>31</td><td>32</td><td><b>63</b></td><td>3,1%</td><td>95,4 meses</td><td>R$ 8.185</td></tr><tr><td style="text-align:left"><b>2019</b></td><td>1.796</td><td>789</td><td>43,9%</td><td>37</td><td>17</td><td><b>54</b></td><td>2,7%</td><td>85,3 meses</td><td>R$ 7.314</td></tr><tr><td style="text-align:left"><b>2020</b></td><td>1.964</td><td>934</td><td>47,6%</td><td>49</td><td>43</td><td><b>92</b></td><td>4,6%</td><td>71,6 meses</td><td>R$ 6.141</td></tr><tr><td style="text-align:left"><b>2021</b></td><td>2.075</td><td>968</td><td>46,7%</td><td>50</td><td>50</td><td><b>100</b></td><td>5,0%</td><td>59,3 meses</td><td>R$ 5.085</td></tr><tr><td style="text-align:left"><b>2022</b></td><td>1.857</td><td>925</td><td>49,8%</td><td>53</td><td>65</td><td><b>118</b></td><td>5,9%</td><td>47,6 meses</td><td>R$ 4.080</td></tr><tr><td style="text-align:left"><b>2023</b></td><td>2.425</td><td>1.299</td><td>53,6%</td><td>89</td><td>116</td><td><b>205</b></td><td>10,2%</td><td>35,1 meses</td><td>R$ 3.009</td></tr><tr><td style="text-align:left"><b>2024</b></td><td>4.348</td><td>2.444</td><td>56,2%</td><td>176</td><td>320</td><td><b>496</b></td><td>24,8%</td><td>22,9 meses</td><td>R$ 1.966</td></tr><tr><td style="text-align:left"><b>2025</b></td><td>2.903</td><td>2.091</td><td>72,0%</td><td>170</td><td>344</td><td><b>514</b></td><td>25,7%</td><td>11,7 meses</td><td>R$ 1.001</td></tr><tr><td style="text-align:left"><b>2026</b></td><td>2.289</td><td>2.012</td><td>87,9%</td><td>119</td><td>181</td><td><b>300</b></td><td>15,0%</td><td>3,5 meses</td><td>R$ 303</td></tr></tbody><tfoot><tr><td style="text-align:left">Total / média</td><td>26.049</td><td>14.096</td><td>54,1%</td><td>802</td><td>1.199</td><td>2.001</td><td>100%</td><td>30,4 meses</td><td>R$ 2.603</td></tr></tfoot></table>
+  <tbody id="tbSafra"><tr><td style="text-align:left"><b>2016</b></td><td>2.328</td><td>966</td><td>41,5%</td><td>11</td><td>18</td><td><b>29</b></td><td>1,4%</td><td>118,4 meses</td><td>R$ 10.158</td></tr><tr><td style="text-align:left"><b>2017</b></td><td>1.567</td><td>635</td><td>40,5%</td><td>14</td><td>13</td><td><b>27</b></td><td>1,3%</td><td>107,3 meses</td><td>R$ 9.201</td></tr><tr><td style="text-align:left"><b>2018</b></td><td>2.359</td><td>1.012</td><td>42,9%</td><td>31</td><td>32</td><td><b>63</b></td><td>3,1%</td><td>95,4 meses</td><td>R$ 8.185</td></tr><tr><td style="text-align:left"><b>2019</b></td><td>1.796</td><td>789</td><td>43,9%</td><td>37</td><td>17</td><td><b>54</b></td><td>2,7%</td><td>85,3 meses</td><td>R$ 7.314</td></tr><tr><td style="text-align:left"><b>2020</b></td><td>1.964</td><td>934</td><td>47,6%</td><td>49</td><td>43</td><td><b>92</b></td><td>4,6%</td><td>71,6 meses</td><td>R$ 6.141</td></tr><tr><td style="text-align:left"><b>2021</b></td><td>2.075</td><td>968</td><td>46,7%</td><td>50</td><td>50</td><td><b>100</b></td><td>5,0%</td><td>59,3 meses</td><td>R$ 5.085</td></tr><tr><td style="text-align:left"><b>2022</b></td><td>1.857</td><td>925</td><td>49,8%</td><td>53</td><td>65</td><td><b>118</b></td><td>5,9%</td><td>47,6 meses</td><td>R$ 4.080</td></tr><tr><td style="text-align:left"><b>2023</b></td><td>2.425</td><td>1.299</td><td>53,6%</td><td>89</td><td>116</td><td><b>205</b></td><td>10,2%</td><td>35,1 meses</td><td>R$ 3.009</td></tr><tr><td style="text-align:left"><b>2024</b></td><td>4.348</td><td>2.444</td><td>56,2%</td><td>176</td><td>320</td><td><b>496</b></td><td>24,8%</td><td>22,9 meses</td><td>R$ 1.966</td></tr><tr><td style="text-align:left"><b>2025</b></td><td>2.903</td><td>2.091</td><td>72,0%</td><td>170</td><td>344</td><td><b>514</b></td><td>25,7%</td><td>11,7 meses</td><td>R$ 1.001</td></tr><tr><td style="text-align:left"><b>2026</b></td><td>2.289</td><td>2.012</td><td>87,9%</td><td>119</td><td>181</td><td><b>300</b></td><td>15,0%</td><td>3,5 meses</td><td>R$ 303</td></tr></tbody><tfoot id="tfSafra"><tr><td style="text-align:left">Total / média</td><td>26.049</td><td>14.096</td><td>54,1%</td><td>802</td><td>1.199</td><td>2.001</td><td>100%</td><td>30,4 meses</td><td>R$ 2.603</td></tr></tfoot></table>
   <div class="jn-l" style="margin-top:14px"><b>Como ler:</b> cada linha é uma safra, ou seja, os clientes instalados naquele ano. Sobrevivência é quanto da safra segue ativa hoje. O LTV realizado é o ARPU multiplicado pelo tempo médio de casa de quem saiu daquela safra. Os 3 clientes sem data de ativação ficaram fora da tabela. A linha de total soma a base inteira, incluindo 138 clientes instalados antes de 2016 que não aparecem por safra: por isso ela é maior que a soma das linhas. Tempo médio de casa (30,4 meses) e LTV realizado (R$ 2.603) são médias de quem saiu em 2026, e o LTV total perdido é de R$ 5,2 milhões.</div>
 </div>
 
@@ -712,17 +722,17 @@ tr:hover{background:#f5f8ff}
 </div>
 
 <div class="chart-container">
-  <div class="chart-title">Receita perdida em 2026</div>
+  <div class="chart-title" id="tituloRec">Receita perdida em 2026</div>
   <div class="chart-sub">O que saiu da base levado a reais. MRR e LTV usam o ARPU de R$ 85,78. Os cartões de MRR e LTV seguem o filtro de safra; o acumulado do ano e os bloqueados são sempre da base inteira.</div>
   <div class="stats">
     <div class="stat"><div class="stat-label">MRR perdido por mês</div><div class="stat-value" id="rpMrr">R$ 171.646</div><div class="stat-sub" id="rpMrrSub">2.001 clientes que saíram</div></div>
-    <div class="stat"><div class="stat-label">Receita perdida no ano</div><div class="stat-value">R$ 1.011.175</div><div class="stat-sub">acumulado de jan a nov, base total</div></div>
+    <div class="stat"><div class="stat-label">Receita perdida no ano</div><div class="stat-value" id="rpAcum">R$ 1.011.175</div><div class="stat-sub">acumulado de jan a nov, base total</div></div>
     <div class="stat"><div class="stat-label">LTV perdido</div><div class="stat-value" id="rpLtv">R$ 5.206.743</div><div class="stat-sub" id="rpLtvSub">receita que esses clientes ainda renderiam</div></div>
     <div class="stat"><div class="stat-label">Receita em risco hoje</div><div class="stat-value">R$ 35.684</div><div class="stat-sub">416 clientes bloqueados, por mês</div></div>
   </div>
   <div class="chart-wrapper"><canvas id="chartReceita"></canvas></div>
   <table style="margin-top:14px">
-    <thead><tr><th>Safra</th><th>Saídas</th><th>MRR perdido</th><th>LTV perdido</th><th>LTV médio por cliente</th><th>% do LTV</th></tr></thead><tbody><tr><td style="text-align:left"><b>2016</b></td><td>29</td><td>R$ 2.488</td><td>R$ 294.534</td><td>R$ 10.156</td><td>5,7%</td></tr><tr><td style="text-align:left"><b>2017</b></td><td>27</td><td>R$ 2.316</td><td>R$ 248.513</td><td>R$ 9.204</td><td>4,8%</td></tr><tr><td style="text-align:left"><b>2018</b></td><td>63</td><td>R$ 5.404</td><td>R$ 515.555</td><td>R$ 8.183</td><td>9,9%</td></tr><tr><td style="text-align:left"><b>2019</b></td><td>54</td><td>R$ 4.632</td><td>R$ 395.120</td><td>R$ 7.317</td><td>7,6%</td></tr><tr><td style="text-align:left"><b>2020</b></td><td>92</td><td>R$ 7.892</td><td>R$ 565.050</td><td>R$ 6.142</td><td>10,9%</td></tr><tr><td style="text-align:left"><b>2021</b></td><td>100</td><td>R$ 8.578</td><td>R$ 508.675</td><td>R$ 5.087</td><td>9,8%</td></tr><tr><td style="text-align:left"><b>2022</b></td><td>118</td><td>R$ 10.122</td><td>R$ 481.809</td><td>R$ 4.083</td><td>9,3%</td></tr><tr><td style="text-align:left"><b>2023</b></td><td>205</td><td>R$ 17.585</td><td>R$ 617.230</td><td>R$ 3.011</td><td>11,9%</td></tr><tr><td style="text-align:left"><b>2024</b></td><td>496</td><td>R$ 42.547</td><td>R$ 974.324</td><td>R$ 1.964</td><td>18,7%</td></tr><tr><td style="text-align:left"><b>2025</b></td><td>514</td><td>R$ 44.091</td><td>R$ 515.864</td><td>R$ 1.004</td><td>9,9%</td></tr><tr><td style="text-align:left"><b>2026</b></td><td>300</td><td>R$ 25.734</td><td>R$ 90.069</td><td>R$ 300</td><td>1,7%</td></tr></tbody><tfoot><tr class="tot"><td style="text-align:left">Total / média</td><td>2.001</td><td>R$ 171.646</td><td>R$ 5.218.032</td><td>R$ 2.608</td><td>100%</td></tr></tfoot>
+    <thead><tr><th>Safra</th><th>Saídas</th><th>MRR perdido</th><th>LTV perdido</th><th>LTV médio por cliente</th><th>% do LTV</th></tr></thead><tbody id="tbReceita"><tr><td style="text-align:left"><b>2016</b></td><td>29</td><td>R$ 2.488</td><td>R$ 294.534</td><td>R$ 10.156</td><td>5,7%</td></tr><tr><td style="text-align:left"><b>2017</b></td><td>27</td><td>R$ 2.316</td><td>R$ 248.513</td><td>R$ 9.204</td><td>4,8%</td></tr><tr><td style="text-align:left"><b>2018</b></td><td>63</td><td>R$ 5.404</td><td>R$ 515.555</td><td>R$ 8.183</td><td>9,9%</td></tr><tr><td style="text-align:left"><b>2019</b></td><td>54</td><td>R$ 4.632</td><td>R$ 395.120</td><td>R$ 7.317</td><td>7,6%</td></tr><tr><td style="text-align:left"><b>2020</b></td><td>92</td><td>R$ 7.892</td><td>R$ 565.050</td><td>R$ 6.142</td><td>10,9%</td></tr><tr><td style="text-align:left"><b>2021</b></td><td>100</td><td>R$ 8.578</td><td>R$ 508.675</td><td>R$ 5.087</td><td>9,8%</td></tr><tr><td style="text-align:left"><b>2022</b></td><td>118</td><td>R$ 10.122</td><td>R$ 481.809</td><td>R$ 4.083</td><td>9,3%</td></tr><tr><td style="text-align:left"><b>2023</b></td><td>205</td><td>R$ 17.585</td><td>R$ 617.230</td><td>R$ 3.011</td><td>11,9%</td></tr><tr><td style="text-align:left"><b>2024</b></td><td>496</td><td>R$ 42.547</td><td>R$ 974.324</td><td>R$ 1.964</td><td>18,7%</td></tr><tr><td style="text-align:left"><b>2025</b></td><td>514</td><td>R$ 44.091</td><td>R$ 515.864</td><td>R$ 1.004</td><td>9,9%</td></tr><tr><td style="text-align:left"><b>2026</b></td><td>300</td><td>R$ 25.734</td><td>R$ 90.069</td><td>R$ 300</td><td>1,7%</td></tr></tbody><tfoot id="tfReceita"><tr class="tot"><td style="text-align:left">Total / média</td><td>2.001</td><td>R$ 171.646</td><td>R$ 5.218.032</td><td>R$ 2.608</td><td>100%</td></tr></tfoot>
   </table>
   <div class="jn-l" style="margin-top:14px"><b>Como a conta é feita:</b> a receita perdida no ano soma, mês a mês, o MRR de quem saiu multiplicado pelos meses que ainda faltavam para dezembro. Quem saiu em janeiro custou onze meses; quem saiu em novembro, um. O LTV perdido é o MRR multiplicado pelo tempo médio de casa da safra, ou seja, a receita que aqueles clientes ainda teriam gerado se ficassem.</div>
   <div class="jn-l"><b>O que esse número não é:</b> é piso, não teto. O cliente negativado já vinha com fatura em aberto antes de ser negativado, então a perda de caixa começou antes da data que aparece aqui. E o LTV usa ARPU médio, não a receita real de cada cliente.</div>
@@ -787,7 +797,7 @@ Chart.register({id:'numCli',afterDatasetsDraw:function(ch){
     ctx.restore();
   }catch(e){}
 }});;
-var BUILD='2026-11-17T20:45';  // atualizado a cada publicacao
+var BUILD='2026-11-17T21:30';  // atualizado a cada publicacao
 // TAB1
 document.getElementById('statsCusto').innerHTML='<div class="stat"><div class="stat-label">Custo Total (10 meses)</div><div class="stat-value">R$ '+grandTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})+'</div><div class="stat-sub">Fixo: R$ '+grandFixo.toLocaleString('pt-BR',{minimumFractionDigits:0})+' + Combustível: R$ '+grandFuel.toLocaleString('pt-BR',{minimumFractionDigits:0})+'</div></div><div class="stat"><div class="stat-label">Total de OS</div><div class="stat-value">'+grandOS.toLocaleString('pt-BR')+'</div><div class="stat-sub">Excluindo setores 76 e 84</div></div><div class="stat"><div class="stat-label">Custo por OS</div><div class="stat-value">R$ '+grandCPOS.toFixed(2)+'</div><div class="stat-sub">Média geral da equipe</div></div><div class="stat"><div class="stat-label">Custo Mensal Médio</div><div class="stat-value">R$ '+(grandTotal/mesesC.length).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div><div class="stat-sub">Inclui meses com equipe reduzida</div></div>';
 new Chart(document.getElementById('chartCost'),{type:'bar',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[{label:'Custo Fixo',data:monthlyTotals.map(function(m){return m.fixo;}),backgroundColor:colors.primary,borderRadius:4,stack:'a'},{label:'Combustível',data:monthlyTotals.map(function(m){return m.fuel;}),backgroundColor:colors.green,borderRadius:4,stack:'a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'k';}}}}}});
@@ -1880,38 +1890,139 @@ function calcRepo(){
    '<div class="calc-c"><div class="calc-l">Três reposições no ano</div><div class="calc-v">'+_brl(porAno,0)+'</div><div class="calc-h">é o que a rotatividade tira do setor</div></div>';
 }
 
+var EXITS={"2018": {"s": {"2016": [259, 0, 24.5], "2017": [245, 6, 13.9], "2018": [182, 0, 4.2]}, "m": [47, 28, 23, 28, 30, 47, 64, 82, 42, 57, 111, 133], "tot": 692, "c": 686, "n": 6, "tc": 15.3}, "2019": {"s": {"2019": [126, 6, 6.2], "2016": [114, 3, 35.2], "2017": [137, 1, 24.0], "2018": [265, 8, 12.0]}, "m": [65, 47, 33, 35, 54, 48, 41, 67, 53, 56, 43, 118], "tot": 660, "c": 642, "n": 18, "tc": 17.4}, "2021": {"s": {"2016": [73, 4, 58.7], "2018": [173, 9, 35.9], "M": [3, 0, 78.7], "2019": [205, 12, 23.6], "2017": [54, 6, 46.6], "2021": [240, 48, 4.7], "2020": [356, 37, 11.4]}, "m": [51, 88, 82, 123, 109, 138, 156, 102, 89, 86, 70, 126], "tot": 1220, "c": 1104, "n": 116, "tc": 20.5}, "2020": {"s": {"2016": [126, 3, 47.2], "2018": [286, 6, 23.6], "2019": [319, 26, 12.9], "2017": [132, 3, 35.9], "2020": [110, 18, 5.9], "M": [1, 0, 65]}, "m": [94, 51, 67, 62, 71, 73, 124, 111, 98, 94, 66, 119], "tot": 1030, "c": 974, "n": 56, "tc": 22.4}, "2017": {"s": {"2016": [289, 0, 9.5], "M": [44, 0, 16.6], "2017": [92, 0, 3.5]}, "m": [40, 169, 26, 13, 24, 25, 38, 17, 25, 21, 10, 17], "tot": 425, "c": 425, "n": 0, "tc": 9.0}, "2016": {"s": {"M": [42, 0, 17.3], "2016": [76, 0, 3.4]}, "m": [0, 0, 0, 0, 0, 0, 0, 4, 15, 12, 73, 14], "tot": 118, "c": 118, "n": 0, "tc": 8.4}, "2022": {"s": {"2016": [20, 9, 71.0], "2021": [169, 206, 10.8], "2022": [47, 145, 4.9], "2017": [27, 16, 59.9], "2018": [54, 29, 48.5], "2020": [88, 58, 23.7], "2019": [52, 46, 35.7]}, "m": [69, 99, 96, 56, 68, 73, 117, 101, 68, 55, 69, 95], "tot": 966, "c": 457, "n": 509, "tc": 21.3}, "2026": {"s": {"2016": [11, 18, 118.4], "2023": [87, 118, 35.1], "2025": [170, 344, 11.7], "2021": [50, 50, 59.3], "2018": [31, 32, 95.4], "2019": [37, 17, 85.3], "2020": [48, 44, 71.6], "2024": [175, 321, 22.9], "2017": [14, 13, 107.3], "2026": [116, 184, 3.5], "2022": [52, 66, 47.6]}, "m": [185, 132, 186, 160, 152, 146, 266, 274, 194, 211, 92, 0], "tot": 1998, "c": 791, "n": 1207, "tc": 30.4}, "2025": {"s": {"2016": [11, 14, 107.0], "2020": [37, 45, 61.5], "2017": [19, 13, 97.2], "2019": [19, 23, 73.1], "2024": [164, 922, 11.2], "2021": [50, 70, 49.2], "2023": [81, 201, 24.2], "2022": [63, 85, 36.7], "M": [0, 1, 126], "2025": [62, 280, 5.7], "2018": [14, 20, 84.7]}, "m": [135, 173, 67, 314, 122, 133, 195, 177, 146, 136, 292, 304], "tot": 2194, "c": 520, "n": 1674, "tc": 22.4}, "2023": {"s": {"2016": [16, 13, 82.3], "2021": [83, 101, 22.7], "2019": [33, 34, 48.6], "2022": [118, 280, 10.7], "2018": [40, 21, 60.3], "2023": [33, 222, 5.0], "2020": [49, 52, 36.1], "2017": [20, 12, 71.8]}, "m": [93, 69, 118, 98, 116, 75, 135, 89, 60, 101, 73, 100], "tot": 1127, "c": 392, "n": 735, "tc": 22.2}, "2024": {"s": {"2016": [25, 6, 95.3], "2017": [11, 15, 83.8], "2021": [43, 74, 35.9], "2023": [86, 370, 11.2], "2024": [55, 356, 5.1], "2020": [45, 49, 48.5], "M": [1, 0, 112], "2022": [59, 126, 23.5], "2019": [26, 21, 60.5], "2018": [32, 31, 71.8]}, "m": [99, 71, 93, 79, 107, 80, 185, 190, 137, 99, 105, 186], "tot": 1431, "c": 383, "n": 1048, "tc": 23.0}};
+
 (function(){
   var elS=document.getElementById('chartSafra'); if(!elS) return;
-  var anos=[2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026];
-  var saiu=[29,27,63,54,92,100,118,205,496,514,300];
-  var ltv=[10158,9201,8185,7314,6141,5085,4080,3009,1966,1001,303];
-  var CANC=[11,14,31,37,49,50,53,89,176,170,119];
-  var NEG=[18,13,32,17,43,50,65,116,320,344,181];
-  window.__safraChart=new Chart(elS,{type:'bar',data:{labels:anos.map(String),datasets:[
-      {label:'Cancelou o contrato',data:CANC,backgroundColor:'#3b82f6',borderRadius:4,stack:'s'},
-      {label:'Só foi negativado',data:NEG,backgroundColor:'#ef4444',borderRadius:4,stack:'s'}]},
+  var ANOS=[2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026];
+  var MESES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  window.__ANO_SAIDA=2026; window.__MODO_SAIDA='todos';
+
+  window.__safraChart=new Chart(elS,{type:'bar',data:{labels:ANOS.map(String),datasets:[
+      {label:'Cancelou o contrato',data:[],backgroundColor:'#00439c',borderRadius:4,stack:'s'},
+      {label:'Só foi negativado',data:[],backgroundColor:'#d33a3a',borderRadius:4,stack:'s'}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+c.raw+' clientes';}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true,grid:{color:colors.border},title:{display:true,text:'clientes',color:'#7d8b9e'}}}}});
-  window.__safraCANC=CANC; window.__safraNEG=NEG;
-  window.filtroSaida=function(modo,btn){
-    document.querySelectorAll('#tab-clientes .tech-btn').forEach(function(b){if(b.id&&b.id.indexOf('f')===0)b.classList.remove('active');});
-    if(btn) btn.classList.add('active');
-    var ch=window.__safraChart; if(!ch) return;
-    if(modo==='cancel'){
-      ch.data.datasets[0].data=CANC; ch.data.datasets[1].data=CANC.map(function(){return 0;});
-      ch.options.scales.x.stacked=false; ch.options.scales.y.stacked=false;
-    } else if(modo==='neg'){
-      ch.data.datasets[0].data=NEG.map(function(){return 0;}); ch.data.datasets[1].data=NEG;
-      ch.options.scales.x.stacked=false; ch.options.scales.y.stacked=false;
-    } else {
-      ch.data.datasets[0].data=CANC; ch.data.datasets[1].data=NEG;
-      ch.options.scales.x.stacked=true; ch.options.scales.y.stacked=true;
-    }
-    ch.update();
-  };
-  var elM=document.getElementById('chartChurnMes');
-  new Chart(elM,{type:'line',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov'],datasets:[{label:'Cancelamentos',data:[185,132,186,160,153,147,266,275,194,211,92],borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,.12)',fill:true,tension:.3,pointRadius:5,pointBackgroundColor:'#ef4444'}]},
+
+  window.__mesChart=new Chart(document.getElementById('chartChurnMes'),{type:'line',data:{labels:MESES.slice(0,11),datasets:[{label:'Saídas no mês',data:[],borderColor:'#d33a3a',backgroundColor:'rgba(211,58,58,.12)',fill:true,tension:.3,pointRadius:5,pointBackgroundColor:'#d33a3a'}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:colors.border}},x:{grid:{display:false}}}}});
+
+  function _ex(ano){ return (window.EXITS&&EXITS[String(ano)])||{s:{},m:[],tot:0,c:0,n:0,tc:0}; }
+  function _fila(ano){
+    var e=_ex(ano), out=[];
+    for(var i=0;i<ANOS.length;i++){
+      var y=ANOS[i]; if(y>ano) break;
+      var v=(e.s||{})[String(y)]||[0,0,0];
+      var b=(window.SAFRAS_JS&&SAFRAS_JS[y])||{inst:0,a:0};
+      out.push({y:y,inst:b.inst||0,at:b.a||0,c:v[0]||0,n:v[1]||0,t:(v[0]||0)+(v[1]||0),tc:v[2]||0});
+    }
+    return out;
+  }
+  function _brl(v){ return 'R$ '+_fmtN(Math.round(v)); }
+
+  function _renderTabelaSafra(ano){
+    var L=_fila(ano), tb=document.getElementById('tbSafra'), tf=document.getElementById('tfSafra');
+    if(!tb) return;
+    var st=0,sInst=0,sAt=0,html='';
+    L.forEach(function(x){
+      st+=x.t; sInst+=x.inst; sAt+=x.at;
+      var sob=x.inst?(100*x.at/x.inst):0;
+      var ltv=x.tc*ARPU_BASE;
+      var pct=0;
+      html+='<tr data-ano="'+x.y+'"><td style="text-align:left"><b>'+x.y+'</b></td><td>'+_fmtN(x.inst)+'</td><td>'+_fmtN(x.at)+'</td><td>'+sob.toFixed(1).replace('.',',')+'%</td><td>'+x.c+'</td><td>'+x.n+'</td><td><b>'+x.t+'</b></td><td>'+(st?pct:0)+'</td><td>'+x.tc.toFixed(1).replace('.',',')+' meses</td><td>'+(x.t?_brl(ltv):'--')+'</td></tr>';
+    });
+    tb.innerHTML=html;
+    // preenche % do total agora que sabemos o total
+    var trs=tb.rows;
+    for(var i=0;i<trs.length;i++){
+      var t=parseInt(trs[i].cells[6].textContent.replace(/\D/g,''),10)||0;
+      trs[i].cells[7].textContent=(st?(100*t/st):0).toFixed(1).replace('.',',')+'%';
+    }
+    var e=_ex(ano);
+    var tcTot=e.tc||0;
+    if(tf) tf.innerHTML='<tr><td style="text-align:left">Total / média</td><td>'+_fmtN(sInst)+'</td><td>'+_fmtN(sAt)+'</td><td>'+(sInst?(100*sAt/sInst):0).toFixed(1).replace('.',',')+'%</td><td>'+_fmtN(e.c)+'</td><td>'+_fmtN(e.n)+'</td><td>'+_fmtN(e.tot)+'</td><td>100%</td><td>'+tcTot.toFixed(1).replace('.',',')+' meses</td><td>'+_brl(tcTot*ARPU_BASE)+'</td></tr>';
+  }
+
+  function _renderReceita(ano){
+    var L=_fila(ano), e=_ex(ano), tb=document.getElementById('tbReceita'), tf=document.getElementById('tfReceita');
+    if(!tb) return;
+    var totLtv=0, html='';
+    L.forEach(function(x){ totLtv+=x.t*ARPU_BASE*x.tc; });
+    L.forEach(function(x){
+      var mrr=x.t*ARPU_BASE, ltv=x.t*ARPU_BASE*x.tc;
+      html+='<tr data-ano="'+x.y+'"><td style="text-align:left"><b>'+x.y+'</b></td><td>'+_fmtN(x.t)+'</td><td>'+_brl(mrr)+'</td><td>'+_brl(ltv)+'</td><td>'+(x.t?_brl(ltv/x.t):'--')+'</td><td>'+(totLtv?(100*ltv/totLtv):0).toFixed(1).replace('.',',')+'%</td></tr>';
+    });
+    tb.innerHTML=html;
+    var mrrTot=e.tot*ARPU_BASE, ltvTot=e.tot*ARPU_BASE*(e.tc||0);
+    if(tf) tf.innerHTML='<tr class="tot"><td style="text-align:left">Total / média</td><td>'+_fmtN(e.tot)+'</td><td>'+_brl(mrrTot)+'</td><td>'+_brl(ltvTot)+'</td><td>'+(e.tot?_brl(ltvTot/e.tot):'--')+'</td><td>100%</td></tr>';
+
+    var ch=window.__recChart;
+    if(ch){
+      var n=(ano>=2026)?11:12;
+      var mrrM=[], acum=[], rodando=0;
+      for(var i=0;i<n;i++){
+        var q=(e.m||[])[i]||0;
+        var v=q*ARPU_BASE;
+        mrrM.push(Math.round(v));
+        rodando+=q*ARPU_BASE*(12-(i+1));
+        acum.push(Math.round(rodando));
+      }
+      ch.data.labels=MESES.slice(0,n);
+      ch.data.datasets[0].data=mrrM;
+      ch.data.datasets[1].data=acum;
+      ch.update();
+    }
+  }
+
+  function _renderCards(ano){
+    var e=_ex(ano);
+    var l=document.getElementById('cSaidasLbl'); if(l) l.textContent='Saíram em '+ano;
+    var v=document.getElementById('cSaidasVal'); if(v) v.textContent=_fmtN(e.tot);
+    var s=document.getElementById('cSaidasSub'); if(s) s.textContent='clientes · '+_fmtN(e.c)+' cancelaram e '+_fmtN(e.n)+' negativaram';
+    var m=document.getElementById('cMrrVal'); if(m) m.textContent='R$ '+_fmtN(Math.round(e.tot*ARPU_BASE));
+    var ms=document.getElementById('cMrrSub'); if(ms) ms.textContent='cerca de R$ '+_fmtN(Math.round(e.tot*ARPU_BASE*12))+' por ano';
+    var rp=document.getElementById('rpMrr'); if(rp) rp.textContent=_brl(e.tot*ARPU_BASE);
+    var rps=document.getElementById('rpMrrSub'); if(rps) rps.textContent=_fmtN(e.tot)+' clientes que saíram em '+ano;
+    var ra=document.getElementById('rpAcum'); if(ra){
+      var acc=0; for(var i=0;i<12;i++){ acc+=((e.m||[])[i]||0)*ARPU_BASE*(12-(i+1)); }
+      ra.textContent=_brl(acc);
+    }
+    var rl=document.getElementById('rpLtv'); if(rl) rl.textContent=_brl(e.tot*ARPU_BASE*(e.tc||0));
+    var rls=document.getElementById('rpLtvSub'); if(rls) rls.textContent='ARPU x '+String(e.tc||0).replace('.',',')+' meses de casa';
+    var ts=document.getElementById('tituloSafra'); if(ts) ts.textContent='Quem saiu em '+ano+', por ano de instalação';
+    var tm=document.getElementById('tituloMes'); if(tm) tm.textContent='Saídas por mês em '+ano+' (cancelamento + negativação)';
+    var tr=document.getElementById('tituloRec'); if(tr) tr.textContent='Receita perdida em '+ano;
+  }
+
+  function _renderCharts(ano,modo){
+    var L=_fila(ano), ch=window.__safraChart;
+    var C=L.map(function(x){return x.c;}), N=L.map(function(x){return x.n;});
+    ch.data.labels=L.map(function(x){return String(x.y);});
+    if(modo==='cancel'){ ch.data.datasets[0].data=C; ch.data.datasets[1].data=C.map(function(){return 0;}); ch.options.scales.x.stacked=false; ch.options.scales.y.stacked=false; }
+    else if(modo==='neg'){ ch.data.datasets[0].data=C.map(function(){return 0;}); ch.data.datasets[1].data=N; ch.options.scales.x.stacked=false; ch.options.scales.y.stacked=false; }
+    else { ch.data.datasets[0].data=C; ch.data.datasets[1].data=N; ch.options.scales.x.stacked=true; ch.options.scales.y.stacked=true; }
+    ch.update();
+    var e=_ex(ano), mm=window.__mesChart, n=(ano>=2026)?11:12;
+    mm.data.labels=MESES.slice(0,n);
+    mm.data.datasets[0].data=(e.m||[]).slice(0,n);
+    mm.update();
+  }
+
+  window.aplicarAnoSaida=function(ano){
+    ano=parseInt(ano,10)||2026; window.__ANO_SAIDA=ano;
+    _renderCharts(ano,window.__MODO_SAIDA);
+    _renderCards(ano);
+    _renderTabelaSafra(ano);
+    _renderReceita(ano);
+  };
+  window.filtroSaida=function(modo,btn){
+    var btns=document.querySelectorAll('#tab-clientes .tech-btn');
+    for(var i=0;i<btns.length;i++){ if(btns[i].id&&btns[i].id.indexOf('f')===0) btns[i].classList.remove('active'); }
+    if(btn) btn.classList.add('active');
+    window.__MODO_SAIDA=modo;
+    _renderCharts(window.__ANO_SAIDA,modo);
+  };
 })();
+
 
 var USERS=[{u:'wellerson',n:'Wellerson',role:'full',h:'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f'}];
 var PLANOS=[{"n": "1 GIGA", "a": 2186, "s": 211, "arpu": 105.09, "nv": 914}, {"n": "800MB", "a": 3586, "s": 513, "arpu": 87.82, "nv": 1830}, {"n": "600MB", "a": 3578, "s": 627, "arpu": 78.74, "nv": 2111}, {"n": "500MB", "a": 974, "s": 76, "arpu": 85.87, "nv": 242}, {"n": "450MB", "a": 1112, "s": 143, "arpu": 64.35, "nv": 235}, {"n": "400MB", "a": 1400, "s": 239, "arpu": 48.4, "nv": 441}, {"n": "300MB", "a": 410, "s": 58, "arpu": 138.0, "nv": 152}, {"n": "200MB", "a": 4, "s": 0, "arpu": 2800.0, "nv": 1}, {"n": "150MB", "a": 16, "s": 4, "arpu": 0, "nv": 0}, {"n": "100MB", "a": 92, "s": 18, "arpu": 226.0, "nv": 5}, {"n": "50 a 90MB", "a": 223, "s": 29, "arpu": 139.38, "nv": 14}, {"n": "até 40MB", "a": 41, "s": 7, "arpu": 232.5, "nv": 4}, {"n": "Legado (cabo e rádio)", "a": 460, "s": 73, "arpu": 101.85, "nv": 34}, {"n": "Empresarial", "a": 5, "s": 0, "arpu": 187.0, "nv": 3}, {"n": "Sem velocidade", "a": 9, "s": 0, "arpu": 237.62, "nv": 4}];
@@ -1941,7 +2052,7 @@ function aplicarFiltroAno(ano){
     box.innerHTML =
       _fichaCard('Clientes instalados', _fmtN(inst), ano?('safra de '+ano):'toda a base já instalada')+
       _fichaCard('Ativos hoje', _fmtN(at), 'sobrevivência de '+(sobrev).toFixed(1).replace('.',',')+'% da safra')+
-      _fichaCard('Saíram em 2026', _fmtN(s), _fmtN(o.canc||0)+' cancelaram · '+_fmtN(o.neg||0)+' negativaram')+
+      _fichaCard('Saíram em '+(window.__ANO_SAIDA||2026), _fmtN(s), _fmtN(o.canc||0)+' cancelaram · '+_fmtN(o.neg||0)+' negativaram')+
       _fichaCard('Tempo médio de casa', tc.toFixed(1).replace('.',',')+' meses', 'de quem saiu em 2026')+
       _fichaCard('LTV realizado', 'R$ '+_fmtN(Math.round(ltv)), 'ARPU x tempo de casa');
   }
@@ -2008,6 +2119,7 @@ function _renderPlanos(ano){
     options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return _fmtN(c.raw)+' clientes ativos';}}}},scales:{x:{beginAtZero:true,grid:{color:colors.border}},y:{grid:{display:false}}}}});
 }
 (function(){ if(document.getElementById('fichaAno')) aplicarFiltroAno(''); })();
+(function(){ if(document.getElementById('tbSafra')) aplicarAnoSaida(2026); })();
 
 var _sess=null;
 function _customUsuarios(){ try{ return JSON.parse(localStorage.getItem('vg_users')||'[]'); }catch(e){ return []; } }
