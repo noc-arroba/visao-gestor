@@ -130,6 +130,32 @@ tr:hover{background:#f5f8ff}
 .login-card button:hover{background:#003579}
 .login-err{color:var(--red);font-size:.75rem;text-align:center;margin-top:12px;min-height:16px;font-weight:600}
 .login-foot{text-align:center;color:var(--muted);font-size:.66rem;margin-top:16px;border-top:1px solid var(--border);padding-top:12px}
+
+/* ===== Gerenciamento de acessos ===== */
+.mod-bg{position:fixed;inset:0;background:rgba(10,30,60,.45);backdrop-filter:blur(2px);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;z-index:9998;overflow:auto}
+.mod-bg.open{display:flex}
+.mod-card{background:#fff;border-radius:16px;width:100%;max-width:720px;box-shadow:0 20px 60px rgba(5,25,55,.25);font-family:inherit}
+.mod-head{display:flex;justify-content:space-between;align-items:flex-start;padding:18px 22px;border-bottom:1px solid var(--border)}
+.mod-head b{font-size:1rem;color:var(--primary)}
+.mod-sub{font-size:.72rem;color:var(--muted);margin-top:2px}
+.mod-x{border:1px solid var(--border);background:#fff;color:var(--muted);border-radius:99px;padding:5px 14px;font-size:.7rem;font-weight:700;cursor:pointer;font-family:inherit}
+.mod-body{padding:18px 22px 22px}
+.usr-tab{width:100%;border-collapse:collapse;font-size:.8rem;margin-bottom:16px}
+.usr-tab th{text-align:left;color:var(--muted);font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;padding:8px 10px;border-bottom:1px solid var(--border)}
+.usr-tab td{padding:9px 10px;border-bottom:1px solid var(--border)}
+.usr-tag{display:inline-block;padding:2px 9px;border-radius:99px;font-size:.62rem;font-weight:700;background:#e8effa;color:var(--primary)}
+.usr-tag.gestor{background:#e6f6ec;color:#127a45}
+.usr-tag.leitura{background:#f1f2f6;color:#5f6f85}
+.usr-del{border:none;background:#fdeaea;color:#c22b2b;border-radius:99px;padding:4px 10px;font-size:.66rem;font-weight:700;cursor:pointer;font-family:inherit}
+.usr-form{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:end;background:#f7f9fd;border:1px solid var(--border);border-radius:12px;padding:14px}
+.usr-field label{display:block;font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;margin-bottom:4px}
+.usr-field input,.usr-field select{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:.8rem;font-family:inherit;color:var(--text);background:#fff}
+.usr-bt{grid-column:1/-1;padding:10px;border:none;border-radius:9px;background:var(--primary);color:#fff;font-weight:700;font-size:.8rem;cursor:pointer;font-family:inherit}
+.usr-bt2{padding:7px 14px;border:1px solid var(--primary);border-radius:99px;background:#fff;color:var(--primary);font-weight:700;font-size:.7rem;cursor:pointer;font-family:inherit}
+.usr-msg{font-size:.75rem;margin-top:10px;min-height:16px}
+.usr-note{font-size:.7rem;color:var(--muted);margin-top:14px;line-height:1.6;border-top:1px dashed var(--border);padding-top:12px}
+@media(max-width:700px){.usr-form{grid-template-columns:1fr 1fr}}
+
 </style>
 </head>
 <body>
@@ -669,7 +695,7 @@ Chart.defaults.font.family='-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,san
 Chart.defaults.font.size=11;
 function showTab(name,btn){document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.getElementById('tab-'+name).classList.add('active');if(btn)btn.classList.add('active');}
 var colors={primary:'#00439c',green:'#159c57',amber:'#fbb900',border:'#e3e9f2',red:'#d33a3a',yellow:'#fbb900',orange:'#ff7043'};
-var BUILD='2026-11-17T14:20';  // atualizado a cada publicacao
+var BUILD='2026-11-17T15:10';  // atualizado a cada publicacao
 // TAB1
 document.getElementById('statsCusto').innerHTML='<div class="stat"><div class="stat-label">Custo Total (10 meses)</div><div class="stat-value">R$ '+grandTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})+'</div><div class="stat-sub">Fixo: R$ '+grandFixo.toLocaleString('pt-BR',{minimumFractionDigits:0})+' + Combustível: R$ '+grandFuel.toLocaleString('pt-BR',{minimumFractionDigits:0})+'</div></div><div class="stat"><div class="stat-label">Total de OS</div><div class="stat-value">'+grandOS.toLocaleString('pt-BR')+'</div><div class="stat-sub">Excluindo setores 76 e 84</div></div><div class="stat"><div class="stat-label">Custo por OS</div><div class="stat-value">R$ '+grandCPOS.toFixed(2)+'</div><div class="stat-sub">Média geral da equipe</div></div><div class="stat"><div class="stat-label">Custo Mensal Médio</div><div class="stat-value">R$ '+(grandTotal/mesesC.length).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div><div class="stat-sub">Inclui meses com equipe reduzida</div></div>';
 new Chart(document.getElementById('chartCost'),{type:'bar',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[{label:'Custo Fixo',data:monthlyTotals.map(function(m){return m.fixo;}),backgroundColor:colors.primary,borderRadius:4,stack:'a'},{label:'Combustível',data:monthlyTotals.map(function(m){return m.fuel;}),backgroundColor:colors.green,borderRadius:4,stack:'a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'k';}}}}}});
@@ -1796,15 +1822,32 @@ function calcRepo(){
 })();
 
 var USERS=[{u:'wellerson',n:'Wellerson',role:'full',h:'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f'}];
+var _sess=null;
+function _customUsuarios(){ try{ return JSON.parse(localStorage.getItem('vg_users')||'[]'); }catch(e){ return []; } }
+function _listaUsuarios(){
+  var base=USERS.map(function(x){ return {u:x.u,n:x.n,role:x.role,h:x.h,base:true}; });
+  var extra=_customUsuarios();
+  for(var i=0;i<extra.length;i++){
+    var achou=false;
+    for(var j=0;j<base.length;j++){ if(base[j].u===extra[i].u){ base[j]=extra[i]; achou=true; } }
+    if(!achou) extra[i].base=false, base.push(extra[i]);
+  }
+  return base;
+}
+function _gravaUsuarios(arr){ try{ localStorage.setItem('vg_users',JSON.stringify(arr)); }catch(e){ alert('Este navegador bloqueou o armazenamento local.'); } }
 function _sha(t){
   return crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)).then(function(b){
     return Array.prototype.map.call(new Uint8Array(b),function(x){return ('00'+x.toString(16)).slice(-2);}).join('');
   });
 }
 function aplicarSessao(s){
+  _sess=s;
   var g=document.getElementById('loginGate'); if(g) g.classList.add('hidden');
   var bu=document.getElementById('brandUser');
-  if(bu) bu.innerHTML='<b>'+s.n+'</b> · '+s.role+'<br><button onclick="sair()">Sair</button>';
+  if(bu){
+    var extra=(s.role==='full')?'<button onclick="abrirAcessos()">Acessos</button> ':'';
+    bu.innerHTML='<b>'+s.n+'</b> · '+s.role+'<br>'+extra+'<button onclick="sair()">Sair</button>';
+  }
   document.body.style.overflow='';
 }
 function sair(){ try{sessionStorage.removeItem('vg_sess');}catch(e){} location.reload(); }
@@ -1816,13 +1859,66 @@ function fazerLogin(){
   if(!u||!pw){ err.textContent='Preencha usuário e senha.'; return; }
   _sha(pw).then(function(hh){
     var f=null;
-    for(var i=0;i<USERS.length;i++){ if(USERS[i].u===u && USERS[i].h===hh) f=USERS[i]; }
+    var lista=_listaUsuarios();
+    for(var i=0;i<lista.length;i++){ if(lista[i].u===u && lista[i].h===hh) f=lista[i]; }
     if(!f){ err.textContent='Usuário ou senha inválidos.'; document.getElementById('lgPass').value=''; return; }
     var s={u:f.u,n:f.n,role:f.role,ts:Date.now()};
     try{sessionStorage.setItem('vg_sess',JSON.stringify(s));}catch(e){}
     aplicarSessao(s);
   }).catch(function(){ err.textContent='Não foi possível validar neste navegador.'; });
 }
+
+function abrirAcessos(){ if(!_sess||_sess.role!=='full'){ alert('Apenas o perfil full gerencia acessos.'); return; } renderAcessos(); document.getElementById('modalAcessos').classList.add('open'); }
+function fecharAcessos(){ document.getElementById('modalAcessos').classList.remove('open'); }
+function renderAcessos(){
+  var lista=_listaUsuarios(), tb=document.getElementById('usrTbody'); tb.innerHTML='';
+  lista.forEach(function(x){
+    var tr=document.createElement('tr');
+    var podeExcluir = !x.base && x.u!==_sess.u;
+    tr.innerHTML='<td>'+x.n+'</td><td>'+x.u+'</td><td><span class="usr-tag '+x.role+'">'+x.role+'</span></td>'+
+      '<td style="text-align:right">'+(podeExcluir?'<button class="usr-del" onclick="removerAcesso(\''+x.u+'\')">Remover</button>':'<span style="font-size:.66rem;color:var(--muted)">fixo</span>')+'</td>';
+    tb.appendChild(tr);
+  });
+}
+function criarAcesso(){
+  var n=(document.getElementById('nuNome').value||'').trim();
+  var u=(document.getElementById('nuLogin').value||'').trim().toLowerCase().replace(/\s+/g,'');
+  var pw=document.getElementById('nuSenha').value||'';
+  var p=document.getElementById('nuPerfil').value;
+  var msg=document.getElementById('usrMsg');
+  msg.style.color='#c22b2b';
+  if(!n||!u||!pw){ msg.textContent='Preencha nome, login e senha.'; return; }
+  if(u.length<3){ msg.textContent='O login precisa ter ao menos 3 caracteres.'; return; }
+  if(pw.length<6){ msg.textContent='A senha precisa ter ao menos 6 caracteres.'; return; }
+  var lista=_listaUsuarios();
+  for(var i=0;i<lista.length;i++){ if(lista[i].u===u){ msg.textContent='Já existe um acesso com esse login.'; return; } }
+  _sha(pw).then(function(hh){
+    var arr=_customUsuarios();
+    arr.push({u:u,n:n,role:p,h:hh,criado:new Date().toISOString().slice(0,10)});
+    _gravaUsuarios(arr);
+    document.getElementById('nuNome').value='';
+    document.getElementById('nuLogin').value='';
+    document.getElementById('nuSenha').value='';
+    msg.style.color='#127a45';
+    msg.textContent='Acesso de '+n+' criado. Ele já entra com o login e a senha definidos.';
+    renderAcessos();
+  }).catch(function(){ msg.textContent='Não foi possível gerar o hash da senha neste navegador.'; });
+}
+function removerAcesso(u){
+  if(!confirm('Remover o acesso de '+u+'?')) return;
+  var arr=_customUsuarios().filter(function(x){ return x.u!==u; });
+  _gravaUsuarios(arr); renderAcessos();
+  var msg=document.getElementById('usrMsg'); msg.style.color='#5f6f85'; msg.textContent='Acesso removido.';
+}
+function copiarAcessos(){
+  var t=JSON.stringify(_customUsuarios(),null,2);
+  var msg=document.getElementById('usrMsg');
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(function(){ msg.style.color='#127a45'; msg.textContent='Lista copiada. Me envie este texto no chat para eu publicar no painel.'; })
+    .catch(function(){ window.prompt('Copie a lista abaixo:',t); });
+  } else { window.prompt('Copie a lista abaixo:',t); }
+}
+
 (function(){
   document.addEventListener('DOMContentLoaded',function(){
     var p=document.getElementById('lgPass');
@@ -1837,5 +1933,37 @@ _montarBarras();
 calcSob();
 calcRepo();
 </script>
+
+<div id="modalAcessos" class="mod-bg">
+  <div class="mod-card">
+    <div class="mod-head">
+      <div><b>Gerenciar acessos</b><div class="mod-sub">Quem pode entrar no Visão Gestor</div></div>
+      <button class="mod-x" onclick="fecharAcessos()">Fechar</button>
+    </div>
+    <div class="mod-body">
+      <table class="usr-tab"><thead><tr><th>Nome</th><th>Login</th><th>Perfil</th><th></th></tr></thead><tbody id="usrTbody"></tbody></table>
+      <div class="usr-form">
+        <div class="usr-field"><label>Nome</label><input id="nuNome" placeholder="Ex.: Maria Souza" autocomplete="off"></div>
+        <div class="usr-field"><label>Login</label><input id="nuLogin" placeholder="ex.: maria" autocomplete="off"></div>
+        <div class="usr-field"><label>Senha</label><input id="nuSenha" type="password" placeholder="mínimo 6 caracteres" autocomplete="new-password"></div>
+        <div class="usr-field"><label>Perfil</label>
+          <select id="nuPerfil">
+            <option value="full">full (vê e altera tudo)</option>
+            <option value="gestor">gestor (vê tudo, sem acessos)</option>
+            <option value="leitura">leitura (só consulta)</option>
+          </select>
+        </div>
+        <button class="usr-bt" onclick="criarAcesso()">Criar acesso</button>
+      </div>
+      <div id="usrMsg" class="usr-msg"></div>
+      <div class="usr-note">
+        Os acessos criados aqui ficam salvos neste navegador. Para valerem em qualquer dispositivo, clique em
+        <b>Copiar acessos</b> e me envie o texto: eu publico a lista dentro do painel.
+        <div style="margin-top:8px"><button class="usr-bt2" onclick="copiarAcessos()">Copiar acessos</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
