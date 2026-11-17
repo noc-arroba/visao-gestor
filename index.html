@@ -117,6 +117,8 @@ td{border-bottom-color:#eef2f8}
 th{border-bottom-color:#e5eaf3}
 tfoot td{padding:9px 6px;font-weight:800;color:var(--text);border-top:2px solid var(--primary);background:#eef3fb}
 tfoot td small{display:block;font-weight:600;color:var(--muted);font-size:.6rem;margin-top:2px}
+tr.tot td{font-weight:800;color:var(--text);border-top:2px solid var(--primary);background:#eef3fb;padding:9px 6px}
+#tab-clientes tbody tr.sel td{background:#fff6d8}
 tr:hover{background:#f5f8ff}
 .tech-btn{border-radius:99px}
 .login-gate{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#00306f 0%,#00439c 55%,#0060c9 100%);padding:20px}
@@ -338,7 +340,8 @@ tr:hover{background:#f5f8ff}
 
 <div id="tab-projetos" class="tab-content">
 <div class="chart-container" id="boxMinhasEtapas"></div>
-<div id="filtroProjetos" style="display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)"><span>Escopo:</span><button class="tech-btn active" onclick="setEscopoProjetos('meus',this)">Minha carteira</button><button class="tech-btn" onclick="setEscopoProjetos('todos',this)">Tudo que estou vinculado</button><span id="filtroNota"></span></div><div class="stats" id="statsProjetos"></div>
+<div id="filtroProjetos" style="display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)"><span>Escopo:</span><button class="tech-btn active" onclick="setEscopoProjetos('meus',this)">Minha carteira</button><button class="tech-btn" onclick="setEscopoProjetos('todos',this)">Tudo que estou vinculado</button><button onclick="limparFiltro()" style="padding:8px 14px;border:1px solid var(--border);background:#fff;color:var(--primary);border-radius:8px;font-family:inherit;font-size:.78rem;font-weight:700;cursor:pointer">Limpar filtro</button>
+    <span id="filtroNota"></span></div><div class="stats" id="statsProjetos"></div>
 <div class="grid-2">
 <div class="chart-container"><div class="chart-title">Progresso dos Projetos — % de atividades concluídas</div><div class="chart-wrapper-lg"><canvas id="chartProjProgresso"></canvas></div></div>
 <div class="chart-container"><div class="chart-title">Atividades por Mês — previstas x concluídas</div><div class="chart-wrapper"><canvas id="chartProjMes"></canvas></div></div>
@@ -608,7 +611,7 @@ tr:hover{background:#f5f8ff}
 
 <div class="chart-container">
   <div class="chart-title">Filtrar por ano de instalação</div>
-  <div class="chart-sub">Escolha a safra para ver só os clientes instalados naquele ano. Cliente com mais de um contrato conta pela primeira ativação.</div>
+  <div class="chart-sub">Escolha a safra e o painel inteiro passa a mostrar só os clientes instalados naquele ano: os cartões, o plano do cliente, a receita e a tabela por safra. Cliente com mais de um contrato conta pela primeira ativação.</div>
   <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0 4px">
     <label for="filtroAno" style="font-size:.78rem;font-weight:700;color:var(--primary)">Ano de instalação</label>
     <select id="filtroAno" onchange="aplicarFiltroAno(this.value)" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:.82rem;color:var(--text);background:#fff">
@@ -718,8 +721,7 @@ tr:hover{background:#f5f8ff}
   </div>
   <div class="chart-wrapper"><canvas id="chartReceita"></canvas></div>
   <table style="margin-top:14px">
-    <thead><tr><th>Safra</th><th>Saídas</th><th>MRR perdido</th><th>LTV perdido</th><th>% do LTV</th></tr></thead>
-    <tbody><tr><td style="text-align:left"><b>2016</b></td><td>29</td><td>R$ 2.488</td><td>R$ 294.534</td><td>5,7%</td></tr><tr><td style="text-align:left"><b>2017</b></td><td>27</td><td>R$ 2.316</td><td>R$ 248.513</td><td>4,8%</td></tr><tr><td style="text-align:left"><b>2018</b></td><td>63</td><td>R$ 5.404</td><td>R$ 515.555</td><td>9,9%</td></tr><tr><td style="text-align:left"><b>2019</b></td><td>54</td><td>R$ 4.632</td><td>R$ 395.120</td><td>7,6%</td></tr><tr><td style="text-align:left"><b>2020</b></td><td>92</td><td>R$ 7.892</td><td>R$ 565.050</td><td>10,9%</td></tr><tr><td style="text-align:left"><b>2021</b></td><td>100</td><td>R$ 8.578</td><td>R$ 508.675</td><td>9,8%</td></tr><tr><td style="text-align:left"><b>2022</b></td><td>118</td><td>R$ 10.122</td><td>R$ 481.809</td><td>9,3%</td></tr><tr><td style="text-align:left"><b>2023</b></td><td>205</td><td>R$ 17.585</td><td>R$ 617.230</td><td>11,9%</td></tr><tr><td style="text-align:left"><b>2024</b></td><td>496</td><td>R$ 42.547</td><td>R$ 974.324</td><td>18,7%</td></tr><tr><td style="text-align:left"><b>2025</b></td><td>514</td><td>R$ 44.091</td><td>R$ 515.864</td><td>9,9%</td></tr><tr><td style="text-align:left"><b>2026</b></td><td>300</td><td>R$ 25.734</td><td>R$ 90.069</td><td>1,7%</td></tr></tbody>
+    <thead><tr><th>Safra</th><th>Saídas</th><th>MRR perdido</th><th>LTV perdido</th><th>LTV médio por cliente</th><th>% do LTV</th></tr></thead><tbody><tr><td style="text-align:left"><b>2016</b></td><td>29</td><td>R$ 2.488</td><td>R$ 294.534</td><td>R$ 10.156</td><td>5,7%</td></tr><tr><td style="text-align:left"><b>2017</b></td><td>27</td><td>R$ 2.316</td><td>R$ 248.513</td><td>R$ 9.204</td><td>4,8%</td></tr><tr><td style="text-align:left"><b>2018</b></td><td>63</td><td>R$ 5.404</td><td>R$ 515.555</td><td>R$ 8.183</td><td>9,9%</td></tr><tr><td style="text-align:left"><b>2019</b></td><td>54</td><td>R$ 4.632</td><td>R$ 395.120</td><td>R$ 7.317</td><td>7,6%</td></tr><tr><td style="text-align:left"><b>2020</b></td><td>92</td><td>R$ 7.892</td><td>R$ 565.050</td><td>R$ 6.142</td><td>10,9%</td></tr><tr><td style="text-align:left"><b>2021</b></td><td>100</td><td>R$ 8.578</td><td>R$ 508.675</td><td>R$ 5.087</td><td>9,8%</td></tr><tr><td style="text-align:left"><b>2022</b></td><td>118</td><td>R$ 10.122</td><td>R$ 481.809</td><td>R$ 4.083</td><td>9,3%</td></tr><tr><td style="text-align:left"><b>2023</b></td><td>205</td><td>R$ 17.585</td><td>R$ 617.230</td><td>R$ 3.011</td><td>11,9%</td></tr><tr><td style="text-align:left"><b>2024</b></td><td>496</td><td>R$ 42.547</td><td>R$ 974.324</td><td>R$ 1.964</td><td>18,7%</td></tr><tr><td style="text-align:left"><b>2025</b></td><td>514</td><td>R$ 44.091</td><td>R$ 515.864</td><td>R$ 1.004</td><td>9,9%</td></tr><tr><td style="text-align:left"><b>2026</b></td><td>300</td><td>R$ 25.734</td><td>R$ 90.069</td><td>R$ 300</td><td>1,7%</td></tr></tbody><tfoot><tr class="tot"><td style="text-align:left">Total / média</td><td>2.001</td><td>R$ 171.646</td><td>R$ 5.218.032</td><td>R$ 2.608</td><td>100%</td></tr></tfoot>
   </table>
   <div class="jn-l" style="margin-top:14px"><b>Como a conta é feita:</b> a receita perdida no ano soma, mês a mês, o MRR de quem saiu multiplicado pelos meses que ainda faltavam para dezembro. Quem saiu em janeiro custou onze meses; quem saiu em novembro, um. O LTV perdido é o MRR multiplicado pelo tempo médio de casa da safra, ou seja, a receita que aqueles clientes ainda teriam gerado se ficassem.</div>
   <div class="jn-l"><b>O que esse número não é:</b> é piso, não teto. O cliente negativado já vinha com fatura em aberto antes de ser negativado, então a perda de caixa começou antes da data que aparece aqui. E o LTV usa ARPU médio, não a receita real de cada cliente.</div>
@@ -752,7 +754,7 @@ Chart.defaults.font.family='-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,san
 Chart.defaults.font.size=11;
 function showTab(name,btn){document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.getElementById('tab-'+name).classList.add('active');if(btn)btn.classList.add('active');}
 var colors={primary:'#00439c',green:'#159c57',amber:'#fbb900',border:'#e3e9f2',red:'#d33a3a',yellow:'#fbb900',orange:'#ff7043'};
-var BUILD='2026-11-17T18:55';  // atualizado a cada publicacao
+var BUILD='2026-11-17T19:30';  // atualizado a cada publicacao
 // TAB1
 document.getElementById('statsCusto').innerHTML='<div class="stat"><div class="stat-label">Custo Total (10 meses)</div><div class="stat-value">R$ '+grandTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})+'</div><div class="stat-sub">Fixo: R$ '+grandFixo.toLocaleString('pt-BR',{minimumFractionDigits:0})+' + Combustível: R$ '+grandFuel.toLocaleString('pt-BR',{minimumFractionDigits:0})+'</div></div><div class="stat"><div class="stat-label">Total de OS</div><div class="stat-value">'+grandOS.toLocaleString('pt-BR')+'</div><div class="stat-sub">Excluindo setores 76 e 84</div></div><div class="stat"><div class="stat-label">Custo por OS</div><div class="stat-value">R$ '+grandCPOS.toFixed(2)+'</div><div class="stat-sub">Média geral da equipe</div></div><div class="stat"><div class="stat-label">Custo Mensal Médio</div><div class="stat-value">R$ '+(grandTotal/mesesC.length).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div><div class="stat-sub">Inclui meses com equipe reduzida</div></div>';
 new Chart(document.getElementById('chartCost'),{type:'bar',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[{label:'Custo Fixo',data:monthlyTotals.map(function(m){return m.fixo;}),backgroundColor:colors.primary,borderRadius:4,stack:'a'},{label:'Combustível',data:monthlyTotals.map(function(m){return m.fuel;}),backgroundColor:colors.green,borderRadius:4,stack:'a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'k';}}}}}});
@@ -1889,6 +1891,10 @@ function _fmtN(v){return (v||0).toLocaleString('pt-BR');}
 function _fichaCard(rot,val,sub){
   return '<div class="stat"><div class="stat-label">'+rot+'</div><div class="stat-value">'+val+'</div><div class="stat-sub">'+sub+'</div></div>';
 }
+function limparFiltro(){
+  var s=document.getElementById('filtroAno'); if(s) s.value='';
+  aplicarFiltroAno('');
+}
 function aplicarFiltroAno(ano){
   var o = ano ? SAFRAS_JS[ano] : TOTAL_ANO;
   if(!o) return;
@@ -1916,6 +1922,7 @@ function aplicarFiltroAno(ano){
     var elL=document.getElementById('rpLtv'); if(elL) elL.textContent='R$ '+_fmtN(Math.round(ltvS));
     var subL=document.getElementById('rpLtvSub'); if(subL) subL.textContent=ano?('ARPU x '+tc.toFixed(1).replace('.',',')+' meses de casa'):'receita que esses clientes ainda renderiam';
   }
+  _destacarSafra(ano);
   _renderPlanos(ano);
 }
 
@@ -1931,6 +1938,15 @@ function aplicarFiltroAno(ano){
     scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:colors.border},title:{display:true,text:'no mês',color:'#7d8b9e'},ticks:{callback:function(v){return 'R$ '+(v/1000)+'k';}}},y1:{position:'right',beginAtZero:true,grid:{display:false},title:{display:true,text:'acumulado',color:'#7d8b9e'},ticks:{callback:function(v){return 'R$ '+(v/1000000).toFixed(1)+' mi';}}}}}});
 })();
 
+function _destacarSafra(ano){
+  var trs=document.querySelectorAll('#tab-clientes table tbody tr');
+  for(var i=0;i<trs.length;i++){
+    var c=trs[i].cells[0]; if(!c) continue;
+    if(trs[i].className==='tot') continue;
+    var v=(c.textContent||'').trim();
+    trs[i].className = (ano && v===String(ano)) ? 'sel' : '';
+  }
+}
 function _renderPlanos(ano){
   var linhas=[], totA=0, totS=0;
   PLANOS.forEach(function(p){
@@ -1948,6 +1964,8 @@ function _renderPlanos(ano){
       var churn = (l.a+l.s)?(100*l.s/(l.a+l.s)):0;
       html+='<tr><td style="text-align:left"><b>'+l.n+'</b></td><td>'+_fmtN(l.a)+'</td><td>'+(totA?(100*l.a/totA).toFixed(1).replace('.',','):'0')+'%</td><td>'+_fmtN(l.s)+'</td><td>'+churn.toFixed(1).replace('.',',')+'%</td></tr>';
     });
+    var churnTot=(totA+totS)?(100*totS/(totA+totS)):0;
+    html+='<tr class="tot"><td style="text-align:left">Total</td><td>'+_fmtN(totA)+'</td><td>100%</td><td>'+_fmtN(totS)+'</td><td>'+churnTot.toFixed(1).replace('.',',')+'%</td></tr>';
     tb.innerHTML=html;
   }
   var el=document.getElementById('chartPlanos'); if(!el) return;
