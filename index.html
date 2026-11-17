@@ -787,17 +787,21 @@ Chart.register({id:'numCli',afterDatasetsDraw:function(ch){
           if(tops[j]===undefined||el.y<tops[j]) tops[j]=el.y;
         });
       });
-      ctx.font='700 10px Quicksand,sans-serif'; ctx.fillStyle='#5f6f85';
+      var totalGeral=0; Object.keys(soma).forEach(function(j){ totalGeral+=soma[j]; });
       Object.keys(tops).forEach(function(j){
         if(!soma[j]) return;
         var m0=ch.getDatasetMeta(0); var el=m0.data[j]; if(!el) return;
+        var pct=totalGeral?(100*soma[j]/totalGeral):0;
+        ctx.font='700 11px Quicksand,sans-serif'; ctx.fillStyle='#00306e';
         ctx.fillText(String(soma[j]), el.x, tops[j]-6);
+        ctx.font='700 9px Quicksand,sans-serif'; ctx.fillStyle='#8a94a6';
+        ctx.fillText(pct.toFixed(1).replace('.',',')+'%', el.x, tops[j]-19);
       });
     }
     ctx.restore();
   }catch(e){}
 }});;
-var BUILD='2026-11-17T22:20';  // atualizado a cada publicacao
+var BUILD='2026-11-17T22:40';  // atualizado a cada publicacao
 // TAB1
 document.getElementById('statsCusto').innerHTML='<div class="stat"><div class="stat-label">Custo Total (10 meses)</div><div class="stat-value">R$ '+grandTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})+'</div><div class="stat-sub">Fixo: R$ '+grandFixo.toLocaleString('pt-BR',{minimumFractionDigits:0})+' + Combustível: R$ '+grandFuel.toLocaleString('pt-BR',{minimumFractionDigits:0})+'</div></div><div class="stat"><div class="stat-label">Total de OS</div><div class="stat-value">'+grandOS.toLocaleString('pt-BR')+'</div><div class="stat-sub">Excluindo setores 76 e 84</div></div><div class="stat"><div class="stat-label">Custo por OS</div><div class="stat-value">R$ '+grandCPOS.toFixed(2)+'</div><div class="stat-sub">Média geral da equipe</div></div><div class="stat"><div class="stat-label">Custo Mensal Médio</div><div class="stat-value">R$ '+(grandTotal/mesesC.length).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div><div class="stat-sub">Inclui meses com equipe reduzida</div></div>';
 new Chart(document.getElementById('chartCost'),{type:'bar',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[{label:'Custo Fixo',data:monthlyTotals.map(function(m){return m.fixo;}),backgroundColor:colors.primary,borderRadius:4,stack:'a'},{label:'Combustível',data:monthlyTotals.map(function(m){return m.fuel;}),backgroundColor:colors.green,borderRadius:4,stack:'a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'k';}}}}}});
@@ -1902,7 +1906,7 @@ var EXITS={"2018": {"s": {"2016": [259, 0, 24.5], "2017": [245, 6, 13.9], "2018"
   window.__safraChart=new Chart(elS,{type:'bar',data:{labels:ANOS.map(String),datasets:[
       {label:'Cancelou o contrato',data:[],backgroundColor:'#00439c',borderRadius:4,stack:'s'},
       {label:'Só foi negativado',data:[],backgroundColor:'#d33a3a',borderRadius:4,stack:'s'}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+c.raw+' clientes';}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true,grid:{color:colors.border},title:{display:true,text:'clientes',color:'#7d8b9e'}}}}});
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:22}},plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': '+c.raw+' clientes';},footer:function(items){ if(!items.length) return ''; var c=items[0].chart, tot=0; c.data.datasets.forEach(function(ds,i){ if(c.isDatasetVisible&&!c.isDatasetVisible(i)) return; (ds.data||[]).forEach(function(v){ tot+=Number(v)||0; }); }); var v=Number(items[0].parsed.y)||0; return tot?((100*v/tot).toFixed(1).replace('.',',')+'% do total de saídas'):''; }}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true,grid:{color:colors.border},title:{display:true,text:'clientes',color:'#7d8b9e'}}}}});
 
   window.__mesChart=new Chart(document.getElementById('chartChurnMes'),{type:'line',data:{labels:MESES.slice(0,11),datasets:[{label:'Saídas no mês',data:[],borderColor:'#d33a3a',backgroundColor:'rgba(211,58,58,.12)',fill:true,tension:.3,pointRadius:5,pointBackgroundColor:'#d33a3a'}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:colors.border}},x:{grid:{display:false}}}}});
