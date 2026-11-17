@@ -604,6 +604,23 @@ tr:hover{background:#f5f8ff}
 <h2 style="font-size:1.05rem;margin-bottom:4px">Clientes: LTV e as safras que perdemos em 2026</h2>
 <p class="subtitle" style="margin-bottom:16px">Base ativa de 14.096 clientes em 15.122 contratos · 31.652 contratos lidos no IXC em 17/11/2026 · saída apurada por cliente, não por contrato</p>
 
+<div class="chart-container">
+  <div class="chart-title">Filtrar por ano de instalação</div>
+  <div class="chart-sub">Escolha a safra para ver só os clientes instalados naquele ano. Cliente com mais de um contrato conta pela primeira ativação.</div>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0 4px">
+    <label for="filtroAno" style="font-size:.78rem;font-weight:700;color:var(--primary)">Ano de instalação</label>
+    <select id="filtroAno" onchange="aplicarFiltroAno(this.value)" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;font-size:.82rem;color:var(--text);background:#fff">
+      <option value="">Todos os anos</option>
+      <option value="2016">2016</option><option value="2017">2017</option><option value="2018">2018</option>
+      <option value="2019">2019</option><option value="2020">2020</option><option value="2021">2021</option>
+      <option value="2022">2022</option><option value="2023">2023</option><option value="2024">2024</option>
+      <option value="2025">2025</option><option value="2026">2026</option>
+    </select>
+    <span id="filtroNota" style="font-size:.72rem;color:var(--muted)"></span>
+  </div>
+  <div class="stats" id="fichaAno" style="margin-top:12px"></div>
+</div>
+
 <div class="stats">
   <div class="stat"><div class="stat-label">Clientes ativos</div><div class="stat-value">14.096</div><div class="stat-sub">15.122 contratos ativos</div></div>
   <div class="stat"><div class="stat-label">ARPU</div><div class="stat-value">R$ 85,78</div><div class="stat-sub">média dos contratos com valor · mediana R$ 50</div></div>
@@ -637,6 +654,17 @@ tr:hover{background:#f5f8ff}
   <div class="jn-l" style="margin-top:14px"><b>Como ler:</b> cada linha é uma safra, ou seja, os clientes instalados naquele ano. Sobrevivência é quanto da safra segue ativa hoje. O LTV realizado é o ARPU multiplicado pelo tempo médio de casa de quem saiu daquela safra. Os 3 clientes sem data de ativação ficaram fora da tabela.</div>
 </div>
 
+
+<div class="chart-container">
+  <div class="chart-title">Plano do cliente</div>
+  <div class="chart-sub">Distribuição da base ativa por faixa de plano e o desempenho de cada faixa em 2026. O filtro de ano acima também vale aqui.</div>
+  <div class="chart-box" style="height:300px"><canvas id="chartPlanos"></canvas></div>
+  <table style="margin-top:16px">
+    <thead><tr><th>Plano</th><th>Clientes ativos</th><th>% da base</th><th>Saíram em 2026</th><th>Churn da faixa</th></tr></thead>
+    <tbody id="planosTbody"></tbody>
+  </table>
+  <div class="jn-l" style="margin-top:12px"><b>Como ler:</b> churn da faixa é quantos saíram dividido por quem estava na faixa (ativos mais saídas). Não mostro ARPU por plano porque o campo de valor do IXC só está preenchido em 37% dos contratos e mistura valor de ativação com mensalidade, o que distorceria a comparação entre faixas.</div>
+</div>
 <div class="chart-container">
   <div class="chart-title">O que os números dizem</div>
   <div class="frentes">
@@ -704,7 +732,7 @@ Chart.defaults.font.family='-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,san
 Chart.defaults.font.size=11;
 function showTab(name,btn){document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.getElementById('tab-'+name).classList.add('active');if(btn)btn.classList.add('active');}
 var colors={primary:'#00439c',green:'#159c57',amber:'#fbb900',border:'#e3e9f2',red:'#d33a3a',yellow:'#fbb900',orange:'#ff7043'};
-var BUILD='2026-11-17T16:30';  // atualizado a cada publicacao
+var BUILD='2026-11-17T17:20';  // atualizado a cada publicacao
 // TAB1
 document.getElementById('statsCusto').innerHTML='<div class="stat"><div class="stat-label">Custo Total (10 meses)</div><div class="stat-value">R$ '+grandTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})+'</div><div class="stat-sub">Fixo: R$ '+grandFixo.toLocaleString('pt-BR',{minimumFractionDigits:0})+' + Combustível: R$ '+grandFuel.toLocaleString('pt-BR',{minimumFractionDigits:0})+'</div></div><div class="stat"><div class="stat-label">Total de OS</div><div class="stat-value">'+grandOS.toLocaleString('pt-BR')+'</div><div class="stat-sub">Excluindo setores 76 e 84</div></div><div class="stat"><div class="stat-label">Custo por OS</div><div class="stat-value">R$ '+grandCPOS.toFixed(2)+'</div><div class="stat-sub">Média geral da equipe</div></div><div class="stat"><div class="stat-label">Custo Mensal Médio</div><div class="stat-value">R$ '+(grandTotal/mesesC.length).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div><div class="stat-sub">Inclui meses com equipe reduzida</div></div>';
 new Chart(document.getElementById('chartCost'),{type:'bar',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[{label:'Custo Fixo',data:monthlyTotals.map(function(m){return m.fixo;}),backgroundColor:colors.primary,borderRadius:4,stack:'a'},{label:'Combustível',data:monthlyTotals.map(function(m){return m.fuel;}),backgroundColor:colors.green,borderRadius:4,stack:'a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'k';}}}}}});
@@ -1831,6 +1859,64 @@ function calcRepo(){
 })();
 
 var USERS=[{u:'wellerson',n:'Wellerson',role:'full',h:'ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f'}];
+var PLANOS=[{"n": "1 GIGA", "a": 2186, "s": 211, "arpu": 105.09, "nv": 914}, {"n": "800MB", "a": 3586, "s": 513, "arpu": 87.82, "nv": 1830}, {"n": "600MB", "a": 3578, "s": 627, "arpu": 78.74, "nv": 2111}, {"n": "500MB", "a": 974, "s": 76, "arpu": 85.87, "nv": 242}, {"n": "450MB", "a": 1112, "s": 143, "arpu": 64.35, "nv": 235}, {"n": "400MB", "a": 1400, "s": 239, "arpu": 48.4, "nv": 441}, {"n": "300MB", "a": 410, "s": 58, "arpu": 138.0, "nv": 152}, {"n": "200MB", "a": 4, "s": 0, "arpu": 2800.0, "nv": 1}, {"n": "150MB", "a": 16, "s": 4, "arpu": 0, "nv": 0}, {"n": "100MB", "a": 92, "s": 18, "arpu": 226.0, "nv": 5}, {"n": "50 a 90MB", "a": 223, "s": 29, "arpu": 139.38, "nv": 14}, {"n": "até 40MB", "a": 41, "s": 7, "arpu": 232.5, "nv": 4}, {"n": "Legado (cabo e rádio)", "a": 460, "s": 73, "arpu": 101.85, "nv": 34}, {"n": "Empresarial", "a": 5, "s": 0, "arpu": 187.0, "nv": 3}, {"n": "Sem velocidade", "a": 9, "s": 0, "arpu": 237.62, "nv": 4}];
+var PLANO_ANO={"Legado (cabo e rádio)": {"2016": [202, 33], "2015": [9, 2], "2014": [0, 0], "2018": [101, 19], "2020": [2, 0], "2017": [105, 13], "2019": [40, 6], "2021": [1, 0]}, "300MB": {"2016": [52, 0], "2018": [52, 4], "2020": [47, 4], "2017": [35, 1], "2019": [50, 4], "2021": [26, 4], "2022": [15, 2], "2023": [15, 4], "2024": [103, 30], "2025": [15, 5]}, "450MB": {"2016": [184, 6], "2013": [1, 0], "2014": [2, 0], "2020": [65, 10], "2017": [97, 8], "2018": [147, 15], "2019": [50, 5], "2021": [114, 18], "2022": [196, 37], "2023": [190, 33], "2024": [57, 11], "2025": [2, 0], "2026": [7, 0]}, "400MB": {"2016": [125, 15], "2020": [174, 30], "2015": [0, 0], "2017": [73, 5], "2018": [139, 17], "2019": [155, 15], "2021": [125, 23], "2022": [118, 8], "2023": [136, 37], "2024": [115, 28], "2025": [147, 46], "2026": [93, 15]}, "50 a 90MB": {"2016": [35, 4], "2013": [0, 0], "2018": [71, 7], "2014": [0, 0], "2015": [0, 0], "2020": [33, 8], "2017": [34, 6], "2019": [39, 4], "2021": [9, 0], "2022": [1, 0], "2023": [0, 0], "2024": [1, 0]}, "Sem velocidade": {"2020": [1, 0], "2016": [1, 0], "2017": [0, 0], "2021": [1, 0], "2023": [2, 0], "2022": [0, 0], "2024": [2, 0], "2025": [1, 0], "2026": [1, 0]}, "600MB": {"2016": [91, 3], "2015": [4, 0], "2020": [133, 13], "2018": [124, 6], "2017": [67, 2], "2019": [124, 11], "2021": [175, 17], "2022": [205, 16], "2024": [437, 101], "2023": [309, 48], "2025": [833, 258], "2026": [1076, 152]}, "até 40MB": {"2016": [9, 0], "2018": [9, 1], "2015": [0, 0], "2020": [3, 1], "2017": [7, 3], "2019": [12, 2], "2021": [1, 0], "2022": [0, 0]}, "500MB": {"2016": [140, 1], "2014": [1, 0], "2017": [72, 4], "2015": [0, 0], "2020": [107, 10], "2018": [155, 5], "2019": [76, 4], "2021": [55, 2], "2022": [43, 2], "2023": [50, 4], "2024": [154, 25], "2025": [104, 18], "2026": [17, 1]}, "1 GIGA": {"2016": [64, 1], "2015": [1, 0], "2014": [1, 0], "2018": [116, 7], "2017": [75, 1], "2020": [157, 10], "2019": [115, 5], "2021": [223, 15], "2022": [172, 19], "2025": [315, 39], "2023": [278, 32], "2024": [421, 56], "2026": [248, 26]}, "100MB": {"2016": [1, 0], "2015": [0, 0], "2020": [39, 6], "2017": [9, 2], "2018": [5, 1], "2019": [14, 4], "2021": [15, 2], "2022": [6, 3], "2023": [2, 0], "2026": [1, 0]}, "800MB": {"2016": [59, 3], "2020": [173, 8], "2015": [2, 0], "2017": [60, 5], "2018": [92, 5], "2019": [112, 3], "2021": [212, 17], "2022": [164, 18], "2023": [317, 28], "2024": [1154, 223], "2025": [674, 120], "2026": [567, 83]}, "Empresarial": {"2016": [1, 0], "2017": [1, 0], "2018": [0, 0], "2019": [0, 0], "2020": [0, 0], "2021": [2, 0], "2026": [1, 0]}, "200MB": {"2016": [1, 0], "2018": [1, 0], "2019": [1, 0], "2020": [0, 0], "2026": [1, 0]}, "150MB": {"2016": [1, 0], "2017": [0, 0], "2018": [0, 0], "2019": [1, 0], "2020": [0, 0], "2021": [9, 3], "2022": [5, 0], "2023": [0, 1]}};
+var SAFRAS_JS={2016:{inst:2328,a:966,canc:11,neg:18,tc:118.4},2017:{inst:1567,a:635,canc:14,neg:13,tc:107.3},2018:{inst:2359,a:1012,canc:31,neg:32,tc:95.4},2019:{inst:1796,a:789,canc:37,neg:17,tc:85.3},2020:{inst:1964,a:934,canc:49,neg:43,tc:71.6},2021:{inst:2075,a:968,canc:50,neg:50,tc:59.3},2022:{inst:1857,a:925,canc:53,neg:65,tc:47.6},2023:{inst:2425,a:1299,canc:89,neg:116,tc:35.1},2024:{inst:4348,a:2444,canc:176,neg:320,tc:22.9},2025:{inst:2903,a:2091,canc:170,neg:344,tc:11.7},2026:{inst:2289,a:2012,canc:119,neg:181,tc:3.5}};
+var TOTAL_ANO={inst:26049,a:14096,canc:802,neg:1199,tc:30.4};
+var ARPU_BASE=85.78;
+
+function _fmtN(v){return (v||0).toLocaleString('pt-BR');}
+function _fichaCard(rot,val,sub){
+  return '<div class="stat"><div class="stat-label">'+rot+'</div><div class="stat-value">'+val+'</div><div class="stat-sub">'+sub+'</div></div>';
+}
+function aplicarFiltroAno(ano){
+  var o = ano ? SAFRAS_JS[ano] : TOTAL_ANO;
+  if(!o) return;
+  var inst = o.inst||0, at = o.a||0;
+  var s = (o.canc||0)+(o.neg||0);
+  var tc = o.tc||0;
+  var ltv = tc*ARPU_BASE;
+  var sobrev = inst ? (100*at/inst) : 0;
+  var box=document.getElementById('fichaAno');
+  if(box){
+    box.innerHTML =
+      _fichaCard('Clientes instalados', _fmtN(inst), ano?('safra de '+ano):'toda a base já instalada')+
+      _fichaCard('Ativos hoje', _fmtN(at), 'sobrevivência de '+(sobrev).toFixed(1).replace('.',',')+'% da safra')+
+      _fichaCard('Saíram em 2026', _fmtN(s), (o.canc||0)+' cancelaram · '+(o.neg||0)+' negativaram')+
+      _fichaCard('Tempo médio de casa', tc.toFixed(1).replace('.',',')+' meses', 'de quem saiu em 2026')+
+      _fichaCard('LTV realizado', 'R$ '+_fmtN(Math.round(ltv)), 'ARPU x tempo de casa');
+  }
+  var nota=document.getElementById('filtroNota');
+  if(nota) nota.textContent = ano ? ('recorte da safra '+ano+' · '+(s? Math.round(100*s/(at+s)):0)+'% da safra já saiu') : 'base completa';
+  _renderPlanos(ano);
+}
+function _renderPlanos(ano){
+  var linhas=[], totA=0, totS=0;
+  PLANOS.forEach(function(p){
+    var a=p.a, s=p.s;
+    if(ano){ var v=(PLANO_ANO[p.n]||{})[ano]; a=v?v[0]:0; s=v?v[1]:0; }
+    if(a===0&&s===0) return;
+    linhas.push({n:p.n,a:a,s:s,arpu:p.arpu,nv:p.nv});
+    totA+=a; totS+=s;
+  });
+  linhas.sort(function(x,y){return y.a-x.a;});
+  var tb=document.getElementById('planosTbody');
+  if(tb){
+    var html='';
+    linhas.forEach(function(l){
+      var churn = (l.a+l.s)?(100*l.s/(l.a+l.s)):0;
+      html+='<tr><td style="text-align:left"><b>'+l.n+'</b></td><td>'+_fmtN(l.a)+'</td><td>'+(totA?(100*l.a/totA).toFixed(1).replace('.',','):'0')+'%</td><td>'+_fmtN(l.s)+'</td><td>'+churn.toFixed(1).replace('.',',')+'%</td></tr>';
+    });
+    tb.innerHTML=html;
+  }
+  var el=document.getElementById('chartPlanos'); if(!el) return;
+  var top=linhas.slice(0,10);
+  if(window.__planChart){ window.__planChart.destroy(); }
+  window.__planChart=new Chart(el,{type:'bar',data:{labels:top.map(function(x){return x.n;}),datasets:[{label:'Clientes ativos',data:top.map(function(x){return x.a;}),backgroundColor:'#00439c',borderRadius:4}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return _fmtN(c.raw)+' clientes ativos';}}}},scales:{x:{beginAtZero:true,grid:{color:colors.border}},y:{grid:{display:false}}}}});
+}
+(function(){ if(document.getElementById('fichaAno')) aplicarFiltroAno(''); })();
+
 var _sess=null;
 function _customUsuarios(){ try{ return JSON.parse(localStorage.getItem('vg_users')||'[]'); }catch(e){ return []; } }
 function _listaUsuarios(){
