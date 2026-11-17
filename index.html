@@ -704,6 +704,24 @@ tr:hover{background:#f5f8ff}
   <div class="alert-item">LTV calculado como ARPU x tempo de casa. A receita efetivamente paga por cliente não está liberada na API do IXC (recurso de contas a receber retorna sem permissão), então não é caixa realizado cliente a cliente.</div>
   <div class="alert-item">ARPU apurado em 5.606 contratos ativos com valor preenchido, 37% dos ativos, com mediana de R$ 50.</div>
 </div>
+
+<div class="chart-container">
+  <div class="chart-title">Receita perdida em 2026</div>
+  <div class="chart-sub">O que saiu da base levado a reais. MRR e LTV usam o ARPU de R$ 85,78. Os cartões de MRR e LTV seguem o filtro de safra; o acumulado do ano e os bloqueados são sempre da base inteira.</div>
+  <div class="stats">
+    <div class="stat"><div class="stat-label">MRR perdido por mês</div><div class="stat-value" id="rpMrr">R$ 171.646</div><div class="stat-sub" id="rpMrrSub">2.001 clientes que saíram</div></div>
+    <div class="stat"><div class="stat-label">Receita perdida no ano</div><div class="stat-value">R$ 1.011.175</div><div class="stat-sub">acumulado de jan a nov, base total</div></div>
+    <div class="stat"><div class="stat-label">LTV perdido</div><div class="stat-value" id="rpLtv">R$ 5.206.743</div><div class="stat-sub" id="rpLtvSub">receita que esses clientes ainda renderiam</div></div>
+    <div class="stat"><div class="stat-label">Receita em risco hoje</div><div class="stat-value">R$ 35.684</div><div class="stat-sub">416 clientes bloqueados, por mês</div></div>
+  </div>
+  <div class="chart-wrapper"><canvas id="chartReceita"></canvas></div>
+  <table style="margin-top:14px">
+    <thead><tr><th>Safra</th><th>Saídas</th><th>MRR perdido</th><th>LTV perdido</th><th>% do LTV</th></tr></thead>
+    <tbody><tr><td style="text-align:left"><b>2016</b></td><td>29</td><td>R$ 2.488</td><td>R$ 294.534</td><td>5,7%</td></tr><tr><td style="text-align:left"><b>2017</b></td><td>27</td><td>R$ 2.316</td><td>R$ 248.513</td><td>4,8%</td></tr><tr><td style="text-align:left"><b>2018</b></td><td>63</td><td>R$ 5.404</td><td>R$ 515.555</td><td>9,9%</td></tr><tr><td style="text-align:left"><b>2019</b></td><td>54</td><td>R$ 4.632</td><td>R$ 395.120</td><td>7,6%</td></tr><tr><td style="text-align:left"><b>2020</b></td><td>92</td><td>R$ 7.892</td><td>R$ 565.050</td><td>10,9%</td></tr><tr><td style="text-align:left"><b>2021</b></td><td>100</td><td>R$ 8.578</td><td>R$ 508.675</td><td>9,8%</td></tr><tr><td style="text-align:left"><b>2022</b></td><td>118</td><td>R$ 10.122</td><td>R$ 481.809</td><td>9,3%</td></tr><tr><td style="text-align:left"><b>2023</b></td><td>205</td><td>R$ 17.585</td><td>R$ 617.230</td><td>11,9%</td></tr><tr><td style="text-align:left"><b>2024</b></td><td>496</td><td>R$ 42.547</td><td>R$ 974.324</td><td>18,7%</td></tr><tr><td style="text-align:left"><b>2025</b></td><td>514</td><td>R$ 44.091</td><td>R$ 515.864</td><td>9,9%</td></tr><tr><td style="text-align:left"><b>2026</b></td><td>300</td><td>R$ 25.734</td><td>R$ 90.069</td><td>1,7%</td></tr></tbody>
+  </table>
+  <div class="jn-l" style="margin-top:14px"><b>Como a conta é feita:</b> a receita perdida no ano soma, mês a mês, o MRR de quem saiu multiplicado pelos meses que ainda faltavam para dezembro. Quem saiu em janeiro custou onze meses; quem saiu em novembro, um. O LTV perdido é o MRR multiplicado pelo tempo médio de casa da safra, ou seja, a receita que aqueles clientes ainda teriam gerado se ficassem.</div>
+  <div class="jn-l"><b>O que esse número não é:</b> é piso, não teto. O cliente negativado já vinha com fatura em aberto antes de ser negativado, então a perda de caixa começou antes da data que aparece aqui. E o LTV usa ARPU médio, não a receita real de cada cliente.</div>
+</div>
 </div>
 
 <div class="footer">Dados: IXC Web (API) + Planilha de Combustível (Bd_TickeckLOG) · Custo fixo: R$ 4.475,44/mês · Combustível: dados reais por abastecimento · Afastamentos: Jose Fernando (04/06, INSS) e Charles (02/08-01/09, voltou 02/09) · Setores 76 e 84 excluídos · Atualizado em 07/11/2026 — dados reais até 31/10/2026</div>
@@ -732,7 +750,7 @@ Chart.defaults.font.family='-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,san
 Chart.defaults.font.size=11;
 function showTab(name,btn){document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.getElementById('tab-'+name).classList.add('active');if(btn)btn.classList.add('active');}
 var colors={primary:'#00439c',green:'#159c57',amber:'#fbb900',border:'#e3e9f2',red:'#d33a3a',yellow:'#fbb900',orange:'#ff7043'};
-var BUILD='2026-11-17T17:45';  // atualizado a cada publicacao
+var BUILD='2026-11-17T18:20';  // atualizado a cada publicacao
 // TAB1
 document.getElementById('statsCusto').innerHTML='<div class="stat"><div class="stat-label">Custo Total (10 meses)</div><div class="stat-value">R$ '+grandTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})+'</div><div class="stat-sub">Fixo: R$ '+grandFixo.toLocaleString('pt-BR',{minimumFractionDigits:0})+' + Combustível: R$ '+grandFuel.toLocaleString('pt-BR',{minimumFractionDigits:0})+'</div></div><div class="stat"><div class="stat-label">Total de OS</div><div class="stat-value">'+grandOS.toLocaleString('pt-BR')+'</div><div class="stat-sub">Excluindo setores 76 e 84</div></div><div class="stat"><div class="stat-label">Custo por OS</div><div class="stat-value">R$ '+grandCPOS.toFixed(2)+'</div><div class="stat-sub">Média geral da equipe</div></div><div class="stat"><div class="stat-label">Custo Mensal Médio</div><div class="stat-value">R$ '+(grandTotal/mesesC.length).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div><div class="stat-sub">Inclui meses com equipe reduzida</div></div>';
 new Chart(document.getElementById('chartCost'),{type:'bar',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[{label:'Custo Fixo',data:monthlyTotals.map(function(m){return m.fixo;}),backgroundColor:colors.primary,borderRadius:4,stack:'a'},{label:'Combustível',data:monthlyTotals.map(function(m){return m.fuel;}),backgroundColor:colors.green,borderRadius:4,stack:'a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'k';}}}}}});
@@ -1888,8 +1906,29 @@ function aplicarFiltroAno(ano){
   }
   var nota=document.getElementById('filtroNota');
   if(nota) nota.textContent = ano ? ('recorte da safra '+ano+' · '+(s? Math.round(100*s/(at+s)):0)+'% da safra já saiu') : 'base completa';
+  var elM=document.getElementById('rpMrr');
+  if(elM){
+    var mrrS=s*ARPU_BASE, ltvS=mrrS*tc;
+    elM.textContent='R$ '+_fmtN(Math.round(mrrS));
+    var subM=document.getElementById('rpMrrSub'); if(subM) subM.textContent=_fmtN(s)+(ano?(' clientes da safra '+ano):' clientes que saíram');
+    var elL=document.getElementById('rpLtv'); if(elL) elL.textContent='R$ '+_fmtN(Math.round(ltvS));
+    var subL=document.getElementById('rpLtvSub'); if(subL) subL.textContent=ano?('ARPU x '+tc.toFixed(1).replace('.',',')+' meses de casa'):'receita que esses clientes ainda renderiam';
+  }
   _renderPlanos(ano);
 }
+
+(function(){
+  var el=document.getElementById('chartReceita'); if(!el) return;
+  var meses=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov'];
+  var mrr=[15869,11323,15955,13725,13124,12610,22817,23590,16641,18100,7892];
+  var acum=[174562,287792,431388,541186,633056,708714,822802,917160,967084,1003283,1011175];
+  window.__recChart=new Chart(el,{data:{labels:meses,datasets:[
+    {type:'bar',label:'MRR que parou no mês',data:mrr,backgroundColor:'#ef4444',borderRadius:4,yAxisID:'y'},
+    {type:'line',label:'Perdido acumulado no ano',data:acum,borderColor:'#00439c',backgroundColor:'#00439c',borderWidth:2,pointRadius:3,tension:.3,yAxisID:'y1'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+Number(c.raw).toLocaleString('pt-BR');}}}},
+    scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:colors.border},title:{display:true,text:'no mês',color:'#7d8b9e'},ticks:{callback:function(v){return 'R$ '+(v/1000)+'k';}}},y1:{position:'right',beginAtZero:true,grid:{display:false},title:{display:true,text:'acumulado',color:'#7d8b9e'},ticks:{callback:function(v){return 'R$ '+(v/1000000).toFixed(1)+' mi';}}}}}});
+})();
+
 function _renderPlanos(ano){
   var linhas=[], totA=0, totS=0;
   PLANOS.forEach(function(p){
