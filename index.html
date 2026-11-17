@@ -108,6 +108,7 @@ tr:hover{background:rgba(59,130,246,.05)}
 <button class="tab" onclick="showTab('redeneutra',this)">Rede Neutra</button>
 <button class="tab" onclick="showTab('projetos',this)">Projetos</button>
 <button class="tab" onclick="showTab('pessoas',this)">Pessoas</button>
+<button class="tab" onclick="showTab('clientes',this)">Clientes</button>
 </div>
 <div id="tab-custo" class="tab-content active">
 
@@ -513,6 +514,65 @@ tr:hover{background:rgba(59,130,246,.05)}
 </div>
 </div>
 
+
+<div class="tab-content" id="tab-clientes">
+<h2 style="font-size:1.05rem;margin-bottom:4px">Clientes: LTV e as safras que perdemos em 2026</h2>
+<p class="subtitle" style="margin-bottom:16px">Base ativa de 14.099 clientes em 15.122 contratos · contratos e cancelamentos do IXC em 17/11/2026</p>
+
+<div class="stats">
+  <div class="stat"><div class="stat-label">Clientes ativos</div><div class="stat-value">14.099</div><div class="stat-sub">15.122 contratos ativos</div></div>
+  <div class="stat"><div class="stat-label">ARPU</div><div class="stat-value">R$ 85,78</div><div class="stat-sub">média dos contratos com valor · mediana R$ 50</div></div>
+  <div class="stat"><div class="stat-label">Tempo médio de casa</div><div class="stat-value">46 meses</div><div class="stat-sub">mediana de 35 meses na base ativa</div></div>
+  <div class="stat"><div class="stat-label">LTV estimado</div><div class="stat-value">R$ 3.984</div><div class="stat-sub">ARPU x tempo médio de casa</div></div>
+  <div class="stat"><div class="stat-label">Saíram em 2026</div><div class="stat-value">956</div><div class="stat-sub">clientes · 994 contratos</div></div>
+  <div class="stat"><div class="stat-label">MRR perdido</div><div class="stat-value">R$ 82 mil</div><div class="stat-sub">cerca de R$ 984 mil por ano</div></div>
+</div>
+
+<div class="grid-2">
+  <div class="chart-container">
+    <div class="chart-title">Quem saiu em 2026, por ano de instalação</div>
+    <div class="chart-wrapper"><canvas id="chartSafra"></canvas></div>
+  </div>
+  <div class="chart-container">
+    <div class="chart-title">Cancelamentos por mês em 2026</div>
+    <div class="chart-wrapper"><canvas id="chartChurnMes"></canvas></div>
+  </div>
+</div>
+
+<div class="chart-container">
+  <div class="chart-title">Safra por safra: sobrevivência, tempo de casa e LTV realizado</div>
+  <table><thead><tr><th style="text-align:left">Safra</th><th>Instalados</th><th>Ativos hoje</th><th>Sobrevivência</th><th>Saíram em 2026</th><th>% do churn</th><th>Tempo médio de casa</th><th>LTV realizado</th></tr></thead>
+  <tbody><tr><td style="text-align:left"><b>2016</b></td><td>2.346</td><td>697</td><td>29,7%</td><td><b>17</b></td><td>1,7%</td><td>117,2 meses</td><td>R$ 10.057</td></tr><tr><td style="text-align:left"><b>2017</b></td><td>1.769</td><td>516</td><td>29,2%</td><td><b>17</b></td><td>1,7%</td><td>107,6 meses</td><td>R$ 9.234</td></tr><tr><td style="text-align:left"><b>2018</b></td><td>2.645</td><td>876</td><td>33,1%</td><td><b>37</b></td><td>3,7%</td><td>95,2 meses</td><td>R$ 8.163</td></tr><tr><td style="text-align:left"><b>2019</b></td><td>2.179</td><td>773</td><td>35,5%</td><td><b>47</b></td><td>4,7%</td><td>85,3 meses</td><td>R$ 7.319</td></tr><tr><td style="text-align:left"><b>2020</b></td><td>2.428</td><td>1.020</td><td>42,0%</td><td><b>60</b></td><td>6,1%</td><td>72,0 meses</td><td>R$ 6.178</td></tr><tr><td style="text-align:left"><b>2021</b></td><td>2.529</td><td>1.063</td><td>42,0%</td><td><b>63</b></td><td>6,4%</td><td>59,5 meses</td><td>R$ 5.108</td></tr><tr><td style="text-align:left"><b>2022</b></td><td>2.348</td><td>1.088</td><td>46,3%</td><td><b>69</b></td><td>7,0%</td><td>48,0 meses</td><td>R$ 4.114</td></tr><tr><td style="text-align:left"><b>2023</b></td><td>2.829</td><td>1.461</td><td>51,6%</td><td><b>104</b></td><td>10,5%</td><td>34,9 meses</td><td>R$ 2.994</td></tr><tr><td style="text-align:left"><b>2024</b></td><td>5.000</td><td>2.818</td><td>56,4%</td><td><b>211</b></td><td>21,3%</td><td>23,2 meses</td><td>R$ 1.991</td></tr><tr><td style="text-align:left"><b>2025</b></td><td>3.352</td><td>2.400</td><td>71,6%</td><td><b>201</b></td><td>20,3%</td><td>13,2 meses</td><td>R$ 1.131</td></tr><tr><td style="text-align:left"><b>2026</b></td><td>2.759</td><td>2.396</td><td>86,8%</td><td><b>165</b></td><td>16,6%</td><td>2,0 meses</td><td>R$ 172</td></tr></tbody></table>
+  <div class="jn-l" style="margin-top:14px"><b>Como ler:</b> cada linha é uma safra, ou seja, os clientes instalados naquele ano. A coluna de sobrevivência mostra quanto da safra continua ativa hoje, e o LTV realizado é o ARPU multiplicado pelo tempo médio de casa dos clientes daquela safra que já saíram.</div>
+</div>
+
+<div class="chart-container">
+  <div class="chart-title">O que os números dizem</div>
+  <div class="frentes">
+    <div class="frente"><div class="frente-h">Onde o churn se concentra</div><div class="frente-t">41% saíram com 1 a 2 anos de casa</div>
+    <div class="frente-i">Safras 2024 e 2025 somam 412 das 991 saídas com data de instalação.</div>
+    <div class="frente-i">Somando 2026, quase 6 em cada 10 saídas são de clientes instalados nos últimos 3 anos.</div>
+    <div class="frente-f">O cliente não sai na porta de entrada: ele sai quando o encanto passa e o concorrente aparece com preço.</div></div>
+    <div class="frente"><div class="frente-h">Quanto custa cada saída</div><div class="frente-t">R$ 2.964 de LTV realizado</div>
+    <div class="frente-i">956 clientes saíram levando cerca de R$ 2,8 milhões de LTV já realizado.</div>
+    <div class="frente-i">O MRR que sai da base é de aproximadamente R$ 82 mil por mês.</div>
+    <div class="frente-f">Reter 10% dessas saídas preservaria cerca de R$ 98 mil de receita por ano.</div></div>
+    <div class="frente"><div class="frente-h">O valor do cliente antigo</div><div class="frente-t">Safra 2016 vale 5 vezes a safra 2025</div>
+    <div class="frente-i">Cliente instalado em 2016 acumula tempo médio de 117 meses, LTV de R$ 10 mil.</div>
+    <div class="frente-i">O instalado em 2025 fica 13 meses, com LTV de R$ 1,1 mil.</div>
+    <div class="frente-f">Cada ponto de retenção no primeiro ano vale mais que qualquer ação de aquisição.</div></div>
+  </div>
+</div>
+
+<div class="alert-box" style="background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.25)">
+  <div class="alert-title" style="color:var(--amber)">Metodologia e limites</div>
+  <div class="alert-item">LTV calculado como ARPU x tempo de casa em meses, porque a API não libera a receita por cliente: o recurso de contas a receber (fn_areceber) retorna sem permissão para este token.</div>
+  <div class="alert-item">ARPU de R$ 85,78 é a média dos contratos com valor preenchido, que são 37% dos ativos. A mediana é R$ 50. Vale confirmar com a folha de faturamento para fechar o número exato.</div>
+  <div class="alert-item">Das 994 saídas de 2026, 991 têm data de instalação. Os motivos de cancelamento vêm em código numérico e a tabela de motivos não está liberada na API.</div>
+  <div class="alert-item">Base: 31.652 contratos lidos, 14.099 clientes com contrato ativo hoje.</div>
+</div>
+</div>
+
 <div class="footer">Dados: IXC Web (API) + Planilha de Combustível (Bd_TickeckLOG) · Custo fixo: R$ 4.475,44/mês · Combustível: dados reais por abastecimento · Afastamentos: Jose Fernando (04/06, INSS) e Charles (02/08-01/09, voltou 02/09) · Setores 76 e 84 excluídos · Atualizado em 07/11/2026 — dados reais até 31/10/2026</div>
 <script>
 const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago"];
@@ -539,7 +599,7 @@ Chart.defaults.font.family='-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,san
 Chart.defaults.font.size=11;
 function showTab(name,btn){document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active');});document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});document.getElementById('tab-'+name).classList.add('active');if(btn)btn.classList.add('active');}
 var colors={primary:'#3b82f6',green:'#10b981',amber:'#f59e0b',border:'#334155',red:'#ef4444'};
-var BUILD='2026-11-07T16:35';  // atualizado a cada publicacao
+var BUILD='2026-11-17T12:40';  // atualizado a cada publicacao
 // TAB1
 document.getElementById('statsCusto').innerHTML='<div class="stat"><div class="stat-label">Custo Total (10 meses)</div><div class="stat-value">R$ '+grandTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})+'</div><div class="stat-sub">Fixo: R$ '+grandFixo.toLocaleString('pt-BR',{minimumFractionDigits:0})+' + Combustível: R$ '+grandFuel.toLocaleString('pt-BR',{minimumFractionDigits:0})+'</div></div><div class="stat"><div class="stat-label">Total de OS</div><div class="stat-value">'+grandOS.toLocaleString('pt-BR')+'</div><div class="stat-sub">Excluindo setores 76 e 84</div></div><div class="stat"><div class="stat-label">Custo por OS</div><div class="stat-value">R$ '+grandCPOS.toFixed(2)+'</div><div class="stat-sub">Média geral da equipe</div></div><div class="stat"><div class="stat-label">Custo Mensal Médio</div><div class="stat-value">R$ '+(grandTotal/mesesC.length).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div><div class="stat-sub">Inclui meses com equipe reduzida</div></div>';
 new Chart(document.getElementById('chartCost'),{type:'bar',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[{label:'Custo Fixo',data:monthlyTotals.map(function(m){return m.fixo;}),backgroundColor:colors.primary,borderRadius:4,stack:'a'},{label:'Combustível',data:monthlyTotals.map(function(m){return m.fuel;}),backgroundColor:colors.green,borderRadius:4,stack:'a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'k';}}}}}});
@@ -1480,7 +1540,8 @@ var ABAS={
   reincidencia:{rotulo:'Reincidência',fonte:'IXC',viva:false},
   redeneutra:{rotulo:'Rede Neutra',fonte:'IXC (carteira VLAN KW)',viva:true},
   projetos:{rotulo:'Projetos',fonte:'InCicle',viva:true},
-  pessoas:{rotulo:'Pessoas',fonte:'Planilha de RH do setor',viva:false}
+  pessoas:{rotulo:'Pessoas',fonte:'Planilha de RH do setor',viva:false},
+  clientes:{rotulo:'Clientes',fonte:'IXC cliente_contrato',viva:false}
 };
 function _p2(n){return String(n).padStart(2,'0');}
 function _fmtTs(iso){
@@ -1630,6 +1691,18 @@ function calcRepo(){
    '<div class="calc-c" style="border-color:var(--primary)"><div class="calc-l">Custo de uma reposição</div><div class="calc-v" style="color:var(--primary)">'+_brl(total,0)+'</div><div class="calc-h">'+ (total/sal).toFixed(1).replace('.',',')+' salários</div></div>'+
    '<div class="calc-c"><div class="calc-l">Três reposições no ano</div><div class="calc-v">'+_brl(porAno,0)+'</div><div class="calc-h">é o que a rotatividade tira do setor</div></div>';
 }
+
+(function(){
+  var elS=document.getElementById('chartSafra'); if(!elS) return;
+  var anos=[2016,2017,2018,2019,2020,2021,2022,2023,2024,2025,2026];
+  var saiu=[17,17,37,47,60,63,69,104,211,201,165];
+  var ltv=[10057,9234,8163,7319,6178,5108,4114,2994,1991,1131,172];
+  new Chart(elS,{type:'bar',data:{labels:anos.map(String),datasets:[{label:'Clientes que saíram em 2026',data:saiu,backgroundColor:anos.map(function(a){return a>=2024?'#ef4444':(a>=2022?'#f59e0b':'#3b82f6');}),borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){return c.raw+' clientes · LTV de R$ '+ltv[c.dataIndex].toLocaleString('pt-BR');}}}},scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:colors.border},title:{display:true,text:'clientes',color:'#94a3b8'}}}}});
+  var elM=document.getElementById('chartChurnMes');
+  new Chart(elM,{type:'line',data:{labels:['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov'],datasets:[{label:'Cancelamentos',data:[81,58,82,76,82,79,183,129,91,89,44],borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,.12)',fill:true,tension:.3,pointRadius:5,pointBackgroundColor:'#ef4444'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:colors.border}},x:{grid:{display:false}}}}});
+})();
 _montarBarras();
 calcSob();
 calcRepo();
