@@ -672,7 +672,7 @@ tr:hover{background:#f5f8ff}
 
 <div class="chart-container">
   <div class="chart-title">Plano do cliente</div>
-  <div class="chart-sub">Distribuição da base ativa por faixa de plano e o desempenho de cada faixa em 2026. O filtro de ano acima também vale aqui.</div>
+  <div class="chart-sub">Distribuição da base ativa por faixa de plano e o que cada faixa perdeu no ano escolhido em "Ano da saída".</div>
   <div class="chart-box" style="height:300px"><canvas id="chartPlanos"></canvas></div>
   <table style="margin-top:16px">
     <thead><tr><th>Plano</th><th>Clientes ativos</th><th>% da base</th><th>Saíram em 2026</th><th>Churn da faixa</th></tr></thead>
@@ -797,7 +797,7 @@ Chart.register({id:'numCli',afterDatasetsDraw:function(ch){
     ctx.restore();
   }catch(e){}
 }});;
-var BUILD='2026-11-17T21:55';  // atualizado a cada publicacao
+var BUILD='2026-11-17T22:20';  // atualizado a cada publicacao
 // TAB1
 document.getElementById('statsCusto').innerHTML='<div class="stat"><div class="stat-label">Custo Total (10 meses)</div><div class="stat-value">R$ '+grandTotal.toLocaleString('pt-BR',{minimumFractionDigits:2})+'</div><div class="stat-sub">Fixo: R$ '+grandFixo.toLocaleString('pt-BR',{minimumFractionDigits:0})+' + Combustível: R$ '+grandFuel.toLocaleString('pt-BR',{minimumFractionDigits:0})+'</div></div><div class="stat"><div class="stat-label">Total de OS</div><div class="stat-value">'+grandOS.toLocaleString('pt-BR')+'</div><div class="stat-sub">Excluindo setores 76 e 84</div></div><div class="stat"><div class="stat-label">Custo por OS</div><div class="stat-value">R$ '+grandCPOS.toFixed(2)+'</div><div class="stat-sub">Média geral da equipe</div></div><div class="stat"><div class="stat-label">Custo Mensal Médio</div><div class="stat-value">R$ '+(grandTotal/mesesC.length).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'</div><div class="stat-sub">Inclui meses com equipe reduzida</div></div>';
 new Chart(document.getElementById('chartCost'),{type:'bar',data:{labels:monthlyTotals.map(function(m){return m.mes;}),datasets:[{label:'Custo Fixo',data:monthlyTotals.map(function(m){return m.fixo;}),backgroundColor:colors.primary,borderRadius:4,stack:'a'},{label:'Combustível',data:monthlyTotals.map(function(m){return m.fuel;}),backgroundColor:colors.green,borderRadius:4,stack:'a'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'},tooltip:{callbacks:{label:function(c){return c.dataset.label+': R$ '+c.raw.toLocaleString('pt-BR',{minimumFractionDigits:2});}}}},scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:colors.border},ticks:{callback:function(v){return 'R$ '+(v/1000).toFixed(0)+'k';}}}}}});
@@ -1890,6 +1890,7 @@ function calcRepo(){
    '<div class="calc-c"><div class="calc-l">Três reposições no ano</div><div class="calc-v">'+_brl(porAno,0)+'</div><div class="calc-h">é o que a rotatividade tira do setor</div></div>';
 }
 
+var PLANO_SAIDA={"2018": {"Legado (cabo e rádio)": 615, "50 a 90MB": 25, "até 40MB": 45, "Sem velocidade": 1, "Empresarial": 4, "500MB": 1, "100MB": 1}, "2019": {"50 a 90MB": 120, "Legado (cabo e rádio)": 495, "até 40MB": 37, "600MB": 1, "500MB": 1, "300MB": 2, "Empresarial": 4}, "2021": {"Legado (cabo e rádio)": 99, "50 a 90MB": 454, "500MB": 76, "100MB": 376, "300MB": 119, "até 40MB": 42, "Sem velocidade": 1, "600MB": 7, "150MB": 44, "Empresarial": 1, "1 GIGA": 1}, "2020": {"Legado (cabo e rádio)": 481, "50 a 90MB": 269, "até 40MB": 127, "100MB": 89, "300MB": 27, "500MB": 26, "Empresarial": 3, "200MB": 8}, "2017": {"50 a 90MB": 9, "Legado (cabo e rádio)": 402, "300MB": 1, "até 40MB": 11, "Sem velocidade": 1, "500MB": 1}, "2016": {"Legado (cabo e rádio)": 113, "até 40MB": 5}, "2022": {"100MB": 215, "50 a 90MB": 316, "500MB": 69, "150MB": 145, "Legado (cabo e rádio)": 8, "300MB": 164, "600MB": 28, "até 40MB": 16, "1 GIGA": 2, "Sem velocidade": 1, "Empresarial": 2}, "2026": {"450MB": 148, "1 GIGA": 234, "400MB": 267, "800MB": 550, "600MB": 658, "500MB": 82, "300MB": 55, "100MB": 2, "50 a 90MB": 1, "150MB": 1}, "2025": {"400MB": 309, "600MB": 518, "800MB": 718, "450MB": 333, "500MB": 37, "300MB": 155, "50 a 90MB": 5, "1 GIGA": 106, "100MB": 9, "Legado (cabo e rádio)": 1, "Empresarial": 1, "150MB": 2}, "2023": {"300MB": 154, "50 a 90MB": 228, "100MB": 284, "600MB": 137, "1 GIGA": 17, "450MB": 97, "150MB": 174, "500MB": 30, "Legado (cabo e rádio)": 2, "até 40MB": 2, "400MB": 1, "Sem velocidade": 1}, "2024": {"600MB": 232, "400MB": 195, "50 a 90MB": 91, "800MB": 140, "450MB": 408, "1 GIGA": 101, "100MB": 76, "150MB": 30, "300MB": 139, "500MB": 15, "até 40MB": 1, "Empresarial": 3}};
 var EXITS={"2018": {"s": {"2016": [259, 0, 24.5], "2017": [245, 6, 13.9], "2018": [182, 0, 4.2]}, "m": [47, 28, 23, 28, 30, 47, 64, 82, 42, 57, 111, 133], "tot": 692, "c": 686, "n": 6, "tc": 15.3}, "2019": {"s": {"2019": [126, 6, 6.2], "2016": [114, 3, 35.2], "2017": [137, 1, 24.0], "2018": [265, 8, 12.0]}, "m": [65, 47, 33, 35, 54, 48, 41, 67, 53, 56, 43, 118], "tot": 660, "c": 642, "n": 18, "tc": 17.4}, "2021": {"s": {"2016": [73, 4, 58.7], "2018": [173, 9, 35.9], "M": [3, 0, 78.7], "2019": [205, 12, 23.6], "2017": [54, 6, 46.6], "2021": [240, 48, 4.7], "2020": [356, 37, 11.4]}, "m": [51, 88, 82, 123, 109, 138, 156, 102, 89, 86, 70, 126], "tot": 1220, "c": 1104, "n": 116, "tc": 20.5}, "2020": {"s": {"2016": [126, 3, 47.2], "2018": [286, 6, 23.6], "2019": [319, 26, 12.9], "2017": [132, 3, 35.9], "2020": [110, 18, 5.9], "M": [1, 0, 65]}, "m": [94, 51, 67, 62, 71, 73, 124, 111, 98, 94, 66, 119], "tot": 1030, "c": 974, "n": 56, "tc": 22.4}, "2017": {"s": {"2016": [289, 0, 9.5], "M": [44, 0, 16.6], "2017": [92, 0, 3.5]}, "m": [40, 169, 26, 13, 24, 25, 38, 17, 25, 21, 10, 17], "tot": 425, "c": 425, "n": 0, "tc": 9.0}, "2016": {"s": {"M": [42, 0, 17.3], "2016": [76, 0, 3.4]}, "m": [0, 0, 0, 0, 0, 0, 0, 4, 15, 12, 73, 14], "tot": 118, "c": 118, "n": 0, "tc": 8.4}, "2022": {"s": {"2016": [20, 9, 71.0], "2021": [169, 206, 10.8], "2022": [47, 145, 4.9], "2017": [27, 16, 59.9], "2018": [54, 29, 48.5], "2020": [88, 58, 23.7], "2019": [52, 46, 35.7]}, "m": [69, 99, 96, 56, 68, 73, 117, 101, 68, 55, 69, 95], "tot": 966, "c": 457, "n": 509, "tc": 21.3}, "2026": {"s": {"2016": [11, 18, 118.4], "2023": [87, 118, 35.1], "2025": [170, 344, 11.7], "2021": [50, 50, 59.3], "2018": [31, 32, 95.4], "2019": [37, 17, 85.3], "2020": [48, 44, 71.6], "2024": [175, 321, 22.9], "2017": [14, 13, 107.3], "2026": [116, 184, 3.5], "2022": [52, 66, 47.6]}, "m": [185, 132, 186, 160, 152, 146, 266, 274, 194, 211, 92, 0], "tot": 1998, "c": 791, "n": 1207, "tc": 30.4}, "2025": {"s": {"2016": [11, 14, 107.0], "2020": [37, 45, 61.5], "2017": [19, 13, 97.2], "2019": [19, 23, 73.1], "2024": [164, 922, 11.2], "2021": [50, 70, 49.2], "2023": [81, 201, 24.2], "2022": [63, 85, 36.7], "M": [0, 1, 126], "2025": [62, 280, 5.7], "2018": [14, 20, 84.7]}, "m": [135, 173, 67, 314, 122, 133, 195, 177, 146, 136, 292, 304], "tot": 2194, "c": 520, "n": 1674, "tc": 22.4}, "2023": {"s": {"2016": [16, 13, 82.3], "2021": [83, 101, 22.7], "2019": [33, 34, 48.6], "2022": [118, 280, 10.7], "2018": [40, 21, 60.3], "2023": [33, 222, 5.0], "2020": [49, 52, 36.1], "2017": [20, 12, 71.8]}, "m": [93, 69, 118, 98, 116, 75, 135, 89, 60, 101, 73, 100], "tot": 1127, "c": 392, "n": 735, "tc": 22.2}, "2024": {"s": {"2016": [25, 6, 95.3], "2017": [11, 15, 83.8], "2021": [43, 74, 35.9], "2023": [86, 370, 11.2], "2024": [55, 356, 5.1], "2020": [45, 49, 48.5], "M": [1, 0, 112], "2022": [59, 126, 23.5], "2019": [26, 21, 60.5], "2018": [32, 31, 71.8]}, "m": [99, 71, 93, 79, 107, 80, 185, 190, 137, 99, 105, 186], "tot": 1431, "c": 383, "n": 1048, "tc": 23.0}};
 
 (function(){
@@ -2014,6 +2015,7 @@ var EXITS={"2018": {"s": {"2016": [259, 0, 24.5], "2017": [245, 6, 13.9], "2018"
     _renderCards(ano);
     _renderTabelaSafra(ano);
     _renderReceita(ano);
+    if(typeof _renderPlanos==='function') _renderPlanos(window.__ANO_SAIDA||2026);
   };
   window.filtroSaida=function(modo,btn){
     var btns=document.querySelectorAll('#tab-clientes .tech-btn');
@@ -2097,9 +2099,9 @@ function _destacarSafra(ano){
 }
 function _renderPlanos(ano){
   var linhas=[], totA=0, totS=0;
+  var psa=(window.PLANO_SAIDA&&PLANO_SAIDA[String(window.__ANO_SAIDA||2026)])||{};
   PLANOS.forEach(function(p){
-    var a=p.a, s=p.s;
-    if(ano){ var v=(PLANO_ANO[p.n]||{})[ano]; a=v?v[0]:0; s=v?v[1]:0; }
+    var a=p.a, s=psa[p.n]||0;
     if(a===0&&s===0) return;
     linhas.push({n:p.n,a:a,s:s,arpu:p.arpu,nv:p.nv});
     totA+=a; totS+=s;
